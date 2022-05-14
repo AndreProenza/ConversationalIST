@@ -2,6 +2,8 @@
 
 A mobile text-based chat application for Android Operating Systems.
 
+![ConversationalIST2](https://user-images.githubusercontent.com/78174997/168442370-834eda47-5517-472b-b0ca-ecc2ae1b5069.png)
+
 ## Introduction
 
 ConversationalIST is at powerful messaging application which explores several key aspects of mobile development, including location awareness, judicious use of limited resources, and social behavior.
@@ -37,7 +39,8 @@ ConversationalIST user communication is centered around chatrooms, which users c
 |Ability to submit media           |   Users should be able to submit a variety of simple media, including: Simple text messages.Photos taken from the phone’s camera. Geographic locations, to be shown as an embedded map with a button to request directions to the given location (e.g. by opening up Google Maps or other similar application). The user sharing a location should be able to specify the location by selecting it on a map, searching an address, or using the phone’s current location.
 | Notify user via a Notification   | If a message is sent to a chatroom the user has access to but the user is not actively watching, notify them via a Notification. Tapping the notification should take them directly to the specific chatroom to see the new messages.
 
----
+<img src="https://user-images.githubusercontent.com/78174997/168443250-d94029eb-9c45-43df-872c-7cb44c7fe0cc.jpg"/>
+
 
 ## Extra Features
 
@@ -72,6 +75,8 @@ we show a placeholder for them when the user is on a metered connection, retriev
 ## Context Awareness and Privacy
 
 Access to chatrooms is restricted to keep conversations private or in context. Three modes are supported:
+
+<img src="https://user-images.githubusercontent.com/78174997/168442705-11ed6c3c-e359-4742-afa3-5df646fe3f4a.png" width="470" height="300"/>
 
 | Mode                             | Context Awareness and Privacy Level                
 |:--------------------------------:|:---------------------------------
