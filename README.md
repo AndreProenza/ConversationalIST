@@ -12,10 +12,18 @@ ConversationalIST user communication is centered around chatrooms, which users c
 
 # Table of Contents
 1. [Introduction](#introduction)
-2. [Features](#features)
-7. [Used Technologies](#used-technologies)
-8. [References](#references)
-9. [Authors](#authors)
+2. [Features](#features) 
+3. [Extra Features](#extra-features)
+4. [Processing and Saving Data](#processing-and-saving-data)
+5. [Moderation and resource management](#moderation-and-resource-management)
+6. [Context Awareness and Privacy](#context-awareness-and-privacy)
+7. [Caching](#caching)
+8. [Getting Started](#getting-started)
+9. [Prerequisites](#prerequisites)
+10. [Setup](#setup)
+11. [Used Technologies](#used-technologies)
+12. [References](#references)
+13. [Authors](#authors)
 
 ---
 
