@@ -26,6 +26,7 @@ ConversationalIST user communication is centered around chatrooms, which users c
 11. [Used Technologies](#used-technologies)
 12. [References](#references)
 13. [Authors](#authors)
+14. [Information about the project statement and idea](#information-about-the-project-statement-and-idea)
 
 ---
 
@@ -139,5 +140,11 @@ The following instructions will get you a copy of the project up and running on 
 * **André Proença** - [GitHub](https://github.com/AndreProenza)
 * **Name1** - [GitHub]()
 * **Name2** - [GitHub]()
+
+---
+
+## Information about the project statement and idea 
+
+Project statement and idea were provided by [Instituto Superior Técnico](https://tecnico.ulisboa.pt/en/), however the system was developed by us.
 
 ---
