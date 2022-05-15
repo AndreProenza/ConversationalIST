@@ -139,7 +139,7 @@ The following instructions will get you a copy of the project up and running on 
 
 * **André Proença** - [GitHub](https://github.com/AndreProenza)
 * **Bernardo** - [GitHub](https://github.com/bernacv)
-* **Name2** - [GitHub]()
+* **António Martins** - [GitHub](https://github.com/AL-CT)
 
 ---
 
