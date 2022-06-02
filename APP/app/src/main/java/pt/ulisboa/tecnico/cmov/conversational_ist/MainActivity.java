@@ -73,30 +73,19 @@ public class MainActivity extends AppCompatActivity {
 
         JSONObject jsonObj = new JSONObject(params);
 
-        // on below line we are calling a string
-        // request method to post the data to our API
-        // in this we are calling a post method.
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, jsonObj,new com.android.volley.Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                // inside on response method we are
-                // hiding our progress bar
-                // and setting data to edit text as empty
                 loadingPB.setVisibility(View.GONE);
                 nameEdt.setText("");
 
-                // on below line we are displaying a success toast message.
                 Toast.makeText(MainActivity.this, "Data added to API", Toast.LENGTH_SHORT).show();
                 try {
-                    // on below line we are parsing the response
-                    // to json object to extract data from it.
 
-                    // below are the strings which we
-                    // extract from our json object.
                     String name = response.getString("name");
 
-                    // on below line we are setting this string s to our text view.
                     responseTV.setText("Name : " + name );
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -104,7 +93,6 @@ public class MainActivity extends AppCompatActivity {
         }, new com.android.volley.Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                // method to handle errors.
                 loadingPB.setVisibility(View.GONE);
                 Toast.makeText(MainActivity.this, "Fail to get response = " + error, Toast.LENGTH_SHORT).show();
                 responseTV.setText("Username already exists!");
