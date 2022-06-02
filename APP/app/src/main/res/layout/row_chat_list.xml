@@ -16,10 +16,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
-            android:layout_toEndOf="@id/profileimage"
-            android:layout_toRightOf="@id/profileimage"
+            android:layout_toEndOf="@id/lastmessge"
+            android:layout_toRightOf="@id/lastmessge"
             android:text="His Name"
-            android:textColor="@color/colorBlack"
+            android:textColor="@color/black"
             android:textSize="18sp" />
 
         <TextView
@@ -28,28 +28,10 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/nameonline"
             android:layout_marginStart="4dp"
-            android:layout_toEndOf="@id/profileimage"
-            android:layout_toRightOf="@id/profileimage"
             android:maxLines="2"
             android:text="Last Message"
-            android:textColor="@color/colorBlack" />
+            android:textColor="@color/black" />
 
-        <ImageView
-            android:id="@+id/blocking"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_gravity="center_vertical"
-            android:src="@drawable/ic_unblock" />
-
-        <ImageView
-            android:id="@+id/seen"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/blocking"
-            android:layout_alignParentEnd="true"
-            android:layout_gravity="center_vertical"
-            android:src="@drawable/ic_unblock" />
 
     </RelativeLayout>
 

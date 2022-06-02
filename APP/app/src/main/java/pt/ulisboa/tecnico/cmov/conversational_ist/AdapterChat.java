@@ -25,12 +25,10 @@ public class AdapterChat extends RecyclerView.Adapter<pt.ulisboa.tecnico.cmov.co
     private static final int MSG_TYPR_RIGHT = 1;
     Context context;
     List<ModelChat> list;
-    String imageurl;
 
-    public AdapterChat(Context context, List<ModelChat> list, String imageurl) {
+    public AdapterChat(Context context, List<ModelChat> list) {
         this.context = context;
         this.list = list;
-        this.imageurl = imageurl;
     }
 
     @NonNull

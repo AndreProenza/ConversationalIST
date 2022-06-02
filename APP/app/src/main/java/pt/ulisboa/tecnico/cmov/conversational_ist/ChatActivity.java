@@ -29,45 +29,53 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.volley.NetworkResponse;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.JsonRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class ChatActivity extends AppCompatActivity {
-    Toolbar toolbar;
+
     RecyclerView recyclerView;
-    ImageView profile, block;
-    TextView name, userstatus;
+    TextView name;
     EditText msg;
     ImageButton send, attach;
-    String uid, myuid, image;
-    List<ModelChat> chatList;
-    AdapterChat adapterChat;
+    String uid;
+    RequestQueue queue;
 
-    private static final int IMAGEPICK_GALLERY_REQUEST = 300;
-    private static final int IMAGE_PICKCAMERA_REQUEST = 400;
-    private static final int CAMERA_REQUEST = 100;
-    private static final int STORAGE_REQUEST = 200;
-    String cameraPermission[];
-    String storagePermission[];
-    Uri imageuri = null;
     boolean notify = false;
+    private AdapterChat adapterChat;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
+        queue = Volley.newRequestQueue(ChatActivity.this);
+
         // initialise the text views and layouts
         name = findViewById(R.id.nameptv);
         msg = findViewById(R.id.messaget);
         send = findViewById(R.id.sendmsg);
         attach = findViewById(R.id.attachbtn);
-        block = findViewById(R.id.block);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setStackFromEnd(true);
         recyclerView = findViewById(R.id.chatrecycle);
@@ -84,89 +92,111 @@ public class ChatActivity extends AppCompatActivity {
                 if (TextUtils.isEmpty(message)) {//if empty
                     Toast.makeText(ChatActivity.this, "Please Write Something Here", Toast.LENGTH_LONG).show();
                 } else {
-                    //sendmessage(message);
+                    sendmessage(message);
                 }
-                msg.setText("");
             }
         });
 
-        //readMessages();
+        readMessages();
     }
-/*
+
     private void readMessages() {
         // show message after retrieving data
-        chatList = new ArrayList<>();
-        DatabaseReference dbref = FirebaseDatabase.getInstance().getReference().child("Chats");
-        dbref.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+        ArrayList<ModelChat> chatList = new ArrayList<>();
 
-                chatList.clear();
-                for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
-                    ModelChat modelChat = dataSnapshot1.getValue(ModelChat.class);
-                    if (modelChat.getSender().equals(myuid) &&
-                            modelChat.getReceiver().equals(uid) ||
-                            modelChat.getReceiver().equals(myuid)
-                                    && modelChat.getSender().equals(uid)) {
-                        chatList.add(modelChat); // add the chat in chatlist
+        String url = "https://cmuapi.herokuapp.com/api/messages";
+
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("roomID", "628e16d233ad036d14ee279a");
+        params.put("token", "");
+        params.put("last", "2022-06-01T12:00:00Z");
+
+        JSONObject jsonObj = new JSONObject(params);
+
+        System.out.println("entrou");
+
+        CustomJsonArrayRequest request = new CustomJsonArrayRequest(Request.Method.GET, url, jsonObj, new com.android.volley.Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+                Toast.makeText(ChatActivity.this, "Messages received!", Toast.LENGTH_SHORT).show();
+                for (int i = 0; i < response.length(); i++) {
+                    try {
+                        JSONObject jresponse = response.getJSONObject(i);
+                        ModelChat modelChat = new ModelChat(jresponse.getString("message"), jresponse.getString("sender"), jresponse.getString("createdAt"));
+                        chatList.add(modelChat);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
-                    adapterChat = new AdapterChat(ChatActivity.this, chatList, image);
-                    adapterChat.notifyDataSetChanged();
-                    recyclerView.setAdapter(adapterChat);
                 }
+                Toast.makeText(ChatActivity.this, "Data " + chatList.get(0), Toast.LENGTH_SHORT).show();
+                adapterChat = new AdapterChat(ChatActivity.this, chatList);
+                adapterChat.notifyDataSetChanged();
+                recyclerView.setAdapter(adapterChat);
+                System.out.println("chega");
             }
-
+        }, new com.android.volley.Response.ErrorListener() {
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(ChatActivity.this, "Fail to get response = " + error, Toast.LENGTH_SHORT).show();
             }
-        });
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("name", "ola");
+                return params;
+            }
+        };
+
+        queue.add(request);
     }
 
     private void sendmessage(final String message) {
-        // creating a reference to store data in firebase
-        // We will be storing data using current time in "Chatlist"
-        // and we are pushing data using unique id in "Chats"
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
-        String timestamp = String.valueOf(System.currentTimeMillis());
-        HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put("sender", myuid);
-        hashMap.put("receiver", uid);
-        hashMap.put("message", message);
-        hashMap.put("timestamp", timestamp);
-        hashMap.put("dilihat", false);
-        hashMap.put("type", "text");
-        databaseReference.child("Chats").push().setValue(hashMap);
-        final DatabaseReference ref1 = FirebaseDatabase.getInstance().getReference("ChatList").child(uid).child(myuid);
-        ref1.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (!dataSnapshot.exists()) {
-                    ref1.child("id").setValue(myuid);
-                }
-            }
+        String url = "https://cmuapi.herokuapp.com/api/messages";
 
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("sender", "bcv");
+        params.put("roomID", "628e16d233ad036d14ee279a");
+        params.put("message", message);
+        params.put("token", "");
+        params.put("isPhoto", "false");
+
+        JSONObject jsonObj = new JSONObject(params);
+
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, jsonObj, new com.android.volley.Response.Listener<JSONObject>() {
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+            public void onResponse(JSONObject response) {
+                msg.getText().clear();
+
+                Toast.makeText(ChatActivity.this, "Message sent!", Toast.LENGTH_SHORT).show();
 
             }
-        });
-        final DatabaseReference ref2 = FirebaseDatabase.getInstance().getReference("ChatList").child(myuid).child(uid);
-        ref2.addValueEventListener(new ValueEventListener() {
+        }, new com.android.volley.Response.ErrorListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                if (!dataSnapshot.exists()) {
-                    ref2.child("id").setValue(uid);
-                }
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(ChatActivity.this, "Fail to get response = " + error, Toast.LENGTH_SHORT).show();
             }
-
+        }) {
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+            protected Map<String, String> getParams() {
+                // below line we are creating a map for
+                // storing our values in key and value pair.
+                Map<String, String> params = new HashMap<String, String>();
 
+                // on below line we are passing our key
+                // and value pair to our parameters.
+                params.put("name", "ola");
+
+                // at last we are
+                // returning our params.
+                return params;
             }
-        });
-    }*/
+        };
+        ;
+
+        queue.add(request);
+
+    }
 
 }
 

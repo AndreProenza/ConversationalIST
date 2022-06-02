@@ -18,7 +18,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="02/01/1990 06:19PM"
-            android:textColor="@color/colorBlack"
+            android:textColor="@color/black"
             android:textSize="12sp" />
 
         <TextView
@@ -27,10 +27,9 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_toEndOf="@id/timetv"
-            android:background="@drawable/bg_sender"
             android:padding="15dp"
             android:text="His Message"
-            android:textColor="@color/colorBlack"
+            android:textColor="@color/black"
             android:textSize="16sp" />
 
         <ImageView
@@ -39,10 +38,8 @@
             android:layout_height="200dp"
             android:layout_alignParentEnd="true"
             android:adjustViewBounds="true"
-            android:background="@drawable/bg_sender"
             android:padding="15dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/ic_images" />
+            android:scaleType="fitCenter"/>
 
     </RelativeLayout>
 

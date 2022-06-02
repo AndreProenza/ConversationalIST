@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
@@ -85,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
                     String name = response.getString("name");
 
                     responseTV.setText("Name : " + name );
+                    switchToChat();
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -122,6 +124,11 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString(getString(R.string.saved_username), nameEdt.getText().toString());
         editor.apply();
+    }
+
+    private void switchToChat() {
+        Intent switchActivityIntent = new Intent(this, ChatActivity.class);
+        startActivity(switchActivityIntent);
     }
 
 }
