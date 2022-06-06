@@ -104,21 +104,14 @@ public class ChatActivity extends AppCompatActivity {
         // show message after retrieving data
         ArrayList<ModelChat> chatList = new ArrayList<>();
 
-        String url = "https://cmuapi.herokuapp.com/api/messages";
+        String url = "http://cmuapi.herokuapp.com/api/messages?roomID=628e1fa903146c7d0cc43b23&token=a&last=2022-05-25T12:26:00Z";
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("roomID", "628e16d233ad036d14ee279a");
-        params.put("token", "");
-        params.put("last", "2022-06-01T12:00:00Z");
-
-        JSONObject jsonObj = new JSONObject(params);
-
-        System.out.println("entrou");
-
-        CustomJsonArrayRequest request = new CustomJsonArrayRequest(Request.Method.GET, url, jsonObj, new com.android.volley.Response.Listener<JSONArray>() {
+        JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, url, null, new com.android.volley.Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
                 Toast.makeText(ChatActivity.this, "Messages received!", Toast.LENGTH_SHORT).show();
+                System.out.println(response);
+
                 for (int i = 0; i < response.length(); i++) {
                     try {
                         JSONObject jresponse = response.getJSONObject(i);
@@ -132,11 +125,11 @@ public class ChatActivity extends AppCompatActivity {
                 adapterChat = new AdapterChat(ChatActivity.this, chatList);
                 adapterChat.notifyDataSetChanged();
                 recyclerView.setAdapter(adapterChat);
-                System.out.println("chega");
             }
         }, new com.android.volley.Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                System.out.println(error);
                 Toast.makeText(ChatActivity.this, "Fail to get response = " + error, Toast.LENGTH_SHORT).show();
             }
         }) {
@@ -147,6 +140,8 @@ public class ChatActivity extends AppCompatActivity {
                 return params;
             }
         };
+
+        System.out.println(request);
 
         queue.add(request);
     }

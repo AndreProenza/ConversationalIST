@@ -22,7 +22,8 @@
             android:text="His Message"
             android:textColor="@color/black"
             android:textSize="16sp"
-            android:visibility="gone" />
+            android:visibility="gone"
+            android:background="@color/design_default_color_primary"/>
 
         <ImageView
             android:id="@+id/images"

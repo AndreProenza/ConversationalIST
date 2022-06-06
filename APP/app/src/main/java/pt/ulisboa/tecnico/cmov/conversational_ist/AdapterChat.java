@@ -1,9 +1,12 @@
 package pt.ulisboa.tecnico.cmov.conversational_ist;
 
+import static android.content.Context.MODE_PRIVATE;
+
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +18,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
@@ -47,12 +51,10 @@ public class AdapterChat extends RecyclerView.Adapter<pt.ulisboa.tecnico.cmov.co
     public void onBindViewHolder(@NonNull Myholder holder, @SuppressLint("RecyclerView") final int position) {
         String message = list.get(position).getMessage();
         String timeStamp = list.get(position).getTimestamp();
-        String type = "ola";//list.get(position).getType();
-        Calendar calendar = Calendar.getInstance(Locale.ENGLISH);
-        calendar.setTimeInMillis(Long.parseLong(timeStamp));
-        String timedate = DateFormat.format("dd/MM/yyyy hh:mm aa", calendar).toString();
+        String type = "text";//list.get(position).getType();
         holder.message.setText(message);
-        holder.time.setText(timedate);
+        holder.time.setText(timeStamp);
+        //TODO change timeStamp
 
         if (type.equals("text")) {
             holder.message.setVisibility(View.VISIBLE);
@@ -62,8 +64,6 @@ public class AdapterChat extends RecyclerView.Adapter<pt.ulisboa.tecnico.cmov.co
             holder.message.setVisibility(View.GONE);
             holder.mimage.setVisibility(View.VISIBLE);
         }
-
-
     }
 
     @Override
@@ -73,14 +73,13 @@ public class AdapterChat extends RecyclerView.Adapter<pt.ulisboa.tecnico.cmov.co
 
     @Override
     public int getItemViewType(int position) {
-        /*
-        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        if (list.get(position).getSender().equals(firebaseUser.getUid())) {
+        SharedPreferences sh = context.getSharedPreferences("MyPrefs",MODE_PRIVATE);
+        String username = sh.getString(context.getString(R.string.saved_username),"");
+        if (list.get(position).getSender().equals(username)) {
             return MSG_TYPR_RIGHT;
         } else {
             return MSG_TYPE_LEFT;
-        }*/
-        return MSG_TYPE_LEFT;
+        }
     }
 
     class Myholder extends RecyclerView.ViewHolder {

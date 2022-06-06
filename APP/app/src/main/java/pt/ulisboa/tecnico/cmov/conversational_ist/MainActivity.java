@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
         responseTV = findViewById(R.id.textView1);
         loadingPB = findViewById(R.id.idLoadingPB);
 
-        sharedPref = getPreferences(Context.MODE_PRIVATE);
+        sharedPref = getSharedPreferences("MyPrefs",Context.MODE_PRIVATE);
 
         postDataBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -86,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
                     String name = response.getString("name");
 
                     responseTV.setText("Name : " + name );
+                    saveUsername(name);
                     switchToChat();
 
                 } catch (JSONException e) {
@@ -99,30 +100,15 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, "Fail to get response = " + error, Toast.LENGTH_SHORT).show();
                 responseTV.setText("Username already exists!");
             }
-        }) {
-            @Override
-            protected Map<String, String> getParams() {
-                // below line we are creating a map for
-                // storing our values in key and value pair.
-                Map<String, String> params = new HashMap<String, String>();
-
-                // on below line we are passing our key
-                // and value pair to our parameters.
-                params.put("name", name);
-
-                // at last we are
-                // returning our params.
-                return params;
-            }
-        };
+        });
         // below line is to make
         // a json object request.
         queue.add(request);
     }
 
-    public void login(View view) {
+    public void saveUsername(String username) {
         SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString(getString(R.string.saved_username), nameEdt.getText().toString());
+        editor.putString(getString(R.string.saved_username), username);
         editor.apply();
     }
 
