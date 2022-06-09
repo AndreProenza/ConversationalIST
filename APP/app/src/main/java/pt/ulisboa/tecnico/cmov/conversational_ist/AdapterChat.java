@@ -26,7 +26,7 @@ import java.util.Locale;
 
 public class AdapterChat extends RecyclerView.Adapter<pt.ulisboa.tecnico.cmov.conversational_ist.AdapterChat.Myholder> {
     private static final int MSG_TYPE_LEFT = 0;
-    private static final int MSG_TYPR_RIGHT = 1;
+    private static final int MSG_TYPE_RIGHT = 1;
     Context context;
     List<ModelChat> list;
 
@@ -76,7 +76,7 @@ public class AdapterChat extends RecyclerView.Adapter<pt.ulisboa.tecnico.cmov.co
         SharedPreferences sh = context.getSharedPreferences("MyPrefs",MODE_PRIVATE);
         String username = sh.getString(context.getString(R.string.saved_username),"");
         if (list.get(position).getSender().equals(username)) {
-            return MSG_TYPR_RIGHT;
+            return MSG_TYPE_RIGHT;
         } else {
             return MSG_TYPE_LEFT;
         }

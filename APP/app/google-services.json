@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "233987961318",
+    "project_id": "cmuapp-4cac7",
+    "storage_bucket": "cmuapp-4cac7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:233987961318:android:62b6195ba3a50db15de627",
+        "android_client_info": {
+          "package_name": "pt.ulisboa.tecnico.cmov.conversational_ist"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "233987961318-s3tjrcb5kfrfvmsatn8rslgbjm269ao3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAZ7x3CqQJfZEwX2B1DDQwHuPUfYYZsFuo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "233987961318-s3tjrcb5kfrfvmsatn8rslgbjm269ao3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
