@@ -38,8 +38,7 @@ public class ChatActivity extends AppCompatActivity {
     private AdapterChat adapterChat;
 
     private String roomID = "628e1fa903146c7d0cc43b23";
-    private String token = "";
-    private String last = "2022-05-25T12:26:00Z";
+    private String last = "2022-05-25T12:26:19.398+00:00";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,7 +78,7 @@ public class ChatActivity extends AppCompatActivity {
     private void readMessagesBefore() {
         ArrayList<ModelChat> chatList = new ArrayList<>();
 
-        String url = "http://10.0.2.2:8080/api/messages/before?roomID=" + roomID + "&token=" + token + "&last=" + last;
+        String url = "http://10.0.2.2:8080/api/messages/before?roomID=" + roomID + "&last=" + last;
 
         JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, url, null, new com.android.volley.Response.Listener<JSONArray>() {
             @Override
@@ -114,7 +113,7 @@ public class ChatActivity extends AppCompatActivity {
     private void readMessages() {
         ArrayList<ModelChat> chatList = new ArrayList<>();
 
-        String url = "http://10.0.2.2:8080/api/messages?roomID=" + roomID + "&token=" + token + "&last=" + last;
+        String url = "http://10.0.2.2:8080/api/messages?roomID=" + roomID + "&last=" + last;
 
         JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, url, null, new com.android.volley.Response.Listener<JSONArray>() {
             @Override
@@ -131,7 +130,6 @@ public class ChatActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 }
-                Toast.makeText(ChatActivity.this, "Data " + chatList.get(0), Toast.LENGTH_SHORT).show();
                 adapterChat = new AdapterChat(ChatActivity.this, chatList);
                 adapterChat.notifyDataSetChanged();
                 recyclerView.setAdapter(adapterChat);
@@ -153,7 +151,6 @@ public class ChatActivity extends AppCompatActivity {
         params.put("sender", "bcv");
         params.put("roomID", "628e16d233ad036d14ee279a");
         params.put("message", message);
-        params.put("token", "");
         params.put("isPhoto", "false");
 
         JSONObject jsonObj = new JSONObject(params);
@@ -162,9 +159,7 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onResponse(JSONObject response) {
                 msg.getText().clear();
-
                 Toast.makeText(ChatActivity.this, "Message sent!", Toast.LENGTH_SHORT).show();
-
             }
         }, new com.android.volley.Response.ErrorListener() {
             @Override

@@ -18,15 +18,10 @@ public class FirebaseMessageReceiver extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
 
-        // TODO(developer): Handle FCM messages here.
+        // TODO : save in the localDB -- redirect notification to chat
         Log.d(TAG, "From: " + remoteMessage.getFrom());
-
-
-        if (remoteMessage.getNotification() != null) {
-            Log.d(TAG, "Message Notification Body: " + remoteMessage.getNotification().getBody());
-            Log.d(TAG, "Message Notification Topic: " + remoteMessage.getData().get("topic"));
-            //TODO request message and put in dataset
-        }
+        Log.d(TAG, "Message Notification Body: " + remoteMessage.getNotification().getBody());
+        Log.d(TAG, "Message Notification Topic: " + remoteMessage.getData().get("topic"));
     }
 
 }

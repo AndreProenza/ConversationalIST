@@ -28,6 +28,7 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,19 +46,20 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        FirebaseMessaging.getInstance().subscribeToTopic("test").addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                Log.d(TAG, "Subscribe successful");
-            }
-        });
-
         nameEdt = findViewById(R.id.editText1);
         postDataBtn = findViewById(R.id.button1);
         responseTV = findViewById(R.id.textView1);
         loadingPB = findViewById(R.id.idLoadingPB);
 
         sharedPref = getSharedPreferences("MyPrefs",Context.MODE_PRIVATE);
+
+        //TODO : use this to enter in new room with ID
+        FirebaseMessaging.getInstance().subscribeToTopic("test").addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Log.d(TAG, "Subscribe successful");
+            }
+        });
 
         postDataBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -109,7 +111,18 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onErrorResponse(VolleyError error) {
                 loadingPB.setVisibility(View.GONE);
-                Toast.makeText(MainActivity.this, "Fail to get response = " + error, Toast.LENGTH_SHORT).show();
+                String body;
+                //get status code here
+                String statusCode = String.valueOf(error.networkResponse.statusCode);
+                //get response body and parse with appropriate encoding
+                if(error.networkResponse.data!=null) {
+                    try {
+                        body = new String(error.networkResponse.data,"UTF-8");
+                        Toast.makeText(MainActivity.this, "Error " + statusCode + " " + body, Toast.LENGTH_SHORT).show();
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
+                }
                 responseTV.setText("Username already exists!");
             }
         });
