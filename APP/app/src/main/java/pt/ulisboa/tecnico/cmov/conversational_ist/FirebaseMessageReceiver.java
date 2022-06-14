@@ -51,6 +51,7 @@ public class FirebaseMessageReceiver extends FirebaseMessagingService {
         Log.d(TAG, "Message Notification sender: " + remoteMessage.getData().get("sender"));
         Log.d(TAG, "Message Notification message: " + remoteMessage.getData().get("message"));
 
+        //TODO : chat activity open with DB data
         Intent notificationIntent = new Intent(getApplicationContext(), ChatActivity.class);
         //create pending intent
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);

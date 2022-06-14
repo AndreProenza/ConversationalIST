@@ -41,6 +41,8 @@ public class ChatActivity extends AppCompatActivity {
     private String roomID = "628e1fa903146c7d0cc43b23";
     private String last = "2022-05-25T12:26:19.398+00:00";
 
+    private final String BASE_URL = "https://cmuapi.herokuapp.com/api";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,7 +81,7 @@ public class ChatActivity extends AppCompatActivity {
     private void readMessagesBefore() {
         ArrayList<ModelChat> chatList = new ArrayList<>();
 
-        String url = "http://10.0.2.2:8080/api/messages/before?roomID=" + roomID + "&last=" + last;
+        String url = BASE_URL + "/messages/before?roomID=" + roomID + "&last=" + last;
 
         JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, url, null, new com.android.volley.Response.Listener<JSONArray>() {
             @Override
@@ -114,7 +116,7 @@ public class ChatActivity extends AppCompatActivity {
     private void readMessages() {
         ArrayList<ModelChat> chatList = new ArrayList<>();
 
-        String url = "http://10.0.2.2:8080/api/messages?roomID=" + roomID + "&last=" + last;
+        String url = BASE_URL + "/messages?roomID=" + roomID + "&last=" + last;
 
         JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, url, null, new com.android.volley.Response.Listener<JSONArray>() {
             @Override
@@ -145,7 +147,7 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void sendMessage(final String message) {
-        String url = "https://cmuapi.herokuapp.com/api/messages";
+        String url = BASE_URL + "/messages";
 
         //TODO arguments
         Map<String, String> params = new HashMap<String, String>();
