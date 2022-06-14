@@ -3,6 +3,7 @@ package pt.ulisboa.tecnico.cmov.conversational_ist;
 import static android.content.ContentValues.TAG;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
 
 
 import android.content.Context;
@@ -54,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
         sharedPref = getSharedPreferences("MyPrefs",Context.MODE_PRIVATE);
 
         //TODO : use this to enter in new room with ID
-        FirebaseMessaging.getInstance().subscribeToTopic("test").addOnSuccessListener(new OnSuccessListener<Void>() {
+        FirebaseMessaging.getInstance().subscribeToTopic("628e1fa903146c7d0cc43b23").addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
                 Log.d(TAG, "Subscribe successful");

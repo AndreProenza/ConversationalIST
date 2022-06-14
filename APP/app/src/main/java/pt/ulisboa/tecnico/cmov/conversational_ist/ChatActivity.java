@@ -37,6 +37,7 @@ public class ChatActivity extends AppCompatActivity {
 
     private AdapterChat adapterChat;
 
+    private String username = "bcv";
     private String roomID = "628e1fa903146c7d0cc43b23";
     private String last = "2022-05-25T12:26:19.398+00:00";
 
@@ -148,8 +149,8 @@ public class ChatActivity extends AppCompatActivity {
 
         //TODO arguments
         Map<String, String> params = new HashMap<String, String>();
-        params.put("sender", "bcv");
-        params.put("roomID", "628e16d233ad036d14ee279a");
+        params.put("sender", username);
+        params.put("roomID", roomID);
         params.put("message", message);
         params.put("isPhoto", "false");
 
