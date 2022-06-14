@@ -77,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void postDataUsingVolley(String name) {
         // url to post our data
+        switchToList();/*
         String url = "https://cmuapi.herokuapp.com/api/users";
         loadingPB.setVisibility(View.VISIBLE);
 
@@ -101,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
 
                     responseTV.setText("Name : " + name );
                     saveUsername(name);
-                    switchToChat();
+                    switchToList();
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -128,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
         });
         // below line is to make
         // a json object request.
-        queue.add(request);
+        queue.add(request);*/
     }
 
     public void saveUsername(String username) {
@@ -142,4 +143,8 @@ public class MainActivity extends AppCompatActivity {
         startActivity(switchActivityIntent);
     }
 
+    private void switchToList() {
+        Intent switchActivityIntent = new Intent(this, ChatListActivity.class);
+        startActivity(switchActivityIntent);
+    }
 }
