@@ -2,6 +2,12 @@ package pt.ulisboa.tecnico.cmov.conversational_ist;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -31,6 +37,9 @@ import java.util.Map;
 import pt.ulisboa.tecnico.cmov.conversational_ist.database.FeedReaderDbHelper;
 import pt.ulisboa.tecnico.cmov.conversational_ist.database.Message;
 import pt.ulisboa.tecnico.cmov.conversational_ist.database.NotifyActive;
+import pt.ulisboa.tecnico.cmov.conversational_ist.database.FeedReaderContract;
+import pt.ulisboa.tecnico.cmov.conversational_ist.database.FeedReaderDbHelper;
+import pt.ulisboa.tecnico.cmov.conversational_ist.database.Message;
 
 
 public class ChatActivity extends AppCompatActivity {
@@ -41,6 +50,19 @@ public class ChatActivity extends AppCompatActivity {
     ImageButton send, attach;
     String uid;
     RequestQueue queue;
+    List<ModelChat> messageList;
+
+    private final BroadcastReceiver Updated = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Bundle extras = intent.getExtras();
+            if (extras != null) {
+                messageList.add(new ModelChat(extras.getString("message"),extras.getString("sender"),extras.getString("date")));
+                adapterChat.notifyItemInserted(messageList.size() - 1);
+            }
+        }
+    };
 
     private AdapterChat adapterChat;
     private List<Message> chatList;
@@ -67,6 +89,7 @@ public class ChatActivity extends AppCompatActivity {
         queue = Volley.newRequestQueue(ChatActivity.this);
 
         // initialise the text views and layouts
+        messageList = new ArrayList<>();
         name = findViewById(R.id.nameptv);
         msg = findViewById(R.id.messaget);
         send = findViewById(R.id.sendmsg);
@@ -91,18 +114,36 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
-        fetchDbMessages();
+        loadMessages();
+
+        registerReceiver(Updated, new IntentFilter("message_inserted_"+roomID));
     }
 
-    private void fetchDbMessages() {
-        FeedReaderDbHelper db = FeedReaderDbHelper.getInstance(getApplicationContext());
-        chatList = db.getAllMessages();
-        adapterChat = new AdapterChat(ChatActivity.this, chatList);
+    private void loadMessages() {
+
+        SQLiteDatabase db = FeedReaderDbHelper.getInstance(getApplicationContext()).getReadableDatabase();
+
+        Cursor cursor = db.rawQuery("select * from " + FeedReaderContract.FeedEntry.MESSAGES_TABLE_NAME + " WHERE roomID = '" + roomID + "';",null);
+
+        if (cursor.moveToFirst()) {
+            while (!cursor.isAfterLast()) {
+                messageList.add(new ModelChat(cursor.getString(3),cursor.getString(1),cursor.getString(4)));
+                cursor.moveToNext();
+            }
+        }
+
+        /*if(!messageList.isEmpty())
+            last = messageList.get(messageList.size()-1).getTimestamp();*/ //TODO translate timestamp
+
+        adapterChat = new AdapterChat(ChatActivity.this, messageList);
+        adapterChat.notifyDataSetChanged();
         recyclerView.setAdapter(adapterChat);
+
+        readMessages();
+
     }
 
-    /*
-    private void readMessagesBefore() {
+   /* private void readMessagesBefore() {
         ArrayList<ModelChat> chatList = new ArrayList<>();
 
         String url = BASE_URL + "/messages/before?roomID=" + roomID + "&last=" + last;
@@ -135,10 +176,11 @@ public class ChatActivity extends AppCompatActivity {
         });
 
         queue.add(request);
-    }
+    }*/
+
+
 
     private void readMessages() {
-        ArrayList<ModelChat> chatList = new ArrayList<>();
 
         String url = BASE_URL + "/messages?roomID=" + roomID + "&last=" + last;
 
@@ -152,14 +194,21 @@ public class ChatActivity extends AppCompatActivity {
                     try {
                         JSONObject jresponse = response.getJSONObject(i);
                         ModelChat modelChat = new ModelChat(jresponse.getString("message"), jresponse.getString("sender"), jresponse.getString("createdAt"));
-                        chatList.add(modelChat);
+                        Message msg = new Message(jresponse.getString("id"),
+                                jresponse.getString("sender"),
+                                jresponse.getString("roomID"),
+                                jresponse.getString("message"),
+                                jresponse.getString("createdAt"),
+                                0);
+                        FeedReaderDbHelper.getInstance(getApplicationContext()).createMessage(msg, false);
+                        messageList.add(modelChat);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                 }
-                adapterChat = new AdapterChat(ChatActivity.this, chatList);
+
                 adapterChat.notifyDataSetChanged();
-                recyclerView.setAdapter(adapterChat);
+
             }
         }, new com.android.volley.Response.ErrorListener() {
             @Override

@@ -47,7 +47,9 @@ public class FirebaseMessageReceiver extends FirebaseMessagingService {
                 0);
 
         FeedReaderDbHelper db = FeedReaderDbHelper.getInstance(getApplicationContext());
-        db.createMessage(m);
+        db.createMessage(m,true);
+
+
 
         if(!NotifyActive.getInstance().getActive().equals(roomID)){
             sendNotification(title, message, roomID);
