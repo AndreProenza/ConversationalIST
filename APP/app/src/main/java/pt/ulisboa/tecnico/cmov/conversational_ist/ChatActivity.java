@@ -1,5 +1,7 @@
 package pt.ulisboa.tecnico.cmov.conversational_ist;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -23,7 +25,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import pt.ulisboa.tecnico.cmov.conversational_ist.database.FeedReaderDbHelper;
+import pt.ulisboa.tecnico.cmov.conversational_ist.database.Message;
+import pt.ulisboa.tecnico.cmov.conversational_ist.database.NotifyActive;
 
 
 public class ChatActivity extends AppCompatActivity {
@@ -36,6 +43,7 @@ public class ChatActivity extends AppCompatActivity {
     RequestQueue queue;
 
     private AdapterChat adapterChat;
+    private List<Message> chatList;
 
     private String username = "bcv";
     private String roomID = "628e1fa903146c7d0cc43b23";
@@ -47,6 +55,14 @@ public class ChatActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
+
+        Bundle b = getIntent().getExtras();
+        if(b != null) {
+            roomID = b.getString("roomID");
+            System.out.println("Abriu notificao com roomID : " + roomID);
+        }
+
+        //TODO listen data changes
 
         queue = Volley.newRequestQueue(ChatActivity.this);
 
@@ -75,9 +91,17 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
-        readMessages();
+        fetchDbMessages();
     }
 
+    private void fetchDbMessages() {
+        FeedReaderDbHelper db = FeedReaderDbHelper.getInstance(getApplicationContext());
+        chatList = db.getAllMessages();
+        adapterChat = new AdapterChat(ChatActivity.this, chatList);
+        recyclerView.setAdapter(adapterChat);
+    }
+
+    /*
     private void readMessagesBefore() {
         ArrayList<ModelChat> chatList = new ArrayList<>();
 
@@ -144,7 +168,7 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
         queue.add(request);
-    }
+    }*/
 
     private void sendMessage(final String message) {
         String url = BASE_URL + "/messages";
@@ -175,5 +199,16 @@ public class ChatActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        NotifyActive.getInstance().setActive("");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        NotifyActive.getInstance().setActive(roomID);
+    }
 }
 

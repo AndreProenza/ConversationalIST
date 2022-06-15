@@ -5,6 +5,7 @@ import static android.content.ContentValues.TAG;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.util.Log;
@@ -16,8 +17,11 @@ import androidx.lifecycle.MutableLiveData;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
+import java.util.Random;
+
 import pt.ulisboa.tecnico.cmov.conversational_ist.database.FeedReaderDbHelper;
 import pt.ulisboa.tecnico.cmov.conversational_ist.database.Message;
+import pt.ulisboa.tecnico.cmov.conversational_ist.database.NotifyActive;
 
 public class FirebaseMessageReceiver extends FirebaseMessagingService {
 
@@ -29,14 +33,15 @@ public class FirebaseMessageReceiver extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
 
-        // TODO : background save in the localDB -- redirect notification to chat -- implement isphoto with metered data
+        // TODO : implement isphoto with metered data
 
         String title = remoteMessage.getData().get("title");
         String message = remoteMessage.getData().get("message");
+        String roomID = remoteMessage.getData().get("roomID");
 
         Message m = new Message(remoteMessage.getData().get("id"),
                 remoteMessage.getData().get("sender"),
-                remoteMessage.getData().get("roomID"),
+                roomID,
                 message,
                 remoteMessage.getData().get("createdAt"),
                 0);
@@ -44,16 +49,16 @@ public class FirebaseMessageReceiver extends FirebaseMessagingService {
         FeedReaderDbHelper db = FeedReaderDbHelper.getInstance(getApplicationContext());
         db.createMessage(m);
 
-        System.out.println(db.getAllMessages());
+        if(!NotifyActive.getInstance().getActive().equals(roomID)){
+            sendNotification(title, message, roomID);
+        }
+    }
 
-        Log.d(TAG, "From: " + remoteMessage.getFrom());
-        Log.d(TAG, "Message Notification ID: " + remoteMessage.getData().get("id"));
-        Log.d(TAG, "Message Notification sender: " + remoteMessage.getData().get("sender"));
-        Log.d(TAG, "Message Notification message: " + remoteMessage.getData().get("message"));
-
-        //TODO : chat activity open with DB data
+    private void sendNotification(String title, String message, String roomID) {
         Intent notificationIntent = new Intent(getApplicationContext(), ChatActivity.class);
-        //create pending intent
+
+        notificationIntent.putExtra("roomID", roomID);
+
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
@@ -65,9 +70,11 @@ public class FirebaseMessageReceiver extends FirebaseMessagingService {
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this,"MyNotification")
                 .setContentTitle(title)
                 .setContentText(message).setSmallIcon(R.drawable.ic_launcher_foreground)
-                .setContentIntent(contentIntent);
+                .setContentIntent(contentIntent)
+                .setAutoCancel(true);
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+        //TODO change notification id
         notificationManager.notify(123, notificationBuilder.build());
     }
 
