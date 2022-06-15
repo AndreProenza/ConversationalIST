@@ -1,0 +1,176 @@
+package pt.ulisboa.tecnico.conversationalist.view.activities;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.drawerlayout.widget.DrawerLayout;
+
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Bundle;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.mikhaellopez.circularimageview.CircularImageView;
+
+import pt.ulisboa.tecnico.conversationalist.R;
+import pt.ulisboa.tecnico.conversationalist.firebase.FirebaseHandler;
+import pt.ulisboa.tecnico.conversationalist.model.User;
+import pt.ulisboa.tecnico.conversationalist.view.activities.profiles.MyProfileActivity;
+
+public class MainActivity extends AppCompatActivity {
+
+    private ActionBar actionBar;
+    private Toolbar toolbar;
+    private DrawerLayout drawerLayout;
+    //private LinearLayout btnGroups;
+    private LinearLayout btnLogOut;
+    //private LinearLayout btnSettings;
+    //private LinearLayout policyBtn;
+    private CircularImageView profileImage;
+    private TextView userName;
+
+    private FirebaseAuth mAuth;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        isUserLoggedIn();
+        init();
+        initProfile();
+        //initSettings();
+        //initPolicy();
+    }
+
+    private void initProfile() {
+        userName = findViewById(R.id.name);
+        profileImage = findViewById(R.id.profile);
+
+        String userId = mAuth.getUid().toString();
+        FirebaseHandler.getCurrentProfileInfo(userId, userName, profileImage);
+
+        profileImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, MyProfileActivity.class));
+            }
+        });
+    }
+
+    private void isUserLoggedIn() {
+        btnLogOut = findViewById(R.id.btnLogOut);
+        mAuth = FirebaseAuth.getInstance();
+
+        btnLogOut.setOnClickListener(view ->{
+            mAuth.signOut();
+            startActivity(new Intent(MainActivity.this, LoginActivity.class));
+        });
+    }
+
+    /**
+    private void initSettings() {
+        btnSettings = findViewById(R.id.settings_btn);
+        btnSettings.setOnClickListener(view ->{
+            startActivity(new Intent(MainActivity.this, MyProfileActivity.class));
+        });
+    }
+     */
+
+    private void init() {
+        toolbar = findViewById(R.id.toolbar);
+        drawerLayout =  findViewById(R.id.drawer_layout);
+        //btnGroups = findViewById(R.id.btn_groups);
+
+        //Set Actionbar
+        setSupportActionBar(toolbar);
+        actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setHomeButtonEnabled(true);
+
+        //Drawer
+        final NavigationView nav_view =  findViewById(R.id.nav_layout);
+        ActionBarDrawerToggle toggle =  new ActionBarDrawerToggle(this, drawerLayout, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
+            public void onDrawerOpened(View drawerView) { super.onDrawerOpened(drawerView); }
+        };
+
+        drawerLayout.setDrawerListener(toggle);
+        toggle.syncState();
+
+        nav_view.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
+                //TODO Later
+                drawerLayout.closeDrawers();
+                return true;
+            }
+        });
+
+        // initClick
+        nav_view.findViewById(R.id.btn_groups).setOnClickListener(v -> {
+            startActivity(new Intent(MainActivity.this, RoomsActivity.class));
+            drawerLayout.closeDrawers();
+        });
+
+        nav_view.findViewById(R.id.ln_new_group).setOnClickListener(v -> {
+            startActivity(new Intent(MainActivity.this, NewRoomActivity.class));
+            drawerLayout.closeDrawers();
+        });
+
+        nav_view.findViewById(R.id.settings_btn).setOnClickListener(v -> {
+            startActivity(new Intent(MainActivity.this, MyProfileActivity.class));
+            drawerLayout.closeDrawers();
+        });
+
+        /**
+        nav_view.findViewById(R.id.recommendations_btn).setOnClickListener(v -> {
+            startActivity(new Intent(MainActivity.this, Recommendations.class));
+            drawerLayout.closeDrawers();
+        });
+         */
+
+        nav_view.findViewById(R.id.ll_policy).setOnClickListener(v -> {
+            initPolicy();
+            drawerLayout.closeDrawers();
+        });
+
+        nav_view.findViewById(R.id.btnLogOut).setOnClickListener(v -> {
+            FirebaseAuth.getInstance().signOut();
+            startActivity(new Intent(MainActivity.this, LoginActivity.class));
+            drawerLayout.closeDrawers();
+        });
+
+        /**
+        btnGroups.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, RoomsActivity.class));
+            }
+        });
+         */
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user == null){
+            startActivity(new Intent(MainActivity.this, LoginActivity.class));
+        }
+    }
+
+    private void initPolicy() {
+        Uri uri = Uri.parse("https://github.com/AndreProenza/ConversationalIST");
+        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+        startActivity(intent);
+    }
+}

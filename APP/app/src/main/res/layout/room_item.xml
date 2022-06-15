@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardElevation="12dp"
+    app:cardCornerRadius="12dp"
+    android:layout_margin="16dp">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.mikhaellopez.circularimageview.CircularImageView
+            android:id="@+id/room_image"
+            android:layout_width="80dp"
+            android:layout_height="70dp"
+            android:layout_marginHorizontal="10dp"
+            android:src="@drawable/conversationalist_icon"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/room_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:text="Room Name"
+                android:maxLength="25"
+                android:textSize="18dp"/>
+
+            <TextView
+                android:id="@+id/room_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Room Description"
+                android:maxLength="25"/>
+
+            <TextView
+                android:id="@+id/room_visibility"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Room Visibility"
+                android:maxLength="15"
+                android:textColor="@android:color/holo_blue_light"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>
