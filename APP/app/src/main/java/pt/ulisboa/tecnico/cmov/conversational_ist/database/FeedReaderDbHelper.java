@@ -60,7 +60,7 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
         onUpgrade(db, oldVersion, newVersion);
     }
 
-    public void createMessage(Message m) {
+    public void createMessage(Message m, Boolean sendBroadcast) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -73,14 +73,15 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
 
         db.insert(FeedReaderContract.FeedEntry.MESSAGES_TABLE_NAME, null, values);
 
-        Intent i = new Intent("message_inserted_"+m.getRoomID());
+        if(sendBroadcast) {
+            Intent i = new Intent("message_inserted_" + m.getRoomID());
 
-        i.putExtra("message", m.getMessage());
-        i.putExtra("date",m.getCreatedAt());
-        i.putExtra("sender",m.getSender());
+            i.putExtra("message", m.getMessage());
+            i.putExtra("date", m.getCreatedAt());
+            i.putExtra("sender", m.getSender());
 
-        dbContext.sendBroadcast(i);
-
+            dbContext.sendBroadcast(i);
+        }
         db.close();
     }
 

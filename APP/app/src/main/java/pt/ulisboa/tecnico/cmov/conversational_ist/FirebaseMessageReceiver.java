@@ -42,7 +42,7 @@ public class FirebaseMessageReceiver extends FirebaseMessagingService {
                 0);
 
         FeedReaderDbHelper db = FeedReaderDbHelper.getInstance(getApplicationContext());
-        db.createMessage(m);
+        db.createMessage(m,true);
 
 
 

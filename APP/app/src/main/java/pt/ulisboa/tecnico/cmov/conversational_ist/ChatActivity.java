@@ -34,6 +34,7 @@ import java.util.Map;
 
 import pt.ulisboa.tecnico.cmov.conversational_ist.database.FeedReaderContract;
 import pt.ulisboa.tecnico.cmov.conversational_ist.database.FeedReaderDbHelper;
+import pt.ulisboa.tecnico.cmov.conversational_ist.database.Message;
 
 
 public class ChatActivity extends AppCompatActivity {
@@ -71,8 +72,6 @@ public class ChatActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
-        registerReceiver(Updated, new IntentFilter("message_inserted_"+roomID));
-
         queue = Volley.newRequestQueue(ChatActivity.this);
 
         // initialise the text views and layouts
@@ -102,6 +101,8 @@ public class ChatActivity extends AppCompatActivity {
         });
 
         loadMessages();
+
+        registerReceiver(Updated, new IntentFilter("message_inserted_"+roomID));
     }
 
     private void loadMessages() {
@@ -179,6 +180,13 @@ public class ChatActivity extends AppCompatActivity {
                     try {
                         JSONObject jresponse = response.getJSONObject(i);
                         ModelChat modelChat = new ModelChat(jresponse.getString("message"), jresponse.getString("sender"), jresponse.getString("createdAt"));
+                        Message msg = new Message(jresponse.getString("id"),
+                                jresponse.getString("sender"),
+                                jresponse.getString("roomID"),
+                                jresponse.getString("message"),
+                                jresponse.getString("createdAt"),
+                                0);
+                        FeedReaderDbHelper.getInstance(getApplicationContext()).createMessage(msg, false);
                         messageList.add(modelChat);
                     } catch (JSONException e) {
                         e.printStackTrace();
