@@ -50,7 +50,7 @@ public class ChatActivity extends AppCompatActivity {
     ImageButton send, attach;
     String uid;
     RequestQueue queue;
-    List<ModelChat> messageList;
+    List<Message> messageList;
 
     private final BroadcastReceiver Updated = new BroadcastReceiver() {
 
@@ -58,14 +58,14 @@ public class ChatActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             Bundle extras = intent.getExtras();
             if (extras != null) {
-                messageList.add(new ModelChat(extras.getString("message"),extras.getString("sender"),extras.getString("date")));
+                Message m = (Message) extras.get("message");
+                messageList.add(m);
                 adapterChat.notifyItemInserted(messageList.size() - 1);
             }
         }
     };
 
     private AdapterChat adapterChat;
-    private List<Message> chatList;
 
     private String username = "bcv";
     private String roomID = "628e1fa903146c7d0cc43b23";
@@ -120,30 +120,42 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void loadMessages() {
-
-        SQLiteDatabase db = FeedReaderDbHelper.getInstance(getApplicationContext()).getReadableDatabase();
-
-        Cursor cursor = db.rawQuery("select * from " + FeedReaderContract.FeedEntry.MESSAGES_TABLE_NAME + " WHERE roomID = '" + roomID + "';",null);
-
-        if (cursor.moveToFirst()) {
-            while (!cursor.isAfterLast()) {
-                messageList.add(new ModelChat(cursor.getString(3),cursor.getString(1),cursor.getString(4)));
-                cursor.moveToNext();
-            }
-        }
-
-        /*if(!messageList.isEmpty())
-            last = messageList.get(messageList.size()-1).getTimestamp();*/ //TODO translate timestamp
-
+        messageList = FeedReaderDbHelper.getInstance(getApplicationContext()).getAllMessages(roomID);
         adapterChat = new AdapterChat(ChatActivity.this, messageList);
-        adapterChat.notifyDataSetChanged();
         recyclerView.setAdapter(adapterChat);
+    }
 
-        readMessages();
+    private void sendMessage(final String message) {
+        String url = BASE_URL + "/messages";
+
+        //TODO arguments
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("sender", username);
+        params.put("roomID", roomID);
+        params.put("message", message);
+        params.put("isPhoto", "false");
+
+        JSONObject jsonObj = new JSONObject(params);
+
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, jsonObj, new com.android.volley.Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                msg.getText().clear();
+                Toast.makeText(ChatActivity.this, "Message sent!", Toast.LENGTH_SHORT).show();
+            }
+        }, new com.android.volley.Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(ChatActivity.this, "Fail to get response = " + error, Toast.LENGTH_SHORT).show();
+            }
+        }) ;
+
+        queue.add(request);
 
     }
 
-   /* private void readMessagesBefore() {
+    /*
+    private void readMessagesBefore() {
         ArrayList<ModelChat> chatList = new ArrayList<>();
 
         String url = BASE_URL + "/messages/before?roomID=" + roomID + "&last=" + last;
@@ -176,9 +188,7 @@ public class ChatActivity extends AppCompatActivity {
         });
 
         queue.add(request);
-    }*/
-
-
+    }
 
     private void readMessages() {
 
@@ -193,7 +203,6 @@ public class ChatActivity extends AppCompatActivity {
                 for (int i = 0; i < response.length(); i++) {
                     try {
                         JSONObject jresponse = response.getJSONObject(i);
-                        ModelChat modelChat = new ModelChat(jresponse.getString("message"), jresponse.getString("sender"), jresponse.getString("createdAt"));
                         Message msg = new Message(jresponse.getString("id"),
                                 jresponse.getString("sender"),
                                 jresponse.getString("roomID"),
@@ -201,7 +210,7 @@ public class ChatActivity extends AppCompatActivity {
                                 jresponse.getString("createdAt"),
                                 0);
                         FeedReaderDbHelper.getInstance(getApplicationContext()).createMessage(msg, false);
-                        messageList.add(modelChat);
+                        messageList.add(msg);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -217,36 +226,8 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
         queue.add(request);
-    }*/
-
-    private void sendMessage(final String message) {
-        String url = BASE_URL + "/messages";
-
-        //TODO arguments
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("sender", username);
-        params.put("roomID", roomID);
-        params.put("message", message);
-        params.put("isPhoto", "false");
-
-        JSONObject jsonObj = new JSONObject(params);
-
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, jsonObj, new com.android.volley.Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                msg.getText().clear();
-                Toast.makeText(ChatActivity.this, "Message sent!", Toast.LENGTH_SHORT).show();
-            }
-        }, new com.android.volley.Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Toast.makeText(ChatActivity.this, "Fail to get response = " + error, Toast.LENGTH_SHORT).show();
-            }
-        }) ;
-
-        queue.add(request);
-
     }
+     */
 
     @Override
     protected void onStop() {

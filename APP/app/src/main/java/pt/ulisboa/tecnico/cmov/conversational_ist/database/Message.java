@@ -1,6 +1,8 @@
 package pt.ulisboa.tecnico.cmov.conversational_ist.database;
 
-public class Message {
+import java.io.Serializable;
+
+public class Message implements Serializable {
 
     private String id;
     private String sender;

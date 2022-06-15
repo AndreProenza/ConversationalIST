@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -76,27 +77,25 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
         if(sendBroadcast) {
             Intent i = new Intent("message_inserted_" + m.getRoomID());
 
-            i.putExtra("message", m.getMessage());
-            i.putExtra("date", m.getCreatedAt());
-            i.putExtra("sender", m.getSender());
+            i.putExtra("message", (Serializable) m);
 
             dbContext.sendBroadcast(i);
         }
         db.close();
     }
 
-    public List<Message> getAllMessages() {
+    public List<Message> getAllMessages(String roomID) {
         List<Message> messages = new ArrayList<>();
-        String selectQuery = "SELECT  * FROM " + FeedReaderContract.FeedEntry.MESSAGES_TABLE_NAME;
+        String selectQuery = "SELECT  * FROM " + FeedReaderContract.FeedEntry.MESSAGES_TABLE_NAME + " WHERE roomID = '" + roomID + "';";
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.rawQuery(selectQuery, null);
 
         if (c.moveToFirst()) {
-            do {
+            while (!c.isAfterLast()) {
                 Message m = new Message(c.getString(0),c.getString(1),c.getString(2),c.getString(3),c.getString(4),c.getInt(5));
                 messages.add(m);
-            } while (c.moveToNext());
+            }
         }
 
         db.close();

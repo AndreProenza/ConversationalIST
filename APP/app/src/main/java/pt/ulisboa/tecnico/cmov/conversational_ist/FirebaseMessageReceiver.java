@@ -38,12 +38,14 @@ public class FirebaseMessageReceiver extends FirebaseMessagingService {
         String title = remoteMessage.getData().get("title");
         String message = remoteMessage.getData().get("message");
         String roomID = remoteMessage.getData().get("roomID");
+        String date = remoteMessage.getData().get("createdAt");
+        System.out.println(date);
 
         Message m = new Message(remoteMessage.getData().get("id"),
                 remoteMessage.getData().get("sender"),
                 roomID,
                 message,
-                remoteMessage.getData().get("createdAt"),
+                date,
                 0);
 
         FeedReaderDbHelper db = FeedReaderDbHelper.getInstance(getApplicationContext());
