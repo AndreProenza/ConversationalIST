@@ -1,4 +1,4 @@
-package pt.ulisboa.tecnico.conversationalist.firebase;
+package pt.ulisboa.tecnico.cmov.conversational_ist.firebase;
 
 import android.net.Uri;
 import android.util.Log;
@@ -20,7 +20,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.mikhaellopez.circularimageview.CircularImageView;
 import com.squareup.picasso.Picasso;
 
-import pt.ulisboa.tecnico.conversationalist.model.User;
+import pt.ulisboa.tecnico.cmov.conversational_ist.model.User;
 
 public class FirebaseHandler {
 

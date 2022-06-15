@@ -1,4 +1,4 @@
-package pt.ulisboa.tecnico.conversationalist.view.activities;
+package pt.ulisboa.tecnico.cmov.conversational_ist.view.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -9,7 +9,7 @@ import android.os.Handler;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import pt.ulisboa.tecnico.conversationalist.R;
+import pt.ulisboa.tecnico.cmov.conversational_ist.R;
 
 public class SplashScreenActivity extends AppCompatActivity {
 

@@ -1,4 +1,4 @@
-package pt.ulisboa.tecnico.conversationalist.model;
+package pt.ulisboa.tecnico.cmov.conversational_ist.model;
 
 import java.util.List;
 

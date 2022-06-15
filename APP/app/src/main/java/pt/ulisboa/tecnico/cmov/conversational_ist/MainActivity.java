@@ -3,7 +3,6 @@ package pt.ulisboa.tecnico.cmov.conversational_ist;
 import static android.content.ContentValues.TAG;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.NotificationCompat;
 
 
 import android.content.Context;
@@ -33,6 +32,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
+import pt.ulisboa.tecnico.cmov.conversational_ist.database.FeedReaderDbHelper;
+
 public class MainActivity extends AppCompatActivity {
 
     SharedPreferences sharedPref;
@@ -45,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main_old);
 
         nameEdt = findViewById(R.id.editText1);
         postDataBtn = findViewById(R.id.button1);
@@ -78,7 +79,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void postDataUsingVolley(String name) {
         // url to post our data
-        switchToChat();/*
         String url = "https://cmuapi.herokuapp.com/api/users";
         loadingPB.setVisibility(View.VISIBLE);
 
@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
 
                     responseTV.setText("Name : " + name );
                     saveUsername(name);
-                    switchToList();
+                    switchToMain();
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -130,22 +130,17 @@ public class MainActivity extends AppCompatActivity {
         });
         // below line is to make
         // a json object request.
-        queue.add(request);*/
+        queue.add(request);
     }
 
     public void saveUsername(String username) {
         SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString(getString(R.string.saved_username), username);
+        editor.putString("saved_username", username);
         editor.apply();
     }
 
-    private void switchToChat() {
-        Intent switchActivityIntent = new Intent(this, ChatActivity.class);
-        startActivity(switchActivityIntent);
-    }
-
-    private void switchToList() {
-        Intent switchActivityIntent = new Intent(this, ChatListActivity.class);
+    private void switchToMain() {
+        Intent switchActivityIntent = new Intent(this, pt.ulisboa.tecnico.cmov.conversational_ist.view.activities.MainActivity.class);
         startActivity(switchActivityIntent);
     }
 }

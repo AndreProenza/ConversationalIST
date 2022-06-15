@@ -1,4 +1,4 @@
-package pt.ulisboa.tecnico.conversationalist.view.activities;
+package pt.ulisboa.tecnico.cmov.conversational_ist.view.activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -10,18 +10,30 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 
-import pt.ulisboa.tecnico.conversationalist.R;
-import pt.ulisboa.tecnico.conversationalist.adapter.RoomsAdapter;
-import pt.ulisboa.tecnico.conversationalist.model.Room;
+import pt.ulisboa.tecnico.cmov.conversational_ist.ChatActivity;
+import pt.ulisboa.tecnico.cmov.conversational_ist.R;
+import pt.ulisboa.tecnico.cmov.conversational_ist.adapter.RoomsAdapter;
+import pt.ulisboa.tecnico.cmov.conversational_ist.database.FeedReaderDbHelper;
+import pt.ulisboa.tecnico.cmov.conversational_ist.model.Room;
 
 public class RoomsActivity extends AppCompatActivity {
 
@@ -32,6 +44,7 @@ public class RoomsActivity extends AppCompatActivity {
     private ArrayList<Room> rooms;
     DatabaseReference db;
     RoomsAdapter roomsAdapter;
+    private RequestQueue queue;
 
 
     @Override
@@ -39,11 +52,13 @@ public class RoomsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rooms);
 
+        queue = Volley.newRequestQueue(RoomsActivity.this);
+
         btnBack = findViewById(R.id.btn_back);
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(RoomsActivity.this, MainActivity.class));
+                startActivity(new Intent(RoomsActivity.this, pt.ulisboa.tecnico.cmov.conversational_ist.view.activities.MainActivity.class));
             }
         });
 
@@ -55,16 +70,19 @@ public class RoomsActivity extends AppCompatActivity {
 
         //************************************************
         //FIREBASE DATABASE
-        db = FirebaseDatabase.getInstance().getReference("room");
+        //db = FirebaseDatabase.getInstance().getReference("room");
         //************************************************
 
-        rooms = new ArrayList<>();
-        roomsAdapter = new RoomsAdapter(RoomsActivity.this, rooms);
-        recyclerView.setAdapter(roomsAdapter);
+        fetchRooms();
+
+        //TODO call to save channel in db
+        //FeedReaderDbHelper.getInstance(getApplicationContext()).createChannel("628e1fa903146c7d0cc43b23","b");
+
 
         //************************************************
         //FIREBASE DATABASE
 
+        /*
         db.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -79,7 +97,7 @@ public class RoomsActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
-        });
+        });*/
 
         //************************************************
 
@@ -93,6 +111,39 @@ public class RoomsActivity extends AppCompatActivity {
             }
         });
          */
+    }
+
+    private void fetchRooms() {
+        rooms = new ArrayList<>();
+
+        String url = "https://cmuapi.herokuapp.com/api/rooms";
+
+        JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, url, null, new com.android.volley.Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+                Toast.makeText(RoomsActivity.this, "Rooms received!", Toast.LENGTH_SHORT).show();
+                System.out.println(response);
+
+                for (int i = 0; i < response.length(); i++) {
+                    try {
+                        JSONObject jresponse = response.getJSONObject(i);
+                        Room room = new Room(jresponse.getString("name"), "description", "visible");
+                        rooms.add(room);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+                roomsAdapter = new RoomsAdapter(RoomsActivity.this, rooms);
+                recyclerView.setAdapter(roomsAdapter);
+            }
+        }, new com.android.volley.Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(RoomsActivity.this, "Fail to get response = " + error, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        queue.add(request);
     }
 
     @Override

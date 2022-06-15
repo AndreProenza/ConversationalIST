@@ -6,9 +6,19 @@
         <entry key="..\:/Users/BCV/Documents/GitHub/ConversationalIST/APP/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.179" />
         <entry key="..\:/Users/BCV/Documents/GitHub/ConversationalIST/APP/app/src/main/res/drawable/ic_launcher_background.xml" value="0.179" />
         <entry key="..\:/Users/BCV/Documents/GitHub/ConversationalIST/APP/app/src/main/res/layout/activity_chat.xml" value="0.25" />
+        <entry key="..\:/Users/BCV/Documents/GitHub/ConversationalIST/APP/app/src/main/res/layout/activity_chat_list.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/BCV/Documents/GitHub/ConversationalIST/APP/app/src/main/res/layout/activity_login.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/BCV/Documents/GitHub/ConversationalIST/APP/app/src/main/res/layout/activity_main.xml" value="0.2484375" />
+        <entry key="..\:/Users/BCV/Documents/GitHub/ConversationalIST/APP/app/src/main/res/layout/activity_mainAndre.xml" value="0.2484375" />
+        <entry key="..\:/Users/BCV/Documents/GitHub/ConversationalIST/APP/app/src/main/res/layout/activity_main_old.xml" value="0.2484375" />
+        <entry key="..\:/Users/BCV/Documents/GitHub/ConversationalIST/APP/app/src/main/res/layout/activity_room.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/BCV/Documents/GitHub/ConversationalIST/APP/app/src/main/res/layout/activity_rooms.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/BCV/Documents/GitHub/ConversationalIST/APP/app/src/main/res/layout/chat_item.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/BCV/Documents/GitHub/ConversationalIST/APP/app/src/main/res/layout/contact_item.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/BCV/Documents/GitHub/ConversationalIST/APP/app/src/main/res/layout/row_chat_left.xml" value="0.10790273556231003" />
         <entry key="..\:/Users/BCV/Documents/GitHub/ConversationalIST/APP/app/src/main/res/layout/row_chat_list.xml" value="0.25" />
         <entry key="..\:/Users/BCV/Documents/GitHub/ConversationalIST/APP/app/src/main/res/layout/row_chat_right.xml" value="0.39110604332953247" />
+        <entry key="..\:/Users/BCV/Documents/GitHub/ConversationalIST/APP/app/src/main/res/layout/text_row_item.xml" value="0.20572916666666666" />
         <entry key="..\:/Users/nioal/Documents/GitHub/ConversationalIST/APP/app/src/main/res/layout/activity_chat.xml" value="0.5541666666666667" />
         <entry key="..\:/Users/nioal/Documents/GitHub/ConversationalIST/APP/app/src/main/res/layout/activity_chat_list.xml" value="0.2246707193515704" />
         <entry key="..\:/Users/nioal/Documents/GitHub/ConversationalIST/APP/app/src/main/res/layout/text_row_item.xml" value="0.358695652173913" />
