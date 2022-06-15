@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import pt.ulisboa.tecnico.cmov.conversational_ist.R;
-import pt.ulisboa.tecnico.conversationalist.model.User;
+import pt.ulisboa.tecnico.cmov.conversational_ist.model.User;
 import pt.ulisboa.tecnico.cmov.conversational_ist.view.activities.RoomActivity;
 
 public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.Holder> {

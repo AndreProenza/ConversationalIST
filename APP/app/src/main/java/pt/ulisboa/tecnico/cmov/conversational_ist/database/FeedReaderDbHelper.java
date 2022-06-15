@@ -11,6 +11,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import pt.ulisboa.tecnico.cmov.conversational_ist.model.Channel;
+
 public class FeedReaderDbHelper extends SQLiteOpenHelper {
     // If you change the database schema, you must increment the database version.
 
@@ -100,6 +102,35 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
 
         db.close();
         return messages;
+    }
+
+    public void createChannel(String id, String name) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(FeedReaderContract.FeedEntry.KEY_CHANNEL_ID, id);
+        values.put(FeedReaderContract.FeedEntry.KEY_CHANNEL_NAME, name);
+
+        db.insert(FeedReaderContract.FeedEntry.CHANNELS_TABLE_NAME, null, values);
+
+        db.close();
+    }
+
+    public List<Channel> getAllChannels() {
+        List<Channel> channels = new ArrayList<>();
+        String selectQuery = "SELECT  * FROM " + FeedReaderContract.FeedEntry.CHANNELS_TABLE_NAME + ";";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        if (c.moveToFirst()) {
+            while (!c.isAfterLast()) {
+                Channel m = new Channel(c.getString(0),c.getString(1));
+                channels.add(m);
+            }
+        }
+
+        db.close();
+        return channels;
     }
 
 }

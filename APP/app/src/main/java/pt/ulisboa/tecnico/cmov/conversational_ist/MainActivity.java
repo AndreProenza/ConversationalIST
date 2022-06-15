@@ -17,8 +17,22 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.messaging.FirebaseMessaging;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
+import java.util.Map;
+
+import pt.ulisboa.tecnico.cmov.conversational_ist.database.FeedReaderDbHelper;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -65,7 +79,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void postDataUsingVolley(String name) {
         // url to post our data
-        switchToChat();/*
         String url = "https://cmuapi.herokuapp.com/api/users";
         loadingPB.setVisibility(View.VISIBLE);
 
@@ -90,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
 
                     responseTV.setText("Name : " + name );
                     saveUsername(name);
-                    switchToList();
+                    switchToMain();
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -117,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
         });
         // below line is to make
         // a json object request.
-        queue.add(request);*/
+        queue.add(request);
     }
 
     public void saveUsername(String username) {
@@ -126,13 +139,8 @@ public class MainActivity extends AppCompatActivity {
         editor.apply();
     }
 
-    private void switchToChat() {
-        Intent switchActivityIntent = new Intent(this, ChatActivity.class);
-        startActivity(switchActivityIntent);
-    }
-
-    private void switchToList() {
-        Intent switchActivityIntent = new Intent(this, ChatListActivity.class);
+    private void switchToMain() {
+        Intent switchActivityIntent = new Intent(this, pt.ulisboa.tecnico.cmov.conversational_ist.view.activities.MainActivity.class);
         startActivity(switchActivityIntent);
     }
 }

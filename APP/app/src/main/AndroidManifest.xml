@@ -16,6 +16,40 @@
         android:theme="@style/Theme.Light"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
+
+        <activity
+            android:name=".view.activities.RegisterActivity"
+            android:exported="false" />
+        <activity
+            android:name=".view.activities.RoomsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".view.activities.profiles.MyProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".view.activities.AddNewRoomActivity"
+            android:exported="false" />
+        <activity
+            android:name=".view.activities.RoomActivity"
+            android:exported="false" />
+        <activity
+            android:name=".view.activities.NewRoomActivity"
+            android:exported="false" />
+        <activity
+            android:name=".view.activities.LoginActivity"
+            android:exported="false" />
+        <activity
+            android:name=".view.activities.MainActivity"
+            android:exported="false" />
+        <activity
+            android:name=".view.activities.StartUpActivity"
+            android:exported="false" />
+        <activity
+            android:name=".view.activities.SplashScreenActivity"
+            android:exported="false">
+        </activity>
+
+
         <activity
             android:name=".ChatListActivity"
             android:exported="false" />

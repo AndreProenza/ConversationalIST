@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 
 import pt.ulisboa.tecnico.cmov.conversational_ist.R;
-import pt.ulisboa.tecnico.conversationalist.model.Room;
+import pt.ulisboa.tecnico.cmov.conversational_ist.model.Room;
 
 public class RoomsAdapter extends RecyclerView.Adapter<RoomsAdapter.RoomsViewHolder> {
     Context context;

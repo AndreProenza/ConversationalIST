@@ -1,4 +1,4 @@
-package pt.ulisboa.tecnico.conversationalist.satic;
+package pt.ulisboa.tecnico.cmov.conversational_ist.satic;
 
 import android.net.Uri;
 

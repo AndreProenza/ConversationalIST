@@ -20,7 +20,7 @@ import com.google.firebase.database.DatabaseReference;
 
 import pt.ulisboa.tecnico.cmov.conversational_ist.R;
 import pt.ulisboa.tecnico.cmov.conversational_ist.firebase.FirebaseHandler;
-import pt.ulisboa.tecnico.conversationalist.model.User;
+import pt.ulisboa.tecnico.cmov.conversational_ist.model.User;
 
 public class RegisterActivity extends AppCompatActivity {
 

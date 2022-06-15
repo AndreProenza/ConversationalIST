@@ -23,7 +23,7 @@ import com.mikhaellopez.circularimageview.CircularImageView;
 
 import pt.ulisboa.tecnico.cmov.conversational_ist.R;
 import pt.ulisboa.tecnico.cmov.conversational_ist.firebase.FirebaseHandler;
-import pt.ulisboa.tecnico.conversationalist.model.User;
+import pt.ulisboa.tecnico.cmov.conversational_ist.model.User;
 import pt.ulisboa.tecnico.cmov.conversational_ist.view.activities.profiles.MyProfileActivity;
 
 public class MainActivity extends AppCompatActivity {
@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        isUserLoggedIn();
+        //isUserLoggedIn();
         init();
         initProfile();
         //initSettings();
@@ -56,8 +56,8 @@ public class MainActivity extends AppCompatActivity {
         userName = findViewById(R.id.name);
         profileImage = findViewById(R.id.profile);
 
-        String userId = mAuth.getUid().toString();
-        FirebaseHandler.getCurrentProfileInfo(userId, userName, profileImage);
+        //String userId = mAuth.getUid().toString();
+        //FirebaseHandler.getCurrentProfileInfo(userId, userName, profileImage);
 
         profileImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -67,6 +67,9 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+
+
+    /*
     private void isUserLoggedIn() {
         btnLogOut = findViewById(R.id.btnLogOut);
         mAuth = FirebaseAuth.getInstance();
@@ -76,6 +79,8 @@ public class MainActivity extends AppCompatActivity {
             startActivity(new Intent(MainActivity.this, LoginActivity.class));
         });
     }
+
+     */
 
     /**
     private void initSettings() {
@@ -160,6 +165,7 @@ public class MainActivity extends AppCompatActivity {
          */
     }
 
+    /*
     @Override
     protected void onStart() {
         super.onStart();
@@ -168,6 +174,7 @@ public class MainActivity extends AppCompatActivity {
             startActivity(new Intent(MainActivity.this, LoginActivity.class));
         }
     }
+     */
 
     private void initPolicy() {
         Uri uri = Uri.parse("https://github.com/AndreProenza/ConversationalIST");

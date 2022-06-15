@@ -47,8 +47,8 @@ import java.util.Date;
 import pt.ulisboa.tecnico.cmov.conversational_ist.BuildConfig;
 import pt.ulisboa.tecnico.cmov.conversational_ist.R;
 import pt.ulisboa.tecnico.cmov.conversational_ist.firebase.FirebaseHandler;
-import pt.ulisboa.tecnico.conversationalist.model.User;
-import pt.ulisboa.tecnico.conversationalist.satic.StaticData;
+import pt.ulisboa.tecnico.cmov.conversational_ist.model.User;
+import pt.ulisboa.tecnico.cmov.conversational_ist.satic.StaticData;
 
 public class MyProfileActivity extends AppCompatActivity {
 
