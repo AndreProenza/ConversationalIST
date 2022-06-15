@@ -1,4 +1,4 @@
-package pt.ulisboa.tecnico.conversationalist.view.activities;
+package pt.ulisboa.tecnico.cmov.conversational_ist.view.activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,8 +18,8 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 
-import pt.ulisboa.tecnico.conversationalist.R;
-import pt.ulisboa.tecnico.conversationalist.firebase.FirebaseHandler;
+import pt.ulisboa.tecnico.cmov.conversational_ist.R;
+import pt.ulisboa.tecnico.cmov.conversational_ist.firebase.FirebaseHandler;
 import pt.ulisboa.tecnico.conversationalist.model.User;
 
 public class RegisterActivity extends AppCompatActivity {
@@ -51,7 +51,7 @@ public class RegisterActivity extends AppCompatActivity {
         });
 
         tvLoginHere.setOnClickListener(view ->{
-            startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
+            startActivity(new Intent(RegisterActivity.this, pt.ulisboa.tecnico.cmov.conversational_ist.view.activities.LoginActivity.class));
         });
     }
 

@@ -1,4 +1,4 @@
-package pt.ulisboa.tecnico.conversationalist.firebase;
+package pt.ulisboa.tecnico.cmov.conversational_ist.firebase;
 
 import android.net.Uri;
 import android.util.Log;

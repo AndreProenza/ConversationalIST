@@ -1,4 +1,4 @@
-package pt.ulisboa.tecnico.conversationalist.view.activities;
+package pt.ulisboa.tecnico.cmov.conversational_ist.view.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -7,7 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
-import pt.ulisboa.tecnico.conversationalist.R;
+import pt.ulisboa.tecnico.cmov.conversational_ist.R;
 
 public class StartUpActivity extends AppCompatActivity {
 
@@ -28,7 +28,7 @@ public class StartUpActivity extends AppCompatActivity {
     }
 
     public void toLogin() {
-        startActivity(new Intent(StartUpActivity.this, LoginActivity.class));
+        startActivity(new Intent(StartUpActivity.this, pt.ulisboa.tecnico.cmov.conversational_ist.view.activities.LoginActivity.class));
         //finish();
     }
 }

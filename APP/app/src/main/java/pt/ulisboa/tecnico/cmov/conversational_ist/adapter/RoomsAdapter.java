@@ -1,4 +1,4 @@
-package pt.ulisboa.tecnico.conversationalist.adapter;
+package pt.ulisboa.tecnico.cmov.conversational_ist.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
-import pt.ulisboa.tecnico.conversationalist.R;
+import pt.ulisboa.tecnico.cmov.conversational_ist.R;
 import pt.ulisboa.tecnico.conversationalist.model.Room;
 
 public class RoomsAdapter extends RecyclerView.Adapter<RoomsAdapter.RoomsViewHolder> {

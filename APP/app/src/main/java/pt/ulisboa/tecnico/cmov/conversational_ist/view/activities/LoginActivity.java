@@ -1,4 +1,4 @@
-package pt.ulisboa.tecnico.conversationalist.view.activities;
+package pt.ulisboa.tecnico.cmov.conversational_ist.view.activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -39,7 +39,9 @@ import com.google.firebase.auth.PhoneAuthProvider;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-import pt.ulisboa.tecnico.conversationalist.R;
+import pt.ulisboa.tecnico.cmov.conversational_ist.MainActivity;
+import pt.ulisboa.tecnico.cmov.conversational_ist.view.activities.RegisterActivity;
+import pt.ulisboa.tecnico.cmov.conversational_ist.R;
 
 public class LoginActivity extends AppCompatActivity {
 

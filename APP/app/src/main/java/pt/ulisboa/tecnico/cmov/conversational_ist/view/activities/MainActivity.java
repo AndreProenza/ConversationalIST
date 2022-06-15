@@ -1,4 +1,5 @@
-package pt.ulisboa.tecnico.conversationalist.view.activities;
+package pt.ulisboa.tecnico.cmov.conversational_ist.view.activities;
+
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
@@ -20,10 +21,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.mikhaellopez.circularimageview.CircularImageView;
 
-import pt.ulisboa.tecnico.conversationalist.R;
-import pt.ulisboa.tecnico.conversationalist.firebase.FirebaseHandler;
+import pt.ulisboa.tecnico.cmov.conversational_ist.R;
+import pt.ulisboa.tecnico.cmov.conversational_ist.firebase.FirebaseHandler;
 import pt.ulisboa.tecnico.conversationalist.model.User;
-import pt.ulisboa.tecnico.conversationalist.view.activities.profiles.MyProfileActivity;
+import pt.ulisboa.tecnico.cmov.conversational_ist.view.activities.profiles.MyProfileActivity;
 
 public class MainActivity extends AppCompatActivity {
 

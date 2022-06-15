@@ -1,4 +1,4 @@
-package pt.ulisboa.tecnico.conversationalist.view.activities.profiles;
+package pt.ulisboa.tecnico.cmov.conversational_ist.view.activities.profiles;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -44,9 +44,9 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import pt.ulisboa.tecnico.conversationalist.BuildConfig;
-import pt.ulisboa.tecnico.conversationalist.R;
-import pt.ulisboa.tecnico.conversationalist.firebase.FirebaseHandler;
+import pt.ulisboa.tecnico.cmov.conversational_ist.BuildConfig;
+import pt.ulisboa.tecnico.cmov.conversational_ist.R;
+import pt.ulisboa.tecnico.cmov.conversational_ist.firebase.FirebaseHandler;
 import pt.ulisboa.tecnico.conversationalist.model.User;
 import pt.ulisboa.tecnico.conversationalist.satic.StaticData;
 

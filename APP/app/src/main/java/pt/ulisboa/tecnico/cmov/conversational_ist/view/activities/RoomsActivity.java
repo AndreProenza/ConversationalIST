@@ -1,4 +1,4 @@
-package pt.ulisboa.tecnico.conversationalist.view.activities;
+package pt.ulisboa.tecnico.cmov.conversational_ist.view.activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,8 +19,9 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
-import pt.ulisboa.tecnico.conversationalist.R;
-import pt.ulisboa.tecnico.conversationalist.adapter.RoomsAdapter;
+import pt.ulisboa.tecnico.cmov.conversational_ist.MainActivity;
+import pt.ulisboa.tecnico.cmov.conversational_ist.R;
+import pt.ulisboa.tecnico.cmov.conversational_ist.adapter.RoomsAdapter;
 import pt.ulisboa.tecnico.conversationalist.model.Room;
 
 public class RoomsActivity extends AppCompatActivity {

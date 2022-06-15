@@ -38,7 +38,7 @@ public class AdapterChat extends RecyclerView.Adapter<pt.ulisboa.tecnico.cmov.co
         this.context = context;
         this.list = list;
         SharedPreferences sh = context.getSharedPreferences("MyPrefs",MODE_PRIVATE);
-        this.username = sh.getString(context.getString(R.string.saved_username),"");
+        this.username = sh.getString("saved_username","");
     }
 
     @NonNull

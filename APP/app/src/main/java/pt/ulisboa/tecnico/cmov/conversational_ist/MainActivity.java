@@ -3,7 +3,6 @@ package pt.ulisboa.tecnico.cmov.conversational_ist;
 import static android.content.ContentValues.TAG;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.NotificationCompat;
 
 
 import android.content.Context;
@@ -18,20 +17,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.messaging.FirebaseMessaging;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.UnsupportedEncodingException;
-import java.util.HashMap;
-import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -45,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main_old);
 
         nameEdt = findViewById(R.id.editText1);
         postDataBtn = findViewById(R.id.button1);
@@ -135,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void saveUsername(String username) {
         SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString(getString(R.string.saved_username), username);
+        editor.putString("saved_username", username);
         editor.apply();
     }
 
