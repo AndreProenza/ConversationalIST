@@ -2,6 +2,7 @@ package pt.ulisboa.tecnico.cmov.conversational_ist.database;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -16,6 +17,7 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
 
     public static final int DATABASE_VERSION = 7;
     public static final String DATABASE_NAME = "FeedReader.db";
+    private Context dbContext;
 
     public static final String SQL_CREATE_CHANNELS = "CREATE TABLE channels ( channel_id TEXT PRIMARY KEY," +
             "channel_name TEXT NOT NULL);";
@@ -38,6 +40,7 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
 
     public FeedReaderDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        dbContext = context;
     }
 
     public void onCreate(SQLiteDatabase db) {
@@ -69,6 +72,16 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
         values.put(FeedReaderContract.FeedEntry.KEY_MESSAGE_ISPHOTO, m.isPhoto());
 
         db.insert(FeedReaderContract.FeedEntry.MESSAGES_TABLE_NAME, null, values);
+
+        Intent i = new Intent("message_inserted_"+m.getRoomID());
+
+        i.putExtra("message", m.getMessage());
+        i.putExtra("date",m.getCreatedAt());
+        i.putExtra("sender",m.getSender());
+
+        dbContext.sendBroadcast(i);
+
+        db.close();
     }
 
     public List<Message> getAllMessages() {
@@ -85,6 +98,7 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
             } while (c.moveToNext());
         }
 
+        db.close();
         return messages;
     }
 

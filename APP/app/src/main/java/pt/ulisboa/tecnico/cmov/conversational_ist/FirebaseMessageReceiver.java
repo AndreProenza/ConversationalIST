@@ -44,6 +44,8 @@ public class FirebaseMessageReceiver extends FirebaseMessagingService {
         FeedReaderDbHelper db = FeedReaderDbHelper.getInstance(getApplicationContext());
         db.createMessage(m);
 
+
+
         System.out.println(db.getAllMessages());
 
         Log.d(TAG, "From: " + remoteMessage.getFrom());

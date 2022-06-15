@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void postDataUsingVolley(String name) {
         // url to post our data
-        switchToList();/*
+        switchToChat();/*
         String url = "https://cmuapi.herokuapp.com/api/users";
         loadingPB.setVisibility(View.VISIBLE);
 
