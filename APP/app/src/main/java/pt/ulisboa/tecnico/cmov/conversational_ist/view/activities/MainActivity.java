@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
 
     RecyclerView recyclerView = null;
-    private ArrayList<Room> rooms;
+    private ArrayList<Room> rooms = new ArrayList<>();
     MainRoomsAdapter roomsAdapter;
 
     @Override
@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getRoomsSubscribed() {
-        //rooms = FeedReaderDbHelper.getInstance(getApplicationContext()).getAllChannels();
+        rooms = FeedReaderDbHelper.getInstance(getApplicationContext()).getAllChannels();
         roomsAdapter = new MainRoomsAdapter(MainActivity.this, rooms);
         recyclerView.setAdapter(roomsAdapter);
         Toast.makeText(MainActivity.this, "Rooms received" , Toast.LENGTH_SHORT).show();

@@ -19,7 +19,7 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
 
     public static FeedReaderDbHelper sInstance;
 
-    public static final int DATABASE_VERSION = 7;
+    public static final int DATABASE_VERSION = 8;
     public static final String DATABASE_NAME = "FeedReader.db";
     private Context dbContext;
 
@@ -37,7 +37,7 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
 
     public static synchronized FeedReaderDbHelper getInstance(Context context){
         if(sInstance == null){
-            sInstance = new FeedReaderDbHelper(context.getApplicationContext());
+            sInstance = new FeedReaderDbHelper(context);
         }
         return sInstance;
     }
@@ -98,11 +98,23 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
             while (!c.isAfterLast()) {
                 Message m = new Message(c.getString(0),c.getString(1),c.getString(2),c.getString(3),c.getString(4),c.getInt(5));
                 messages.add(m);
+                c.moveToNext();
             }
         }
 
         db.close();
         return messages;
+    }
+
+    public boolean isChannelSubscribed(String ID) {
+        String selectQuery = "SELECT * FROM " + FeedReaderContract.FeedEntry.CHANNELS_TABLE_NAME + " WHERE channel_id = '" +  ID + "';";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        boolean result = c.getCount() == 0;
+
+        db.close();
+        return result;
     }
 
     public void createChannel(String id, String name) {
@@ -125,8 +137,8 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
 
         if (c.moveToFirst()) {
             while (!c.isAfterLast()) {
-                Room m = new Room(c.getString(0),c.getString(1));
-                rooms.add(m);
+                rooms.add(new Room(c.getString(1),c.getString(0)));
+                c.moveToNext();
             }
         }
 

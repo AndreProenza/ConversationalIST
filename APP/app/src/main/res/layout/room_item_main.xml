@@ -5,7 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:cardElevation="12dp"
     app:cardCornerRadius="12dp"
-    android:layout_margin="16dp">
+    android:layout_margin="10dp">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:orientation="horizontal"
@@ -59,7 +59,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Room Id"
-                android:maxLength="15"
+                android:maxLength="25"
                 android:textColor="@android:color/holo_blue_light"/>
         </LinearLayout>
 

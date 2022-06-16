@@ -130,7 +130,10 @@ public class RoomsActivity extends AppCompatActivity implements RecyclerViewAddR
                     try {
                         JSONObject jresponse = response.getJSONObject(i);
                         Room room = new Room(jresponse.getString("name"), jresponse.getString("id"));
-                        rooms.add(room);
+                        if(FeedReaderDbHelper.getInstance(getApplicationContext()).isChannelSubscribed(jresponse.getString("id"))) {
+                            System.out.println("Name: " + jresponse.getString("name") + "; ID: " + jresponse.getString("id") +"\n");
+                            rooms.add(room);
+                        }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
