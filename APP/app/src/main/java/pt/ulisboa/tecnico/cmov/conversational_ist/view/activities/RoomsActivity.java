@@ -17,6 +17,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -34,8 +35,9 @@ import pt.ulisboa.tecnico.cmov.conversational_ist.R;
 import pt.ulisboa.tecnico.cmov.conversational_ist.adapter.RoomsAdapter;
 import pt.ulisboa.tecnico.cmov.conversational_ist.database.FeedReaderDbHelper;
 import pt.ulisboa.tecnico.cmov.conversational_ist.model.Room;
+import pt.ulisboa.tecnico.cmov.conversational_ist.recyclerview.RecyclerViewAddRoomsInterface;
 
-public class RoomsActivity extends AppCompatActivity {
+public class RoomsActivity extends AppCompatActivity implements RecyclerViewAddRoomsInterface {
 
     private ImageButton btnBack;
     private ImageButton searchBtn;
@@ -58,10 +60,9 @@ public class RoomsActivity extends AppCompatActivity {
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(RoomsActivity.this, pt.ulisboa.tecnico.cmov.conversational_ist.view.activities.MainActivity.class));
+                startActivity(new Intent(RoomsActivity.this, MainActivity.class));
             }
         });
-
 
         recyclerView = (RecyclerView) findViewById(R.id.recycle_view_rooms);
 
@@ -111,6 +112,7 @@ public class RoomsActivity extends AppCompatActivity {
             }
         });
          */
+
     }
 
     private void fetchRooms() {
@@ -127,13 +129,13 @@ public class RoomsActivity extends AppCompatActivity {
                 for (int i = 0; i < response.length(); i++) {
                     try {
                         JSONObject jresponse = response.getJSONObject(i);
-                        Room room = new Room(jresponse.getString("name"), "description", "visible");
+                        Room room = new Room(jresponse.getString("name"), jresponse.getString("id"));
                         rooms.add(room);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                 }
-                roomsAdapter = new RoomsAdapter(RoomsActivity.this, rooms);
+                roomsAdapter = new RoomsAdapter(RoomsActivity.this, rooms, RoomsActivity.this);
                 recyclerView.setAdapter(roomsAdapter);
             }
         }, new com.android.volley.Response.ErrorListener() {
@@ -153,4 +155,8 @@ public class RoomsActivity extends AppCompatActivity {
         finish();
     }
 
+    @Override
+    public void onItemClick(int position) {
+
+    }
 }

@@ -5,17 +5,19 @@ import java.util.List;
 public class Room {
 
     private String roomName;
-    private String roomDescription;
-    private String roomVisibility;
+    public String roomId;
+    //private String roomDescription;
+    //private String roomVisibility;
+
+
 
     public Room() {
         // Does nothing
     }
 
-    public Room(String roomName, String roomDescription, String roomVisibility) {
+    public Room(String roomName, String roomId) {
         this.roomName = roomName;
-        this.roomDescription = roomDescription;
-        this.roomVisibility = roomVisibility;
+        this.roomId = roomId;
     }
 
     public String getRoomName() {
@@ -26,19 +28,11 @@ public class Room {
         this.roomName = roomName;
     }
 
-    public String getRoomDescription() {
-        return roomDescription;
+    public String getRoomId() {
+        return roomId;
     }
 
-    public void setRoomDescription(String roomDescription) {
-        this.roomDescription = roomDescription;
-    }
-
-    public String getRoomVisibility() {
-        return roomVisibility;
-    }
-
-    public void setRoomVisibility(String roomVisibility) {
-        this.roomVisibility = roomVisibility;
+    public void setRoomId(String roomId) {
+        this.roomId = roomId;
     }
 }

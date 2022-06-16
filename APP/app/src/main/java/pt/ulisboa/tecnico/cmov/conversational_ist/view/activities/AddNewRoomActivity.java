@@ -25,7 +25,7 @@ public class AddNewRoomActivity extends AppCompatActivity implements AdapterView
 
     private EditText edRoomName, edRoomDescription;
     private Spinner spinner;
-    private DatabaseReference db;
+    //private DatabaseReference db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +39,7 @@ public class AddNewRoomActivity extends AppCompatActivity implements AdapterView
 
     private void init() {
         edRoomName = findViewById(R.id.ed_room_name);
-        edRoomDescription = findViewById(R.id.ed_room_description);
+        //edRoomDescription = findViewById(R.id.ed_room_description);
         spinner = findViewById(R.id.sp_new_room);
     }
 
@@ -58,19 +58,22 @@ public class AddNewRoomActivity extends AppCompatActivity implements AdapterView
                 // Check Validate
                 if (TextUtils.isEmpty(edRoomName.getText().toString())) {
                     edRoomName.setError("Field required!");
-                } else if (TextUtils.isEmpty(edRoomDescription.getText().toString())) {
-                    edRoomDescription.setError("Field required!");
-                } else if (spinner.getSelectedItem().toString() == null) {
+                } //else if (TextUtils.isEmpty(edRoomDescription.getText().toString())) {
+                    //edRoomDescription.setError("Field required!");
+                //}
+                else if (spinner.getSelectedItem().toString() == null) {
                     Toast.makeText(getApplicationContext(), "Please Select Room visibility", Toast.LENGTH_SHORT).show();
                 }
                 else {
-                    addRoom();
+                    //addRoomToFirebase();
+                    //ADD HERE ROOM
                 }
             }
         });
     }
 
-    private void addRoom() {
+    /**
+    private void addRoomToFirebase() {
         String roomName = edRoomName.getText().toString();
         String roomDescription = edRoomDescription.getText().toString();
         String roomVisibility = spinner.getSelectedItem().toString();
@@ -96,6 +99,7 @@ public class AddNewRoomActivity extends AppCompatActivity implements AdapterView
         //*********************
 
     }
+     */
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {

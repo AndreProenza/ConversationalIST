@@ -43,12 +43,15 @@ public class FirebaseHandler {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 
+
                 userName.setText(snapshot.child("username").getValue().toString());
                 if (snapshot.hasChild("photo")) {
                     String photo = snapshot.child("photo").getValue().toString();
                     Picasso.get().load(photo).into(profileImage);
                 }
+
             }
+
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {

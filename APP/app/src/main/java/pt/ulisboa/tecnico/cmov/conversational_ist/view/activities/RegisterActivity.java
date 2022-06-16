@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -56,7 +57,7 @@ public class RegisterActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private DatabaseReference db;
 
-    private boolean isSuccessfull;
+    private static boolean isUserRegistered;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,9 +100,9 @@ public class RegisterActivity extends AppCompatActivity {
             etRegPassword.requestFocus();
         } else {
             // calling a method to post the data and passing our name and job.
-            boolean isUserRegisterd = postDataUsingVolley(userName);
-
-            if (!isUserRegisterd) {
+            postDataUsingVolley(userName);
+            Log.d("IsUserRegistered = ", RegisterActivity.isUserRegistered + "");
+            if (RegisterActivity.isUserRegistered) {
                 Toast.makeText(RegisterActivity.this, "Registration Error: User already exists", Toast.LENGTH_SHORT).show();
             } else {
                 mAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -122,8 +123,8 @@ public class RegisterActivity extends AppCompatActivity {
         }
     }
 
-    private boolean postDataUsingVolley(String name) {
-        isSuccessfull = true;
+    private void postDataUsingVolley(String name) {
+        RegisterActivity.isUserRegistered = false;
 
         // url to post our data
         String url = "https://cmuapi.herokuapp.com/api/users";
@@ -148,6 +149,8 @@ public class RegisterActivity extends AppCompatActivity {
         }, new com.android.volley.Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                RegisterActivity.isUserRegistered = true;
+                Log.d("isSuccessfull init = ", RegisterActivity.isUserRegistered + "");
                 loadingPB.setVisibility(View.GONE);
                 String body;
                 //get status code here
@@ -158,16 +161,23 @@ public class RegisterActivity extends AppCompatActivity {
                         body = new String(error.networkResponse.data,"UTF-8");
                         Toast.makeText(RegisterActivity.this, "Error " + statusCode + " " + body, Toast.LENGTH_SHORT).show();
                     } catch (UnsupportedEncodingException e) {
+                        Log.d("isSuccessfull exep = ", RegisterActivity.isUserRegistered + "");
+                        RegisterActivity.isUserRegistered = true;
                         e.printStackTrace();
                     }
                 }
-                isSuccessfull = false;
             }
         });
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            public void run() {
+                // yourMethod();
+            }
+        }, 2000);
         // below line is to make
         // a json object request.
         queue.add(request);
-        return isSuccessfull;
+        Log.d("isSuccessfull final = ", RegisterActivity.isUserRegistered + "");
     }
 
     public void saveUsername(String username) {

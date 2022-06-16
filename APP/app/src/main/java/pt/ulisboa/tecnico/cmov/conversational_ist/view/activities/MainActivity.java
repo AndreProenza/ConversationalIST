@@ -36,10 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private ActionBar actionBar;
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
-    //private LinearLayout btnGroups;
     private LinearLayout btnLogOut;
-    //private LinearLayout btnSettings;
-    //private LinearLayout policyBtn;
     private CircularImageView profileImage;
     private TextView userName;
 
@@ -61,8 +58,6 @@ public class MainActivity extends AppCompatActivity {
         isUserLoggedIn();
         init();
         initProfile();
-        //initSettings();
-        //initPolicy();
     }
 
     private void initProfile() {
@@ -90,15 +85,6 @@ public class MainActivity extends AppCompatActivity {
             startActivity(new Intent(MainActivity.this, LoginActivity.class));
         });
     }
-
-    /**
-    private void initSettings() {
-        btnSettings = findViewById(R.id.settings_btn);
-        btnSettings.setOnClickListener(view ->{
-            startActivity(new Intent(MainActivity.this, MyProfileActivity.class));
-        });
-    }
-     */
 
     private void init() {
         toolbar = findViewById(R.id.toolbar);
@@ -146,13 +132,6 @@ public class MainActivity extends AppCompatActivity {
             drawerLayout.closeDrawers();
         });
 
-        /**
-        nav_view.findViewById(R.id.recommendations_btn).setOnClickListener(v -> {
-            startActivity(new Intent(MainActivity.this, Recommendations.class));
-            drawerLayout.closeDrawers();
-        });
-         */
-
         nav_view.findViewById(R.id.ll_policy).setOnClickListener(v -> {
             initPolicy();
             drawerLayout.closeDrawers();
@@ -163,15 +142,6 @@ public class MainActivity extends AppCompatActivity {
             startActivity(new Intent(MainActivity.this, LoginActivity.class));
             drawerLayout.closeDrawers();
         });
-
-        /**
-        btnGroups.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, RoomsActivity.class));
-            }
-        });
-         */
     }
 
     @Override

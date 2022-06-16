@@ -7,7 +7,7 @@
     android:fitsSystemWindows="true"
     android:id="@+id/drawer_layout"
     tools:openDrawer="start"
-    tools:context=".MainActivity">
+    tools:context=".view.activities.MainActivity">
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/coordinatorLayout"
