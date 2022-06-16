@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "102233526223",
+    "firebase_url": "https://conversationalist-84077-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "conversationalist-84077",
+    "storage_bucket": "conversationalist-84077.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:102233526223:android:c4122643e3ebc8c51a4cba",
+        "android_client_info": {
+          "package_name": "pt.ulisboa.tecnico.cmov.conversational_ist"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "102233526223-4a7t26okrpn49pbtg29mkior0mb6f37d.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "pt.ulisboa.tecnico.cmov.conversational_ist",
+            "certificate_hash": "f1acda64481055379992942c770f3993799ee01f"
+          }
+        },
+        {
+          "client_id": "102233526223-cu4mr348g7odeh9smaad6ndnsqohqi3h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDwIhzmlMWEU8_M_WfORT2SJNVnpT5qtjE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "102233526223-cu4mr348g7odeh9smaad6ndnsqohqi3h.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

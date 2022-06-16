@@ -1,55 +1,45 @@
 package pt.ulisboa.tecnico.cmov.conversational_ist;
 
-import android.Manifest;
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
-import android.content.ContentValues;
-import android.content.DialogInterface;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.net.Uri;
+import android.content.IntentFilter;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.text.TextUtils;
-import android.text.format.DateFormat;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.JsonRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import pt.ulisboa.tecnico.cmov.conversational_ist.database.FeedReaderDbHelper;
+import pt.ulisboa.tecnico.cmov.conversational_ist.database.Message;
+import pt.ulisboa.tecnico.cmov.conversational_ist.database.NotifyActive;
+import pt.ulisboa.tecnico.cmov.conversational_ist.database.FeedReaderContract;
+import pt.ulisboa.tecnico.cmov.conversational_ist.database.FeedReaderDbHelper;
+import pt.ulisboa.tecnico.cmov.conversational_ist.database.Message;
 
 
 public class ChatActivity extends AppCompatActivity {
@@ -60,18 +50,46 @@ public class ChatActivity extends AppCompatActivity {
     ImageButton send, attach;
     String uid;
     RequestQueue queue;
+    List<Message> messageList;
 
-    boolean notify = false;
+    private final BroadcastReceiver Updated = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Bundle extras = intent.getExtras();
+            if (extras != null) {
+                Message m = (Message) extras.get("message");
+                messageList.add(m);
+                adapterChat.notifyItemInserted(messageList.size() - 1);
+            }
+        }
+    };
+
     private AdapterChat adapterChat;
+
+    private String username = "bcv";
+    private String roomID = "628e1fa903146c7d0cc43b23";
+    private String last = "2022-05-25T12:26:19.398+00:00";
+
+    private final String BASE_URL = "https://cmuapi.herokuapp.com/api";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
+        Bundle b = getIntent().getExtras();
+        if(b != null) {
+            roomID = b.getString("roomID");
+            System.out.println("Abriu notificao com roomID : " + roomID);
+        }
+
+        //TODO listen data changes
+
         queue = Volley.newRequestQueue(ChatActivity.this);
 
         // initialise the text views and layouts
+        messageList = new ArrayList<>();
         name = findViewById(R.id.nameptv);
         msg = findViewById(R.id.messaget);
         send = findViewById(R.id.sendmsg);
@@ -87,24 +105,60 @@ public class ChatActivity extends AppCompatActivity {
         send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                notify = true;
                 String message = msg.getText().toString().trim();
-                if (TextUtils.isEmpty(message)) {//if empty
+                if (TextUtils.isEmpty(message)) { //if empty
                     Toast.makeText(ChatActivity.this, "Please Write Something Here", Toast.LENGTH_LONG).show();
                 } else {
-                    sendmessage(message);
+                    sendMessage(message);
                 }
             }
         });
 
-        readMessages();
+        loadMessages();
+
+        registerReceiver(Updated, new IntentFilter("message_inserted_"+roomID));
     }
 
-    private void readMessages() {
-        // show message after retrieving data
+    private void loadMessages() {
+        messageList = FeedReaderDbHelper.getInstance(getApplicationContext()).getAllMessages(roomID);
+        adapterChat = new AdapterChat(ChatActivity.this, messageList);
+        recyclerView.setAdapter(adapterChat);
+    }
+
+    private void sendMessage(final String message) {
+        String url = BASE_URL + "/messages";
+
+        //TODO arguments
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("sender", username);
+        params.put("roomID", roomID);
+        params.put("message", message);
+        params.put("isPhoto", "false");
+
+        JSONObject jsonObj = new JSONObject(params);
+
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, jsonObj, new com.android.volley.Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                msg.getText().clear();
+                Toast.makeText(ChatActivity.this, "Message sent!", Toast.LENGTH_SHORT).show();
+            }
+        }, new com.android.volley.Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(ChatActivity.this, "Fail to get response = " + error, Toast.LENGTH_SHORT).show();
+            }
+        }) ;
+
+        queue.add(request);
+
+    }
+
+    /*
+    private void readMessagesBefore() {
         ArrayList<ModelChat> chatList = new ArrayList<>();
 
-        String url = "http://cmuapi.herokuapp.com/api/messages?roomID=628e1fa903146c7d0cc43b23&token=a&last=2022-05-25T12:26:00Z";
+        String url = BASE_URL + "/messages/before?roomID=" + roomID + "&last=" + last;
 
         JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, url, null, new com.android.volley.Response.Listener<JSONArray>() {
             @Override
@@ -129,41 +183,40 @@ public class ChatActivity extends AppCompatActivity {
         }, new com.android.volley.Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                System.out.println(error);
                 Toast.makeText(ChatActivity.this, "Fail to get response = " + error, Toast.LENGTH_SHORT).show();
             }
-        }) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("name", "ola");
-                return params;
-            }
-        };
-
-        System.out.println(request);
+        });
 
         queue.add(request);
     }
 
-    private void sendmessage(final String message) {
-        String url = "https://cmuapi.herokuapp.com/api/messages";
+    private void readMessages() {
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("sender", "bcv");
-        params.put("roomID", "628e16d233ad036d14ee279a");
-        params.put("message", message);
-        params.put("token", "");
-        params.put("isPhoto", "false");
+        String url = BASE_URL + "/messages?roomID=" + roomID + "&last=" + last;
 
-        JSONObject jsonObj = new JSONObject(params);
-
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, jsonObj, new com.android.volley.Response.Listener<JSONObject>() {
+        JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, url, null, new com.android.volley.Response.Listener<JSONArray>() {
             @Override
-            public void onResponse(JSONObject response) {
-                msg.getText().clear();
+            public void onResponse(JSONArray response) {
+                Toast.makeText(ChatActivity.this, "Messages received!", Toast.LENGTH_SHORT).show();
+                System.out.println(response);
 
-                Toast.makeText(ChatActivity.this, "Message sent!", Toast.LENGTH_SHORT).show();
+                for (int i = 0; i < response.length(); i++) {
+                    try {
+                        JSONObject jresponse = response.getJSONObject(i);
+                        Message msg = new Message(jresponse.getString("id"),
+                                jresponse.getString("sender"),
+                                jresponse.getString("roomID"),
+                                jresponse.getString("message"),
+                                jresponse.getString("createdAt"),
+                                0);
+                        FeedReaderDbHelper.getInstance(getApplicationContext()).createMessage(msg, false);
+                        messageList.add(msg);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                adapterChat.notifyDataSetChanged();
 
             }
         }, new com.android.volley.Response.ErrorListener() {
@@ -171,27 +224,21 @@ public class ChatActivity extends AppCompatActivity {
             public void onErrorResponse(VolleyError error) {
                 Toast.makeText(ChatActivity.this, "Fail to get response = " + error, Toast.LENGTH_SHORT).show();
             }
-        }) {
-            @Override
-            protected Map<String, String> getParams() {
-                // below line we are creating a map for
-                // storing our values in key and value pair.
-                Map<String, String> params = new HashMap<String, String>();
-
-                // on below line we are passing our key
-                // and value pair to our parameters.
-                params.put("name", "ola");
-
-                // at last we are
-                // returning our params.
-                return params;
-            }
-        };
-        ;
-
+        });
         queue.add(request);
+    }
+     */
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        NotifyActive.getInstance().setActive("");
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        NotifyActive.getInstance().setActive(roomID);
+    }
 }
 

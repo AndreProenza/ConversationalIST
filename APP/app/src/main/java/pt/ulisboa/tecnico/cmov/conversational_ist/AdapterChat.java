@@ -23,16 +23,22 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
+import pt.ulisboa.tecnico.cmov.conversational_ist.database.Message;
+
 
 public class AdapterChat extends RecyclerView.Adapter<pt.ulisboa.tecnico.cmov.conversational_ist.AdapterChat.Myholder> {
     private static final int MSG_TYPE_LEFT = 0;
-    private static final int MSG_TYPR_RIGHT = 1;
+    private static final int MSG_TYPE_RIGHT = 1;
     Context context;
-    List<ModelChat> list;
+    List<Message> list;
 
-    public AdapterChat(Context context, List<ModelChat> list) {
+    private final String username;
+
+    public AdapterChat(Context context, List<Message> list) {
         this.context = context;
         this.list = list;
+        SharedPreferences sh = context.getSharedPreferences("MyPrefs",MODE_PRIVATE);
+        this.username = sh.getString("saved_username","");
     }
 
     @NonNull
@@ -50,13 +56,12 @@ public class AdapterChat extends RecyclerView.Adapter<pt.ulisboa.tecnico.cmov.co
     @Override
     public void onBindViewHolder(@NonNull Myholder holder, @SuppressLint("RecyclerView") final int position) {
         String message = list.get(position).getMessage();
-        String timeStamp = list.get(position).getTimestamp();
-        String type = "text";//list.get(position).getType();
+        String timeStamp = list.get(position).getCreatedAt();
+        boolean isPhoto = list.get(position).isPhoto();
         holder.message.setText(message);
         holder.time.setText(timeStamp);
-        //TODO change timeStamp
 
-        if (type.equals("text")) {
+        if (!isPhoto) {
             holder.message.setVisibility(View.VISIBLE);
             holder.mimage.setVisibility(View.GONE);
             holder.message.setText(message);
@@ -73,10 +78,8 @@ public class AdapterChat extends RecyclerView.Adapter<pt.ulisboa.tecnico.cmov.co
 
     @Override
     public int getItemViewType(int position) {
-        SharedPreferences sh = context.getSharedPreferences("MyPrefs",MODE_PRIVATE);
-        String username = sh.getString(context.getString(R.string.saved_username),"");
         if (list.get(position).getSender().equals(username)) {
-            return MSG_TYPR_RIGHT;
+            return MSG_TYPE_RIGHT;
         } else {
             return MSG_TYPE_LEFT;
         }
