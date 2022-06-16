@@ -10,7 +10,6 @@ import android.widget.ImageButton;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import pt.ulisboa.tecnico.cmov.conversational_ist.MainActivity;
 import pt.ulisboa.tecnico.cmov.conversational_ist.R;
 
 public class NewRoomActivity extends AppCompatActivity {

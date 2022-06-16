@@ -1,6 +1,8 @@
 package pt.ulisboa.tecnico.cmov.conversational_ist.view.activities;
 
 
+import static android.content.ContentValues.TAG;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -11,14 +13,17 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.mikhaellopez.circularimageview.CircularImageView;
 
 import pt.ulisboa.tecnico.cmov.conversational_ist.R;
@@ -45,7 +50,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //isUserLoggedIn();
+        //TODO : use this to enter in new room with ID
+        FirebaseMessaging.getInstance().subscribeToTopic("628e1fa903146c7d0cc43b23").addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Log.d(TAG, "Subscribe successful");
+            }
+        });
+
+        isUserLoggedIn();
         init();
         initProfile();
         //initSettings();
@@ -56,8 +69,8 @@ public class MainActivity extends AppCompatActivity {
         userName = findViewById(R.id.name);
         profileImage = findViewById(R.id.profile);
 
-        //String userId = mAuth.getUid().toString();
-        //FirebaseHandler.getCurrentProfileInfo(userId, userName, profileImage);
+        String userId = mAuth.getUid().toString();
+        FirebaseHandler.getCurrentProfileInfo(userId, userName, profileImage);
 
         profileImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -68,8 +81,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
-    /*
     private void isUserLoggedIn() {
         btnLogOut = findViewById(R.id.btnLogOut);
         mAuth = FirebaseAuth.getInstance();
@@ -79,8 +90,6 @@ public class MainActivity extends AppCompatActivity {
             startActivity(new Intent(MainActivity.this, LoginActivity.class));
         });
     }
-
-     */
 
     /**
     private void initSettings() {
@@ -165,7 +174,6 @@ public class MainActivity extends AppCompatActivity {
          */
     }
 
-    /*
     @Override
     protected void onStart() {
         super.onStart();
@@ -174,7 +182,6 @@ public class MainActivity extends AppCompatActivity {
             startActivity(new Intent(MainActivity.this, LoginActivity.class));
         }
     }
-     */
 
     private void initPolicy() {
         Uri uri = Uri.parse("https://github.com/AndreProenza/ConversationalIST");

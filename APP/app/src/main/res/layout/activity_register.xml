@@ -103,15 +103,30 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnRegister"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="18dp"
-                android:text="Register"
-                android:textAppearance="@style/TextAppearance.AppCompat"
-                android:textSize="17dp" />
+                android:orientation="horizontal"
+                android:layout_gravity="center">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnRegister"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:layout_marginTop="15dp"
+                    android:text="Register"
+                    android:textAppearance="@style/TextAppearance.AppCompat"
+                    android:textSize="17dp" />
+
+                <ProgressBar
+                    android:id="@+id/idLoadingPB"
+                    android:layout_width="35dp"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="17dp"
+                    android:visibility="gone" />
+
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"

@@ -37,53 +37,6 @@ public class FirebaseHandler {
         db.child(userId).setValue(user);
     }
 
-    /**
-    public static void addContact(User user) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        if (firebaseUser != null) {
-            //db.collection("Users").document(firebaseUser.getUid()).collection("Contacts").document(user.getUserId()).set(user)
-                    .addOnSuccessListener(unused -> Log.d(TAG, "onSuccess: ")).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Log.e(TAG, "onFailure: ", e);
-                }
-            });
-        } else {
-            Log.d(TAG, "addContact: Not Login");
-        }
-    }
-     */
-
-    /**
-    //Check phone number using the app or not
-    public static void getUser(String phone, OnGetUserCallBack onGetUserCallBack) {
-        FirebaseFirestore db =  FirebaseFirestore.getInstance();
-        db.collection("Users").whereEqualTo("phone", phone).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-            @Override
-            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                if (!queryDocumentSnapshots.isEmpty()) {
-                    Log.d(TAG, "onSuccess: ===> " + queryDocumentSnapshots.getDocuments().get(0).getString("userId"));
-                    User userModel = new User();
-                    //userModel.setUserId(queryDocumentSnapshots.getDocuments().get(0).getString("userId"));
-                    userModel.setUserName(queryDocumentSnapshots.getDocuments().get(0).getString("userId"));
-
-                    onGetUserCallBack.onSuccess(userModel);
-                } else {
-                    onGetUserCallBack.onFailed();
-                }
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-
-            }
-        });
-    }
-     */
-
-
-
     public static void getCurrentProfileInfo(String userId, TextView userName, CircularImageView profileImage) {
         db = FirebaseDatabase.getInstance().getReference("users");
         db.child(userId).addValueEventListener(new ValueEventListener() {
