@@ -121,7 +121,7 @@ public class ChatActivity extends AppCompatActivity {
 
     private void loadMessages() {
         messageList = FeedReaderDbHelper.getInstance(getApplicationContext()).getAllMessages(roomID);
-        adapterChat = new AdapterChat(ChatActivity.this, messageList);
+        adapterChat = new AdapterChat(ChatActivity.this, messageList, username);
         recyclerView.setAdapter(adapterChat);
     }
 

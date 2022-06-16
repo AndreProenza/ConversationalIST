@@ -19,9 +19,12 @@ import android.widget.Toast;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -36,7 +39,7 @@ import pt.ulisboa.tecnico.cmov.conversational_ist.database.Message;
 import pt.ulisboa.tecnico.cmov.conversational_ist.database.NotifyActive;
 
 public class RoomActivity extends AppCompatActivity {
-    
+
     ImageButton backBtn;
     RecyclerView recyclerView;
     TextView name;
@@ -60,12 +63,11 @@ public class RoomActivity extends AppCompatActivity {
         }
     };
 
-    
+
     private AdapterChat adapterChat;
 
     private String username = "bcv";
-    private String roomID = "628e1fa903146c7d0cc43b23";
-    private String last = "2022-05-25T12:26:19.398+00:00";
+    private String roomID;
 
     private final String BASE_URL = "https://cmuapi.herokuapp.com/api";
 
@@ -80,15 +82,14 @@ public class RoomActivity extends AppCompatActivity {
         rId = findViewById(R.id.room_id);
         backBtn = findViewById(R.id.btn_back);
 
-         msg = findViewById(R.id.ed_msg);
-         send = findViewById(R.id.room_send_btn);
-         attach = findViewById(R.id.btn_attach_file);
-         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-         linearLayoutManager.setStackFromEnd(true);
-         recyclerView = findViewById(R.id.recycler_chat);
-         recyclerView.setHasFixedSize(true);
-         recyclerView.setLayoutManager(linearLayoutManager);
-
+        msg = findViewById(R.id.ed_msg);
+        send = findViewById(R.id.room_send_btn);
+        attach = findViewById(R.id.btn_attach_file);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        linearLayoutManager.setStackFromEnd(true);
+        recyclerView = findViewById(R.id.recycler_chat);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(linearLayoutManager);
 
 
         //********* DATA FROM MAIN ACTIVITY **********
@@ -99,14 +100,9 @@ public class RoomActivity extends AppCompatActivity {
         rId.setText(roomID);
         //********************************************
 
-
         backBtn.setOnClickListener(v -> finish());
 
-
-        //TODO listen data changes
-
         queue = Volley.newRequestQueue(RoomActivity.this);
-
 
         send.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -122,25 +118,32 @@ public class RoomActivity extends AppCompatActivity {
 
         loadMessages();
 
-        registerReceiver(Updated, new IntentFilter("message_inserted_"+roomID));
+        registerReceiver(Updated, new IntentFilter("message_inserted_" + roomID));
 
     }
 
     private void loadMessages() {
         messageList = FeedReaderDbHelper.getInstance(getApplicationContext()).getAllMessages(roomID);
-        adapterChat = new AdapterChat(RoomActivity.this, messageList);
+        if (messageList.isEmpty()) {
+            fetchMessages();
+            return;
+        }
+        initAdapter();
+    }
+
+    private void initAdapter() {
+        adapterChat = new AdapterChat(RoomActivity.this, messageList, username);
         recyclerView.setAdapter(adapterChat);
     }
 
     private void sendMessage(final String message) {
         String url = BASE_URL + "/messages";
 
-        //TODO arguments
         Map<String, String> params = new HashMap<String, String>();
         params.put("sender", username);
         params.put("roomID", roomID);
         params.put("message", message);
-        params.put("isPhoto", "false");
+        params.put("isPhoto", "false"); //TODO implement photo
 
         JSONObject jsonObj = new JSONObject(params);
 
@@ -155,7 +158,7 @@ public class RoomActivity extends AppCompatActivity {
             public void onErrorResponse(VolleyError error) {
                 Toast.makeText(RoomActivity.this, "Fail to get response = " + error, Toast.LENGTH_SHORT).show();
             }
-        }) ;
+        });
 
         queue.add(request);
 
@@ -195,11 +198,11 @@ public class RoomActivity extends AppCompatActivity {
         });
 
         queue.add(request);
-    }
+    }*/
 
-    private void readMessages() {
+    private void fetchMessages() {
 
-        String url = BASE_URL + "/messages?roomID=" + roomID + "&last=" + last;
+        String url = BASE_URL + "/messages?roomID=" + roomID;
 
         JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, url, null, new com.android.volley.Response.Listener<JSONArray>() {
             @Override
@@ -223,8 +226,7 @@ public class RoomActivity extends AppCompatActivity {
                     }
                 }
 
-                adapterChat.notifyDataSetChanged();
-
+                initAdapter();
             }
         }, new com.android.volley.Response.ErrorListener() {
             @Override
@@ -234,7 +236,6 @@ public class RoomActivity extends AppCompatActivity {
         });
         queue.add(request);
     }
-     */
 
 
     @Override
@@ -250,5 +251,5 @@ public class RoomActivity extends AppCompatActivity {
         NotifyActive.getInstance().setActive(roomID);
     }
 
-    
+
 }
