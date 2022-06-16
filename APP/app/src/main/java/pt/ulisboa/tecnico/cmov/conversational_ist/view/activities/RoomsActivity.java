@@ -1,6 +1,5 @@
 package pt.ulisboa.tecnico.cmov.conversational_ist.view.activities;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -8,7 +7,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -17,12 +15,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -30,12 +23,11 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-import pt.ulisboa.tecnico.cmov.conversational_ist.ChatActivity;
 import pt.ulisboa.tecnico.cmov.conversational_ist.R;
 import pt.ulisboa.tecnico.cmov.conversational_ist.adapter.RoomsAdapter;
 import pt.ulisboa.tecnico.cmov.conversational_ist.database.FeedReaderDbHelper;
 import pt.ulisboa.tecnico.cmov.conversational_ist.model.Room;
-import pt.ulisboa.tecnico.cmov.conversational_ist.recyclerview.RecyclerViewAddRoomsInterface;
+import pt.ulisboa.tecnico.cmov.conversational_ist.interfaces.RecyclerViewAddRoomsInterface;
 
 public class RoomsActivity extends AppCompatActivity implements RecyclerViewAddRoomsInterface {
 

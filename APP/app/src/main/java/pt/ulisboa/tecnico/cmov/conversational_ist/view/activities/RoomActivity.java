@@ -37,16 +37,17 @@ import pt.ulisboa.tecnico.cmov.conversational_ist.database.NotifyActive;
 
 public class RoomActivity extends AppCompatActivity {
     
-    private ImageButton backBtn;
-
+    ImageButton backBtn;
     RecyclerView recyclerView;
     TextView name;
+    TextView rId;
     EditText msg;
     ImageButton send, attach;
     String uid;
     RequestQueue queue;
     List<Message> messageList;
 
+    /**
     private final BroadcastReceiver Updated = new BroadcastReceiver() {
 
         @Override
@@ -59,6 +60,7 @@ public class RoomActivity extends AppCompatActivity {
             }
         }
     };
+     */
     
     private AdapterChat adapterChat;
 
@@ -73,6 +75,34 @@ public class RoomActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
+        // initialise the text views and layouts
+        messageList = new ArrayList<>();
+        name = findViewById(R.id.room_name);
+        rId = findViewById(R.id.room_id);
+        //backBtn.findViewById(R.id.btn_back);
+        /**
+         msg = findViewById(R.id.ed_msg);
+         send = findViewById(R.id.room_send_btn);
+         attach = findViewById(R.id.btn_attach_file);
+         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+         linearLayoutManager.setStackFromEnd(true);
+         recyclerView = findViewById(R.id.recycler_chat);
+         recyclerView.setHasFixedSize(true);
+         recyclerView.setLayoutManager(linearLayoutManager);
+         uid = getIntent().getStringExtra("uid");
+         */
+
+        //********* DATA FROM MAIN ACTIVITY **********
+        String roomName = getIntent().getStringExtra("roomName");
+        String roomId = getIntent().getStringExtra("roomId");
+        name.setText(roomName);
+        rId.setText(roomId);
+        //********************************************
+
+
+        backBtn.setOnClickListener(v -> finish());
+
+        /**
         Bundle b = getIntent().getExtras();
         if(b != null) {
             roomID = b.getString("roomID");
@@ -83,22 +113,10 @@ public class RoomActivity extends AppCompatActivity {
 
         queue = Volley.newRequestQueue(RoomActivity.this);
 
-        // initialise the text views and layouts
-        messageList = new ArrayList<>();
-        name = findViewById(R.id.room_name);
-        msg = findViewById(R.id.ed_msg);
-        send = findViewById(R.id.room_send_btn);
-        backBtn.findViewById(R.id.btn_back);
-        attach = findViewById(R.id.btn_attach_file);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        linearLayoutManager.setStackFromEnd(true);
-        recyclerView = findViewById(R.id.recycler_chat);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(linearLayoutManager);
-        uid = getIntent().getStringExtra("uid");
+         */
 
-        backBtn.setOnClickListener(v -> finish());
 
+        /**
         send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -114,6 +132,7 @@ public class RoomActivity extends AppCompatActivity {
         loadMessages();
 
         registerReceiver(Updated, new IntentFilter("message_inserted_"+roomID));
+         */
     }
 
     private void loadMessages() {
@@ -226,16 +245,20 @@ public class RoomActivity extends AppCompatActivity {
     }
      */
 
+    /**
     @Override
     protected void onStop() {
         super.onStop();
         NotifyActive.getInstance().setActive("");
     }
+     */
 
+    /**
     @Override
     protected void onResume() {
         super.onResume();
         NotifyActive.getInstance().setActive(roomID);
     }
+    */
     
 }

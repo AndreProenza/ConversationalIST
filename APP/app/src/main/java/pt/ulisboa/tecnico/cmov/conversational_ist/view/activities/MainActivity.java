@@ -8,6 +8,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -19,6 +20,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,11 +38,12 @@ import pt.ulisboa.tecnico.cmov.conversational_ist.adapter.MainRoomsAdapter;
 import pt.ulisboa.tecnico.cmov.conversational_ist.adapter.RoomsAdapter;
 import pt.ulisboa.tecnico.cmov.conversational_ist.database.FeedReaderDbHelper;
 import pt.ulisboa.tecnico.cmov.conversational_ist.firebase.FirebaseHandler;
+import pt.ulisboa.tecnico.cmov.conversational_ist.interfaces.RecyclerViewEnterChatInterface;
 import pt.ulisboa.tecnico.cmov.conversational_ist.model.Room;
 import pt.ulisboa.tecnico.cmov.conversational_ist.model.User;
 import pt.ulisboa.tecnico.cmov.conversational_ist.view.activities.profiles.MyProfileActivity;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements RecyclerViewEnterChatInterface {
 
     private ActionBar actionBar;
     private Toolbar toolbar;
@@ -81,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void getRoomsSubscribed() {
         rooms = FeedReaderDbHelper.getInstance(getApplicationContext()).getAllChannels();
-        roomsAdapter = new MainRoomsAdapter(MainActivity.this, rooms);
+        roomsAdapter = new MainRoomsAdapter(MainActivity.this, rooms, this);
         recyclerView.setAdapter(roomsAdapter);
         Toast.makeText(MainActivity.this, "Rooms received" , Toast.LENGTH_SHORT).show();
     }
@@ -149,7 +152,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         nav_view.findViewById(R.id.ln_new_group).setOnClickListener(v -> {
-            startActivity(new Intent(MainActivity.this, NewRoomActivity.class));
+            startActivity(new Intent(MainActivity.this, AddNewRoomActivity.class));
             drawerLayout.closeDrawers();
         });
 
@@ -182,6 +185,21 @@ public class MainActivity extends AppCompatActivity {
     private void initPolicy() {
         Uri uri = Uri.parse("https://github.com/AndreProenza/ConversationalIST");
         Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+        startActivity(intent);
+    }
+
+    @Override
+    public void onItemClick(int position) {
+        CardView cardView = (CardView) recyclerView.getChildAt(position);
+        TextView tvRoomName = (TextView) cardView.findViewById(R.id.room_name);
+        String roomName = tvRoomName.getText().toString();
+        Log.d("RoomName: ", roomName);
+        TextView tvRoomId = (TextView) cardView.findViewById(R.id.room_id);
+        String roomId = tvRoomId.getText().toString();
+        Log.d("RoomName: ", roomId);
+        Intent intent = new Intent(MainActivity.this, RoomActivity.class);
+        intent.putExtra("roomName", roomName);
+        intent.putExtra("roomId", roomId);
         startActivity(intent);
     }
 }

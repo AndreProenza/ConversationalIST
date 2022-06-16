@@ -32,18 +32,20 @@
 
         </com.google.android.material.appbar.AppBarLayout>
 
+
         <LinearLayout
-            android:id="@+id/layout1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="15dp"
             android:orientation="horizontal"
-            android:layout_marginTop="55dp">
+            android:layout_marginTop="55dp"
+            android:background="@color/purple_700">
 
             <com.mikhaellopez.circularimageview.CircularImageView
                 android:id="@+id/image_profile"
                 android:layout_width="75dp"
                 android:layout_height="80dp"
+                android:layout_marginTop="10dp"
                 android:src="@drawable/conversationalist_icon"/>
 
             <LinearLayout
@@ -77,7 +79,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:descendantFocusability="blocksDescendants"
-            android:layout_marginTop="100dp"
+            android:layout_marginTop="105dp"
             app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
 
         </androidx.recyclerview.widget.RecyclerView>

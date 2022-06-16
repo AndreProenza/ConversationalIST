@@ -47,6 +47,15 @@
                     android:textSize="20sp"
                     android:textColor="@android:color/white"/>
 
+
+                <TextView
+                    android:id="@+id/room_id"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Room id"
+                    android:textSize="16sp"
+                    android:textColor="@android:color/white"/>
+
                 <!--
                 <TextView
                     android:id="@+id/room_description"
