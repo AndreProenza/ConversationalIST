@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import pt.ulisboa.tecnico.cmov.conversational_ist.model.Channel;
+import pt.ulisboa.tecnico.cmov.conversational_ist.model.Room;
 
 public class FeedReaderDbHelper extends SQLiteOpenHelper {
     // If you change the database schema, you must increment the database version.
@@ -116,21 +117,21 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-    public List<Channel> getAllChannels() {
-        List<Channel> channels = new ArrayList<>();
+    public ArrayList<Room> getAllChannels() {
+        ArrayList<Room> rooms = new ArrayList<>();
         String selectQuery = "SELECT  * FROM " + FeedReaderContract.FeedEntry.CHANNELS_TABLE_NAME + ";";
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.rawQuery(selectQuery, null);
 
         if (c.moveToFirst()) {
             while (!c.isAfterLast()) {
-                Channel m = new Channel(c.getString(0),c.getString(1));
-                channels.add(m);
+                Room m = new Room(c.getString(0),c.getString(1));
+                rooms.add(m);
             }
         }
 
         db.close();
-        return channels;
+        return rooms;
     }
 
 }

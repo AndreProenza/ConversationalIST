@@ -20,6 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.navigation.NavigationView;
@@ -33,6 +34,7 @@ import java.util.ArrayList;
 import pt.ulisboa.tecnico.cmov.conversational_ist.R;
 import pt.ulisboa.tecnico.cmov.conversational_ist.adapter.MainRoomsAdapter;
 import pt.ulisboa.tecnico.cmov.conversational_ist.adapter.RoomsAdapter;
+import pt.ulisboa.tecnico.cmov.conversational_ist.database.FeedReaderDbHelper;
 import pt.ulisboa.tecnico.cmov.conversational_ist.firebase.FirebaseHandler;
 import pt.ulisboa.tecnico.cmov.conversational_ist.model.Room;
 import pt.ulisboa.tecnico.cmov.conversational_ist.model.User;
@@ -74,7 +76,14 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        //TODO
+        getRoomsSubscribed();
+    }
+
+    private void getRoomsSubscribed() {
+        //rooms = FeedReaderDbHelper.getInstance(getApplicationContext()).getAllChannels();
+        roomsAdapter = new MainRoomsAdapter(MainActivity.this, rooms);
+        recyclerView.setAdapter(roomsAdapter);
+        Toast.makeText(MainActivity.this, "Rooms received" , Toast.LENGTH_SHORT).show();
     }
 
     private void initProfile() {
