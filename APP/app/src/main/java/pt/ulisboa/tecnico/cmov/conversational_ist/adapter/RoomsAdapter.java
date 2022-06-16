@@ -1,6 +1,7 @@
 package pt.ulisboa.tecnico.cmov.conversational_ist.adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,8 +9,11 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import static android.content.ContentValues.TAG;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.ArrayList;
 
@@ -72,7 +76,14 @@ public class RoomsAdapter extends RecyclerView.Adapter<RoomsAdapter.RoomsViewHol
                         if (position != RecyclerView.NO_POSITION) {
                             rvAddRoomsInterface.onItemClick(position);
                             FeedReaderDbHelper.getInstance(v.getContext()).createChannel(roomId.getText().toString(),roomName.getText().toString());
+                            FirebaseMessaging.getInstance().subscribeToTopic(roomId.getText().toString()).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Log.d(TAG, "Subscribe successful");
+                                }
+                            });
                         }
+
                     }
 
                 }

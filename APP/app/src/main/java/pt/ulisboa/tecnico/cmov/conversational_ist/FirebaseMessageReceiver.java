@@ -22,6 +22,7 @@ import java.util.Random;
 import pt.ulisboa.tecnico.cmov.conversational_ist.database.FeedReaderDbHelper;
 import pt.ulisboa.tecnico.cmov.conversational_ist.database.Message;
 import pt.ulisboa.tecnico.cmov.conversational_ist.database.NotifyActive;
+import pt.ulisboa.tecnico.cmov.conversational_ist.view.activities.RoomActivity;
 
 public class FirebaseMessageReceiver extends FirebaseMessagingService {
 
@@ -59,9 +60,9 @@ public class FirebaseMessageReceiver extends FirebaseMessagingService {
     }
 
     private void sendNotification(String title, String message, String roomID) {
-        Intent notificationIntent = new Intent(getApplicationContext(), ChatActivity.class);
+        Intent notificationIntent = new Intent(getApplicationContext(), RoomActivity.class);
 
-        notificationIntent.putExtra("roomID", roomID);
+        notificationIntent.putExtra("roomId", roomID);
 
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 

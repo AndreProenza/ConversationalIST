@@ -43,24 +43,23 @@ public class RoomActivity extends AppCompatActivity {
     TextView rId;
     EditText msg;
     ImageButton send, attach;
-    String uid;
     RequestQueue queue;
     List<Message> messageList;
 
-    /**
     private final BroadcastReceiver Updated = new BroadcastReceiver() {
 
         @Override
         public void onReceive(Context context, Intent intent) {
             Bundle extras = intent.getExtras();
             if (extras != null) {
+                System.out.println("HEOEEKEFKEFKEEF\n");
                 Message m = (Message) extras.get("message");
                 messageList.add(m);
                 adapterChat.notifyItemInserted(messageList.size() - 1);
             }
         }
     };
-     */
+
     
     private AdapterChat adapterChat;
 
@@ -73,14 +72,14 @@ public class RoomActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_chat);
+        setContentView(R.layout.activity_room);
 
         // initialise the text views and layouts
         messageList = new ArrayList<>();
         name = findViewById(R.id.room_name);
         rId = findViewById(R.id.room_id);
-        //backBtn.findViewById(R.id.btn_back);
-        /**
+        backBtn = findViewById(R.id.btn_back);
+
          msg = findViewById(R.id.ed_msg);
          send = findViewById(R.id.room_send_btn);
          attach = findViewById(R.id.btn_attach_file);
@@ -89,34 +88,26 @@ public class RoomActivity extends AppCompatActivity {
          recyclerView = findViewById(R.id.recycler_chat);
          recyclerView.setHasFixedSize(true);
          recyclerView.setLayoutManager(linearLayoutManager);
-         uid = getIntent().getStringExtra("uid");
-         */
+
+
 
         //********* DATA FROM MAIN ACTIVITY **********
-        String roomName = getIntent().getStringExtra("roomName");
-        String roomId = getIntent().getStringExtra("roomId");
+        String roomName = getIntent().getStringExtra("roomName"); //TODO Nome da sala
+        roomID = getIntent().getStringExtra("roomId");
+        System.out.println("HERE: " + roomName + "\n");
         name.setText(roomName);
-        rId.setText(roomId);
+        rId.setText(roomID);
         //********************************************
 
 
         backBtn.setOnClickListener(v -> finish());
 
-        /**
-        Bundle b = getIntent().getExtras();
-        if(b != null) {
-            roomID = b.getString("roomID");
-            System.out.println("Abriu notificao com roomID : " + roomID);
-        }
 
         //TODO listen data changes
 
         queue = Volley.newRequestQueue(RoomActivity.this);
 
-         */
 
-
-        /**
         send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -132,7 +123,7 @@ public class RoomActivity extends AppCompatActivity {
         loadMessages();
 
         registerReceiver(Updated, new IntentFilter("message_inserted_"+roomID));
-         */
+
     }
 
     private void loadMessages() {
@@ -245,20 +236,19 @@ public class RoomActivity extends AppCompatActivity {
     }
      */
 
-    /**
+
     @Override
     protected void onStop() {
         super.onStop();
         NotifyActive.getInstance().setActive("");
     }
-     */
 
-    /**
+
     @Override
     protected void onResume() {
         super.onResume();
         NotifyActive.getInstance().setActive(roomID);
     }
-    */
+
     
 }

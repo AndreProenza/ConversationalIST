@@ -115,14 +115,13 @@
     </androidx.cardview.widget.CardView>
     -->
 
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_chat"
-        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"/>
-
-
+        android:layout_height="597dp"
+        android:layout_margin="10dp"
+        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior" />
 
     <LinearLayout
         android:layout_width="match_parent"

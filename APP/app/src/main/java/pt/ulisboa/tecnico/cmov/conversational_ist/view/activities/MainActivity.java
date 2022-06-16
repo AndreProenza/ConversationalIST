@@ -86,7 +86,6 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
         rooms = FeedReaderDbHelper.getInstance(getApplicationContext()).getAllChannels();
         roomsAdapter = new MainRoomsAdapter(MainActivity.this, rooms, this);
         recyclerView.setAdapter(roomsAdapter);
-        Toast.makeText(MainActivity.this, "Rooms received" , Toast.LENGTH_SHORT).show();
     }
 
     private void initProfile() {
