@@ -3,6 +3,7 @@ package pt.ulisboa.tecnico.cmov.conversational_ist.view.activities;
 
 import static android.content.ContentValues.TAG;
 
+import static android.content.Context.MODE_PRIVATE;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -13,7 +14,9 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -52,26 +55,24 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
     private CircularImageView profileImage;
     private TextView userName;
 
-    private FirebaseAuth mAuth;
+    //private FirebaseAuth mAuth;
+    private String userId;
 
     RecyclerView recyclerView = null;
     private ArrayList<Room> rooms = new ArrayList<>();
     MainRoomsAdapter roomsAdapter;
+
+    SharedPreferences sharedPref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //TODO : use this to enter in new room with ID
-        FirebaseMessaging.getInstance().subscribeToTopic("628e1fa903146c7d0cc43b23").addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                Log.d(TAG, "Subscribe successful");
-            }
-        });
+        sharedPref = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
 
-        isUserLoggedIn();
+        //isUserLoggedIn();
+        initUser();
         init();
         initProfile();
 
@@ -88,12 +89,18 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
         recyclerView.setAdapter(roomsAdapter);
     }
 
+    private void initUser() {
+        SharedPreferences sh = getApplicationContext().getSharedPreferences("MyPrefs",MODE_PRIVATE);
+        userId = sh.getString("saved_username","");
+        Log.d("UserId: ", userId);
+    }
+
     private void initProfile() {
         userName = findViewById(R.id.name);
         profileImage = findViewById(R.id.profile);
 
-        String userId = mAuth.getUid().toString();
-        FirebaseHandler.getCurrentProfileInfo(userId, userName, profileImage);
+        //String userId = mAuth.getUid().toString();
+        FirebaseHandler.getCurrentProfileInfoMain(userId, userName, profileImage);
 
         profileImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -103,7 +110,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
         });
     }
 
-
+    /**
     private void isUserLoggedIn() {
         btnLogOut = findViewById(R.id.btnLogOut);
         mAuth = FirebaseAuth.getInstance();
@@ -113,11 +120,12 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
             startActivity(new Intent(MainActivity.this, LoginActivity.class));
         });
     }
+     */
 
     private void init() {
         toolbar = findViewById(R.id.toolbar);
         drawerLayout =  findViewById(R.id.drawer_layout);
-        //btnGroups = findViewById(R.id.btn_groups);
+
 
         //Set Actionbar
         setSupportActionBar(toolbar);
@@ -165,20 +173,48 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
             drawerLayout.closeDrawers();
         });
 
+        nav_view.findViewById(R.id.btnDelAccount).setOnClickListener(v -> {
+            deleteAccount();
+            startActivity(new Intent(MainActivity.this, RegisterActivity.class));
+            drawerLayout.closeDrawers();
+        });
+
+        /** Logout
         nav_view.findViewById(R.id.btnLogOut).setOnClickListener(v -> {
             FirebaseAuth.getInstance().signOut();
             startActivity(new Intent(MainActivity.this, LoginActivity.class));
             drawerLayout.closeDrawers();
         });
+         */
     }
+
 
     @Override
     protected void onStart() {
         super.onStart();
+
+        /** FIREBASE AUTH
         FirebaseUser user = mAuth.getCurrentUser();
         if (user == null){
             startActivity(new Intent(MainActivity.this, LoginActivity.class));
         }
+         */
+    }
+
+
+    private void deleteAccount() {
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.remove("saved_username");
+        editor.clear();
+        editor.apply();
+        //Delete Firebase Account
+        FirebaseHandler.deleteUserId(userId);
+        //Delete tables
+        FeedReaderDbHelper.getInstance(MainActivity.this).getWritableDatabase().execSQL(FeedReaderDbHelper.SQL_DELETE_ENTRIES_CHANNELS);
+        FeedReaderDbHelper.getInstance(MainActivity.this).getWritableDatabase().execSQL(FeedReaderDbHelper.SQL_DELETE_ENTRIES_MESSAGES);
+        //Create Tables
+        FeedReaderDbHelper.getInstance(MainActivity.this).getWritableDatabase().execSQL(FeedReaderDbHelper.SQL_CREATE_CHANNELS);
+        FeedReaderDbHelper.getInstance(MainActivity.this).getWritableDatabase().execSQL(FeedReaderDbHelper.SQL_CREATE_MESSAGES);
     }
 
     private void initPolicy() {

@@ -11,16 +11,20 @@ import androidx.core.content.FileProvider;
 
 import android.Manifest;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -49,6 +53,7 @@ import pt.ulisboa.tecnico.cmov.conversational_ist.R;
 import pt.ulisboa.tecnico.cmov.conversational_ist.firebase.FirebaseHandler;
 import pt.ulisboa.tecnico.cmov.conversational_ist.model.User;
 import pt.ulisboa.tecnico.cmov.conversational_ist.satic.StaticData;
+import pt.ulisboa.tecnico.cmov.conversational_ist.view.activities.RegisterActivity;
 
 public class MyProfileActivity extends AppCompatActivity {
 
@@ -73,8 +78,12 @@ public class MyProfileActivity extends AppCompatActivity {
 
     private CircularImageView profileImage;
     private TextView userName;
+    private TextView userName2;
+    private EditText bio;
+    private FloatingActionButton bioUploadBtn;
 
-    private FirebaseAuth mAuth = FirebaseAuth.getInstance();
+    private String userId;
+    SharedPreferences sharedPref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,16 +93,26 @@ public class MyProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_profile);
 
+        sharedPref = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+
+        initUser();
         initProfile();
+        uploadBio();
 
         //To take a picture
-        //initCamera();
+        initCamera();
 
         //To Upload a picture
         uploadPhoto();
 
         initLightDarkMode();
         initPolicy();
+    }
+
+    private void initUser() {
+        SharedPreferences sh = getApplicationContext().getSharedPreferences("MyPrefs",MODE_PRIVATE);
+        userId = sh.getString("saved_username","");
+        Log.d("UserId: ", userId);
     }
 
     private void verifyLightDarkMode() {
@@ -109,17 +128,40 @@ public class MyProfileActivity extends AppCompatActivity {
 
     private void initProfile() {
         userName = findViewById(R.id.username);
+        userName2 = findViewById(R.id.tv_username);
         profileImage = findViewById(R.id.image_profile);
+        bio = findViewById(R.id.tv_bio);
 
-        String userId = mAuth.getUid().toString();
-
-        FirebaseHandler.getCurrentProfileInfo(userId, userName, profileImage);
+        FirebaseHandler.getCurrentProfileInfo(userId, userName, userName2, profileImage, bio);
 
         findViewById(R.id.btn_back).setOnClickListener(v -> finish());
     }
 
+    private void uploadBio() {
+        bioUploadBtn = findViewById(R.id.btn_bio_upload);
+        bioUploadBtn.setOnClickListener(view ->{
+            String bioText = getBio();
+            if (bioText == null) {
+                Toast.makeText(MyProfileActivity.this, "Bio cannot be empty", Toast.LENGTH_SHORT).show();
+            } else {
+                FirebaseHandler.uploadUserBio(userId, bioText);
+            }
+        });
+    }
+
+    private String getBio() {
+        String bioText = bio.getText().toString();
+        if (bioText.trim().equals("")){
+            return null;
+        }
+        else {
+            return bioText;
+        }
+    }
+
     private void initCamera() {
         imageView = findViewById(R.id.image_profile);
+        cameraBtn = findViewById(R.id.fab_camera);
         cameraBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -216,21 +258,28 @@ public class MyProfileActivity extends AppCompatActivity {
         return image;
     }
 
-    /** CAMERA USAGE
+
+
+
+    // UPLOAD PHOTO USAGE
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        // UPLOAD PHOTO USAGE
+        if (requestCode == 2 && resultCode == RESULT_OK && data != null){
+            imageUri = data.getData();
+            imageView.setImageURI(imageUri);
+        }
+        // CAMERA USAGE
         if (resultCode == RESULT_OK && requestCode == REQUEST_TAKE_PHOTO) {
             if (StaticData.uri != null) {
                 imageView.setImageURI(StaticData.uri);
             }
         }
     }
-    */
 
     private void uploadPhoto() {
         imageView = findViewById(R.id.image_profile);
-        cameraBtn = findViewById(R.id.fab_camera);
         uploadBtn = findViewById(R.id.btn_upload);
         progressBar = findViewById(R.id.profile_progress_bar);
 
@@ -258,16 +307,6 @@ public class MyProfileActivity extends AppCompatActivity {
         });
     }
 
-    // UPLOAD PHOTO USAGE
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 2 && resultCode == RESULT_OK && data != null){
-            imageUri = data.getData();
-            imageView.setImageURI(imageUri);
-        }
-    }
-
     private void uploadToFirebase(Uri uri){
 
         db = FirebaseDatabase.getInstance().getReference("users");
@@ -281,7 +320,6 @@ public class MyProfileActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(Uri uri) {
                         User user = new User();
-                        String userId = mAuth.getUid().toString();
                         db.child(userId).child("photo").setValue(uri.toString());
 
                         progressBar.setVisibility(View.INVISIBLE);

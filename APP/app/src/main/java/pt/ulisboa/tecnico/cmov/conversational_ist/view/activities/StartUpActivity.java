@@ -28,7 +28,7 @@ public class StartUpActivity extends AppCompatActivity {
     }
 
     public void toLogin() {
-        startActivity(new Intent(StartUpActivity.this, pt.ulisboa.tecnico.cmov.conversational_ist.view.activities.LoginActivity.class));
+        startActivity(new Intent(StartUpActivity.this, RegisterActivity.class));
         //finish();
     }
 }
