@@ -45,10 +45,10 @@ public class AdapterChat extends RecyclerView.Adapter<pt.ulisboa.tecnico.cmov.co
     @Override
     public Myholder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         if (viewType == MSG_TYPE_LEFT) {
-            View view = LayoutInflater.from(context).inflate(R.layout.row_chat_left, parent, false);
+            View view = LayoutInflater.from(context).inflate(R.layout.message_item, parent, false);
             return new Myholder(view);
         } else {
-            View view = LayoutInflater.from(context).inflate(R.layout.row_chat_right, parent, false);
+            View view = LayoutInflater.from(context).inflate(R.layout.message_item_me, parent, false);
             return new Myholder(view);
         }
     }
@@ -60,6 +60,7 @@ public class AdapterChat extends RecyclerView.Adapter<pt.ulisboa.tecnico.cmov.co
         boolean isPhoto = list.get(position).isPhoto();
         holder.message.setText(message);
         holder.time.setText(timeStamp);
+        holder.username.setText(username);
 
         if (!isPhoto) {
             holder.message.setVisibility(View.VISIBLE);
@@ -88,14 +89,13 @@ public class AdapterChat extends RecyclerView.Adapter<pt.ulisboa.tecnico.cmov.co
     class Myholder extends RecyclerView.ViewHolder {
 
         ImageView mimage;
-        TextView message, time;
-        LinearLayout msglayput;
+        TextView username, message, time;
 
         public Myholder(@NonNull View itemView) {
             super(itemView);
-            message = itemView.findViewById(R.id.msgc);
-            time = itemView.findViewById(R.id.timetv);
-            msglayput = itemView.findViewById(R.id.msglayout);
+            username = itemView.findViewById(R.id.message_username);
+            message = itemView.findViewById(R.id.message_data);
+            time = itemView.findViewById(R.id.message_date);
             mimage = itemView.findViewById(R.id.images);
         }
     }

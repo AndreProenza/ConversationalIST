@@ -38,7 +38,6 @@
                     android:gravity="center"
                     android:layout_marginLeft="-55dp"/>
 
-
             </LinearLayout>
         </androidx.appcompat.widget.Toolbar>
 
