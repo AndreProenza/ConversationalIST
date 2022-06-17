@@ -40,6 +40,7 @@ public class FirebaseMessageReceiver extends FirebaseMessagingService {
         String message = remoteMessage.getData().get("message");
         String roomID = remoteMessage.getData().get("roomID");
         String date = remoteMessage.getData().get("createdAt");
+        boolean isPhoto = Boolean.parseBoolean(remoteMessage.getData().get("isPhoto"));
         System.out.println(date);
 
         Message m = new Message(remoteMessage.getData().get("id"),
@@ -47,7 +48,7 @@ public class FirebaseMessageReceiver extends FirebaseMessagingService {
                 roomID,
                 message,
                 date,
-                0);
+                isPhoto);
 
         FeedReaderDbHelper db = FeedReaderDbHelper.getInstance(getApplicationContext());
         db.createMessage(m,true);

@@ -9,9 +9,9 @@ public class Message implements Serializable {
     private String roomID;
     private String message;
     private String createdAt;
-    private int isPhoto;
+    private boolean isPhoto;
 
-    public Message(String id, String sender, String roomID, String message, String createdAt, int isPhoto) {
+    public Message(String id, String sender, String roomID, String message, String createdAt, boolean isPhoto) {
         this.id = id;
         this.sender = sender;
         this.roomID = roomID;
@@ -41,7 +41,7 @@ public class Message implements Serializable {
     }
 
     public boolean isPhoto() {
-        return isPhoto == 1;
+        return isPhoto;
     }
 
 }

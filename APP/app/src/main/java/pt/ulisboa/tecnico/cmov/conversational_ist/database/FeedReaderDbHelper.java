@@ -96,7 +96,8 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
 
         if (c.moveToFirst()) {
             while (!c.isAfterLast()) {
-                Message m = new Message(c.getString(0),c.getString(1),c.getString(2),c.getString(3),c.getString(4),c.getInt(5));
+                boolean isPhoto = c.getInt(5) == 1;
+                Message m = new Message(c.getString(0),c.getString(1),c.getString(2),c.getString(3),c.getString(4), isPhoto);
                 messages.add(m);
                 c.moveToNext();
             }

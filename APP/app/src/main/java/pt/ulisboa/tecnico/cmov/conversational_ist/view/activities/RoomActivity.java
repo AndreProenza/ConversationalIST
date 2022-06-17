@@ -8,17 +8,26 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
@@ -27,6 +36,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -164,42 +177,6 @@ public class RoomActivity extends AppCompatActivity {
 
     }
 
-    /*
-    private void readMessagesBefore() {
-        ArrayList<ModelChat> chatList = new ArrayList<>();
-
-        String url = BASE_URL + "/messages/before?roomID=" + roomID + "&last=" + last;
-
-        JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, url, null, new com.android.volley.Response.Listener<JSONArray>() {
-            @Override
-            public void onResponse(JSONArray response) {
-                Toast.makeText(RoomActivity.this, "Messages received!", Toast.LENGTH_SHORT).show();
-                System.out.println(response);
-
-                for (int i = 0; i < response.length(); i++) {
-                    try {
-                        JSONObject jresponse = response.getJSONObject(i);
-                        ModelChat modelChat = new ModelChat(jresponse.getString("message"), jresponse.getString("sender"), jresponse.getString("createdAt"));
-                        chatList.add(modelChat);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-                Toast.makeText(RoomActivity.this, "Data " + chatList.get(0), Toast.LENGTH_SHORT).show();
-                adapterChat = new AdapterChat(RoomActivity.this, chatList);
-                adapterChat.notifyDataSetChanged();
-                recyclerView.setAdapter(adapterChat);
-            }
-        }, new com.android.volley.Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Toast.makeText(RoomActivity.this, "Fail to get response = " + error, Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        queue.add(request);
-    }*/
-
     private void fetchMessages() {
 
         String url = BASE_URL + "/messages?roomID=" + roomID;
@@ -213,12 +190,13 @@ public class RoomActivity extends AppCompatActivity {
                 for (int i = 0; i < response.length(); i++) {
                     try {
                         JSONObject jresponse = response.getJSONObject(i);
+                        boolean isPhoto = Boolean.parseBoolean(jresponse.getString("isPhoto"));
                         Message msg = new Message(jresponse.getString("id"),
                                 jresponse.getString("sender"),
                                 jresponse.getString("roomID"),
                                 jresponse.getString("message"),
                                 jresponse.getString("createdAt"),
-                                0);
+                                isPhoto);
                         FeedReaderDbHelper.getInstance(getApplicationContext()).createMessage(msg, false);
                         messageList.add(msg);
                     } catch (JSONException e) {
@@ -234,6 +212,91 @@ public class RoomActivity extends AppCompatActivity {
                 Toast.makeText(RoomActivity.this, "Fail to get response = " + error, Toast.LENGTH_SHORT).show();
             }
         });
+        queue.add(request);
+    }
+
+
+    public void fetchPhoto(String message, String messageID) {
+        String url = BASE_URL + "/photo?messageID=" + messageID;
+
+        ImageRequest imageRequest = new ImageRequest(url, new Response.Listener<Bitmap>() {
+            @Override
+            public void onResponse(Bitmap response) {
+                savePhotoFile(message, messageID, response);
+            }
+        },50,50, ImageView.ScaleType.CENTER, null, new Response.ErrorListener(){
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(RoomActivity.this, "Fail to get response = " + error, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public void savePhotoFile(String message, String messageID, Bitmap bitmap){
+        String path = Environment.getExternalStorageDirectory().toString();
+        File file = new File(path, message + messageID + ".jpg");
+        try {
+            FileOutputStream fOut = new FileOutputStream(file);
+            bitmap.compress(Bitmap.CompressFormat.JPEG,100,fOut);
+            fOut.flush();
+            fOut.close();
+            MediaStore.Images.Media.insertImage(getContentResolver(),file.getAbsolutePath(),file.getName(),file.getName());
+        } catch (IOException e) {
+            Toast.makeText(RoomActivity.this, "Fail to save photo file", Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+        }
+    }
+
+    private boolean isWifiEnabled() {
+        WifiManager wifi_m = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+
+        if (wifi_m.isWifiEnabled()) { // if user opened wifi
+            WifiInfo wifi_i = wifi_m.getConnectionInfo();
+            return wifi_i.getNetworkId() != -1; // Not connected to any wifi device
+        } else {
+            return false; // user turned off wifi
+        }
+    }
+
+    private void fetchMessagesBefore() {
+        ArrayList<Message> chatList = new ArrayList<>();
+
+        String last = ""; //TODO get last and sort
+
+        String url = BASE_URL + "/messages/before?roomID=" + roomID + "&last=" + last;
+
+        JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, url, null, new com.android.volley.Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+                Toast.makeText(RoomActivity.this, "Messages received!", Toast.LENGTH_SHORT).show();
+                System.out.println(response);
+
+                for (int i = 0; i < response.length(); i++) {
+                    try {
+                        JSONObject jresponse = response.getJSONObject(i);
+                        boolean isPhoto = Boolean.parseBoolean(jresponse.getString("isPhoto"));
+                        Message msg = new Message(jresponse.getString("id"),
+                                jresponse.getString("sender"),
+                                jresponse.getString("roomID"),
+                                jresponse.getString("message"),
+                                jresponse.getString("createdAt"),
+                                isPhoto);
+                        FeedReaderDbHelper.getInstance(getApplicationContext()).createMessage(msg, false);
+                        chatList.add(msg);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+                Toast.makeText(RoomActivity.this, "Data " + chatList.get(0), Toast.LENGTH_SHORT).show();
+                adapterChat.notifyDataSetChanged();
+            }
+        }, new com.android.volley.Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(RoomActivity.this, "Fail to get response = " + error, Toast.LENGTH_SHORT).show();
+            }
+        });
+
         queue.add(request);
     }
 
