@@ -42,7 +42,7 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
         return sInstance;
     }
 
-    public FeedReaderDbHelper(Context context) {
+    private FeedReaderDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         dbContext = context;
     }

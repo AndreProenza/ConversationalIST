@@ -37,7 +37,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -144,8 +143,8 @@ public class RoomActivity extends AppCompatActivity {
         initAdapter();
     }
 
-    private void initAdapter() {
-        adapterChat = new AdapterChat(RoomActivity.this, messageList, username);
+    public void initAdapter() {
+        adapterChat = new AdapterChat(RoomActivity.this, getContentResolver(), messageList, username);
         recyclerView.setAdapter(adapterChat);
     }
 
@@ -213,49 +212,6 @@ public class RoomActivity extends AppCompatActivity {
             }
         });
         queue.add(request);
-    }
-
-
-    public void fetchPhoto(String message, String messageID) {
-        String url = BASE_URL + "/photo?messageID=" + messageID;
-
-        ImageRequest imageRequest = new ImageRequest(url, new Response.Listener<Bitmap>() {
-            @Override
-            public void onResponse(Bitmap response) {
-                savePhotoFile(message, messageID, response);
-            }
-        },50,50, ImageView.ScaleType.CENTER, null, new Response.ErrorListener(){
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Toast.makeText(RoomActivity.this, "Fail to get response = " + error, Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    public void savePhotoFile(String message, String messageID, Bitmap bitmap){
-        String path = Environment.getExternalStorageDirectory().toString();
-        File file = new File(path, message + messageID + ".jpg");
-        try {
-            FileOutputStream fOut = new FileOutputStream(file);
-            bitmap.compress(Bitmap.CompressFormat.JPEG,100,fOut);
-            fOut.flush();
-            fOut.close();
-            MediaStore.Images.Media.insertImage(getContentResolver(),file.getAbsolutePath(),file.getName(),file.getName());
-        } catch (IOException e) {
-            Toast.makeText(RoomActivity.this, "Fail to save photo file", Toast.LENGTH_SHORT).show();
-            e.printStackTrace();
-        }
-    }
-
-    private boolean isWifiEnabled() {
-        WifiManager wifi_m = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-
-        if (wifi_m.isWifiEnabled()) { // if user opened wifi
-            WifiInfo wifi_i = wifi_m.getConnectionInfo();
-            return wifi_i.getNetworkId() != -1; // Not connected to any wifi device
-        } else {
-            return false; // user turned off wifi
-        }
     }
 
     private void fetchMessagesBefore() {

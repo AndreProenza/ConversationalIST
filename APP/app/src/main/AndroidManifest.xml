@@ -67,10 +67,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".ChatListActivity"
-            android:exported="false" />
-        <activity android:name=".ChatActivity"></activity>
 
         <provider
             android:name="androidx.core.content.FileProvider"
