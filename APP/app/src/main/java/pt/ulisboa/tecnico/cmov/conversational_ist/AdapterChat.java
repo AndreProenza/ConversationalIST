@@ -6,9 +6,11 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
@@ -31,6 +33,8 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageRequest;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -89,19 +93,20 @@ public class AdapterChat extends RecyclerView.Adapter<pt.ulisboa.tecnico.cmov.co
             try {
                 Bitmap image = getPhotoFromMedia(messageID);
                 holder.mimage.setImageBitmap(image);
-            } catch (IOException e) {
+            } catch (FileNotFoundException e) {
                 e.printStackTrace();
-                //TODO set placeholder
+                //TODO set placeholder and change line below
+                fetchPhoto(messageID,position);
                 if(isWifiEnabled()){
-                    fetchPhoto(messageID,position);
+
                 }
             }
         }
     }
 
-    public Bitmap getPhotoFromMedia(String messageID) throws IOException {
-        Uri uri = MediaStore.Images.Media.getContentUri(messageID + ".jpg");
-        return MediaStore.Images.Media.getBitmap(resolver,uri);
+    public Bitmap getPhotoFromMedia(String messageID) throws FileNotFoundException {
+        Bitmap b = BitmapFactory.decodeStream(context.openFileInput(messageID + ".jpg"));
+        return b;
     }
 
     private boolean isWifiEnabled() {
@@ -116,15 +121,15 @@ public class AdapterChat extends RecyclerView.Adapter<pt.ulisboa.tecnico.cmov.co
     }
 
     public void fetchPhoto(String messageID, int position) {
-        String url = "https://cmuapi.herokuapp.com/api/photo?messageID=" + messageID;
+        String url = "https://cmuapi.herokuapp.com/api/photos?messageID=" + messageID;
 
         ImageRequest imageRequest = new ImageRequest(url, new Response.Listener<Bitmap>() {
             @Override
             public void onResponse(Bitmap response) {
-                savePhotoFile(messageID, response, resolver);
+                savePhotoFile(messageID, response);
                 notifyItemChanged(position);
             }
-        },50,50, ImageView.ScaleType.CENTER, null, new Response.ErrorListener(){
+        },3000,3000, ImageView.ScaleType.CENTER, null, new Response.ErrorListener(){
             @Override
             public void onErrorResponse(VolleyError error) {
                 Toast.makeText(context.getApplicationContext(), "Fail to get response = " + error, Toast.LENGTH_SHORT).show();
@@ -133,18 +138,20 @@ public class AdapterChat extends RecyclerView.Adapter<pt.ulisboa.tecnico.cmov.co
         VolleySingleton.getInstance(context).getmRequestQueue().add(imageRequest);
     }
 
-    public void savePhotoFile(String messageID, Bitmap bitmap, ContentResolver resolver){
-        String path = Environment.getExternalStorageDirectory().toString();
-        File file = new File(path, messageID + ".jpg");
+    public void savePhotoFile(String messageID, Bitmap bitmap){
+        FileOutputStream fos = null;
         try {
-            FileOutputStream fOut = new FileOutputStream(file);
-            bitmap.compress(Bitmap.CompressFormat.JPEG,100,fOut);
-            fOut.flush();
-            fOut.close();
-            MediaStore.Images.Media.insertImage(resolver,file.getAbsolutePath(),file.getName(),file.getName());
-        } catch (IOException e) {
-            Toast.makeText(context.getApplicationContext(), "Fail to save photo file", Toast.LENGTH_SHORT).show();
+            fos = context.openFileOutput(messageID + ".jpg", Context.MODE_PRIVATE);
+            // Use the compress method on the BitMap object to write image to the OutputStream
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+        } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            try {
+                fos.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
