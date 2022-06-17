@@ -175,8 +175,8 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
 
         nav_view.findViewById(R.id.btnDelAccount).setOnClickListener(v -> {
             deleteAccount();
-            drawerLayout.closeDrawers();
             startActivity(new Intent(MainActivity.this, RegisterActivity.class));
+            drawerLayout.closeDrawers();
         });
 
         /** Logout
@@ -207,6 +207,14 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
         editor.remove("saved_username");
         editor.clear();
         editor.apply();
+        //Delete Firebase Account
+        FirebaseHandler.deleteUserId(userId);
+        //Delete tables
+        FeedReaderDbHelper.getInstance(MainActivity.this).getWritableDatabase().execSQL(FeedReaderDbHelper.SQL_DELETE_ENTRIES_CHANNELS);
+        FeedReaderDbHelper.getInstance(MainActivity.this).getWritableDatabase().execSQL(FeedReaderDbHelper.SQL_DELETE_ENTRIES_MESSAGES);
+        //Create Tables
+        FeedReaderDbHelper.getInstance(MainActivity.this).getWritableDatabase().execSQL(FeedReaderDbHelper.SQL_CREATE_CHANNELS);
+        FeedReaderDbHelper.getInstance(MainActivity.this).getWritableDatabase().execSQL(FeedReaderDbHelper.SQL_CREATE_MESSAGES);
     }
 
     private void initPolicy() {

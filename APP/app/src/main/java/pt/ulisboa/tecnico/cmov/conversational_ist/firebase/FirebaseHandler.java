@@ -91,4 +91,9 @@ public class FirebaseHandler {
         db = FirebaseDatabase.getInstance().getReference("users");
         db.child(userId).child("bio").setValue(bioText);
     }
+
+    public static void deleteUserId(String userId) {
+        db = FirebaseDatabase.getInstance().getReference("users");
+        db.child(userId).removeValue();
+    }
 }
