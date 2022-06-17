@@ -2,6 +2,7 @@ package pt.ulisboa.tecnico.cmov.conversational_ist.firebase;
 
 import android.net.Uri;
 import android.util.Log;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -30,21 +31,23 @@ public class FirebaseHandler {
     public static void registerUser(DatabaseReference db, String userId, String userName) {
         User user = new User();
         user.setUsername(userName);
-        user.setBio(null);
-        user.setPhoto(null);
 
         db = FirebaseDatabase.getInstance().getReference("users");
         db.child(userId).setValue(user);
     }
 
-    public static void getCurrentProfileInfo(String userId, TextView userName, CircularImageView profileImage) {
+    public static void getCurrentProfileInfo(String userId, TextView userName, TextView userName2, CircularImageView profileImage, EditText bio) {
         db = FirebaseDatabase.getInstance().getReference("users");
         db.child(userId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-
-
-                userName.setText(snapshot.child("username").getValue().toString());
+                if (snapshot.hasChild("username")) {
+                    userName.setText(snapshot.child("username").getValue().toString());
+                    userName2.setText(snapshot.child("username").getValue().toString());
+                }
+                if (snapshot.hasChild("bio")) {
+                    bio.setText(snapshot.child("bio").getValue().toString());
+                }
                 if (snapshot.hasChild("photo")) {
                     String photo = snapshot.child("photo").getValue().toString();
                     Picasso.get().load(photo).into(profileImage);
@@ -58,5 +61,34 @@ public class FirebaseHandler {
                 Log.w(TAG, "Failed to read value.", error.toException());
             }
         });
+    }
+
+    public static void getCurrentProfileInfoMain(String userId, TextView userName, CircularImageView profileImage) {
+        db = FirebaseDatabase.getInstance().getReference("users");
+        db.child(userId).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                if (snapshot.hasChild("username")) {
+                    userName.setText(snapshot.child("username").getValue().toString());
+                }
+                if (snapshot.hasChild("photo")) {
+                    String photo = snapshot.child("photo").getValue().toString();
+                    Picasso.get().load(photo).into(profileImage);
+                }
+
+            }
+
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.w(TAG, "Failed to read value.", error.toException());
+            }
+        });
+    }
+
+    public static void uploadUserBio(String userId, String bioText) {
+        db = FirebaseDatabase.getInstance().getReference("users");
+        db.child(userId).child("bio").setValue(bioText);
     }
 }

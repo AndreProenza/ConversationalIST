@@ -36,7 +36,7 @@ import pt.ulisboa.tecnico.cmov.conversational_ist.database.Message;
 import pt.ulisboa.tecnico.cmov.conversational_ist.database.NotifyActive;
 
 public class RoomActivity extends AppCompatActivity {
-    
+
     ImageButton backBtn;
     RecyclerView recyclerView;
     TextView name;
