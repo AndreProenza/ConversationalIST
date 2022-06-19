@@ -33,7 +33,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageRequest;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.MapsInitializer;
+import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -89,29 +95,28 @@ public class AdapterChat extends RecyclerView.Adapter<pt.ulisboa.tecnico.cmov.co
 
         if (!isPhoto) {
             if(message.startsWith("https://www.google.com/maps/@")) {
-                String[] half = message.split("@")[1].split(",");
+                /*String[] half = message.split("@")[1].split(",");*/
                 holder.message.setVisibility(View.GONE);
                 holder.mimage.setVisibility(View.GONE);
-                holder.map_icon.setVisibility(View.VISIBLE);
-                holder.map_icon.setImageResource(R.drawable.ic_map_image);
+                holder.map.setVisibility(View.VISIBLE);
 
-                holder.map_icon.setOnClickListener(new View.OnClickListener() {
+                /* holder.map.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         Intent it = new Intent(context, MapsActivity.class).putExtra("markedPosition", new LatLng(Double.parseDouble(half[0]), Double.parseDouble(half[1])));
                         context.startActivity(it);
                     }
-                });
+                });*/
             } else {
                 holder.message.setVisibility(View.VISIBLE);
                 holder.mimage.setVisibility(View.GONE);
-                holder.map_icon.setVisibility(View.GONE);
+                holder.map.setVisibility(View.GONE);
                 holder.message.setText(message);
             }
         } else {
             holder.message.setVisibility(View.GONE);
             holder.mimage.setVisibility(View.VISIBLE);
-            holder.map_icon.setVisibility(View.GONE);
+            holder.map.setVisibility(View.GONE);
             try {
                 Bitmap image = getPhotoFromMedia(messageID);
                 holder.mimage.setImageBitmap(image);
@@ -125,6 +130,20 @@ public class AdapterChat extends RecyclerView.Adapter<pt.ulisboa.tecnico.cmov.co
             }
         }
     }
+
+    //TODO: Recycle and un-recycle to be more efficient
+/*
+    @Override
+    public void onViewRecycled(Myholder holder)
+    {
+        // Cleanup MapView here?
+        if (holder.gMap != null)
+        {
+            holder.gMap.clear();
+            holder.gMap.setMapType(GoogleMap.MAP_TYPE_NONE);
+        }
+    }
+*/
 
     public Bitmap getPhotoFromMedia(String messageID) throws FileNotFoundException {
         Bitmap b = BitmapFactory.decodeStream(context.openFileInput(messageID + ".jpg"));
@@ -191,20 +210,55 @@ public class AdapterChat extends RecyclerView.Adapter<pt.ulisboa.tecnico.cmov.co
         }
     }
 
-    class Myholder extends RecyclerView.ViewHolder {
+    class Myholder extends RecyclerView.ViewHolder implements OnMapReadyCallback {
 
         ImageView mimage;
         TextView message, time;
         LinearLayout msglayput;
-        ImageButton map_icon;
+        GoogleMap gMap;
+        MapView map;
 
         public Myholder(@NonNull View itemView) {
             super(itemView);
             message = itemView.findViewById(R.id.msgc);
             time = itemView.findViewById(R.id.timetv);
             msglayput = itemView.findViewById(R.id.msglayout);
-            map_icon = itemView.findViewById(R.id.map_button);
             mimage = itemView.findViewById(R.id.images);
+
+            map = (MapView) itemView.findViewById(R.id.mapImageView);
+
+            if (map != null)
+            {
+                map.onCreate(null);
+                map.onResume();
+                map.getMapAsync(this);
+            }
+        }
+
+
+
+
+        @Override
+        public void onMapReady(@NonNull GoogleMap googleMap) {
+            MapsInitializer.initialize(context.getApplicationContext());
+            gMap = googleMap;
+
+            //you can move map here to item specific 'location'
+            int pos = getAbsoluteAdapterPosition();
+            //get 'location' by 'pos' from data list
+            //then move to 'location'
+            String m = list.get(pos).getMessage();
+
+            String[] half = m.split("@");
+
+            if(half.length>1) {
+                half = half[1].split(",");
+                LatLng loc = new LatLng(Double.parseDouble(half[0]), Double.parseDouble(half[1]));
+
+                gMap.addMarker(new MarkerOptions().position(loc).title("Marker"));
+                gMap.moveCamera(CameraUpdateFactory.newLatLng(loc));
+                //gMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(Double.parseDouble(half[0]), Double.parseDouble(half[1])), 16.0f));
+            }
         }
     }
 }
