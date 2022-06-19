@@ -140,6 +140,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
             }
         });
 
+
         //Drawer
         final NavigationView nav_view =  findViewById(R.id.nav_layout);
         ActionBarDrawerToggle toggle =  new ActionBarDrawerToggle(this, drawerLayout, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
