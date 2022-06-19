@@ -36,6 +36,11 @@ public class RoomsAdapter extends RecyclerView.Adapter<RoomsAdapter.RoomsViewHol
         this.rvAddRoomsInterface = rvAddRoomsInterface;
     }
 
+    public void setFilteredRooms(ArrayList<Room> filteredRooms) {
+        this.rooms = filteredRooms;
+        notifyDataSetChanged();
+    }
+
     @NonNull
     @Override
     public RoomsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

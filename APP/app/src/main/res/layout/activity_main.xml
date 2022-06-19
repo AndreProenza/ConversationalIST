@@ -79,7 +79,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:descendantFocusability="blocksDescendants"
-            android:layout_marginTop="105dp"
+            android:layout_marginTop="115dp"
             app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
 
         </androidx.recyclerview.widget.RecyclerView>
@@ -153,7 +153,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="15dp"
-                        android:text="Groups" />
+                        android:text="Rooms" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -184,7 +184,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="15dp"
-                        android:text="New Group" />
+                        android:text="New Room" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
 

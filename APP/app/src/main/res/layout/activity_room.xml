@@ -9,6 +9,7 @@
     android:orientation="vertical">
 
     <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/app_bar_layout"
         android:layout_width="match_parent"
         android:layout_height="65dp">
         <LinearLayout
@@ -29,8 +30,7 @@
                 android:id="@+id/profile"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
-                android:layout_marginStart="15dp"
-                android:layout_margin="10dp"
+                android:layout_marginStart="5dp"
                 android:src="@drawable/place_holder"/>
 
             <LinearLayout
@@ -69,12 +69,13 @@
 
             </LinearLayout>
 
+            <!--
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <!--
+
                 <ImageButton
                     android:id="@+id/btn_call"
                     android:layout_width="wrap_content"
@@ -83,9 +84,9 @@
                     android:background="@android:color/transparent"
                     android:padding="15dp"
                     app:tint="@color/white" />
-                    -->
 
-                <!--
+
+
                 <ImageButton
                     android:id="@+id/btn_more"
                     android:layout_width="wrap_content"
@@ -94,9 +95,10 @@
                     android:background="@android:color/transparent"
                     android:padding="15dp"
                     app:tint="@color/white" />
-                    -->
+
 
             </LinearLayout>
+        -->
 
 
         </LinearLayout>
@@ -116,19 +118,14 @@
     </androidx.cardview.widget.CardView>
     -->
 
-    <ScrollView
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_chat"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_chat"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="70dp"
-            android:scrollbars="vertical"
-            android:isScrollContainer="true"/>
-    </ScrollView>
-
+        android:layout_height="580dp"
+        android:layout_marginTop="75dp"
+        android:isScrollContainer="true"
+        android:scrollbars="vertical" />
 
     <LinearLayout
         android:layout_width="match_parent"

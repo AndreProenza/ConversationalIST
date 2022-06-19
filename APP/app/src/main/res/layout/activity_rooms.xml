@@ -42,6 +42,7 @@
         </androidx.appcompat.widget.Toolbar>
 
         <LinearLayout
+            android:id="@+id/choose_room"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="15dp"
@@ -63,7 +64,7 @@
                     android:id="@+id/tv_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Choose your favourite room"
+                    android:text="Choose your Room"
                     android:textColor="@android:color/white"
                     android:textSize="20sp"
                     android:textStyle="bold"/>
@@ -102,12 +103,26 @@
     </LinearLayout>
     -->
 
+    <androidx.appcompat.widget.SearchView
+        android:id="@+id/search_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/app_bar_layout"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginBottom="5dp"
+        android:background="@drawable/search_view_bg"
+        app:queryHint="Search your room..."
+        app:iconifiedByDefault="false"/>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycle_view_rooms"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/app_bar_layout"
-        android:layout_marginTop="0dp" />
+        android:layout_below="@+id/search_view"
+        android:isScrollContainer="true"
+        android:scrollbars="vertical" />
 
 
 </RelativeLayout>
