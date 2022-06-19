@@ -217,5 +217,6 @@
         <item>Private</item>
         <item>Geo-fenced</item>
     </string-array>
+    <string name="title_activity_maps">MapsActivity</string>
 </resources>
 
