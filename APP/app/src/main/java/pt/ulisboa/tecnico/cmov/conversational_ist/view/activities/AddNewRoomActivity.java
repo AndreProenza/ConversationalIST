@@ -42,7 +42,7 @@ public class AddNewRoomActivity extends AppCompatActivity implements AdapterView
     private EditText edRoomName, edRoomDescription;
     private Spinner spinner;
     //private DatabaseReference db;
-    private TextView latitude, longitude, country, locality, address;
+    private String latitude, longitude, country, locality, address;
     private TextView latitudeText, longitudeText, countryText, localityText, addressText;
     private LinearLayout locationLayout;
     private ProgressBar progressBar;
@@ -66,11 +66,6 @@ public class AddNewRoomActivity extends AppCompatActivity implements AdapterView
 
     private void initSpinnerAndLocation() {
         locationLayout = (LinearLayout) findViewById(R.id.location_ll);
-        latitude = findViewById(R.id.latitude);
-        longitude = findViewById(R.id.longitude);
-        country = findViewById(R.id.country);
-        locality = findViewById(R.id.locality);
-        address = findViewById(R.id.address);
         latitudeText = findViewById(R.id.latitude_coor);
         longitudeText = findViewById(R.id.longitude_coor);
         countryText = findViewById(R.id.country_coor);
@@ -135,11 +130,16 @@ public class AddNewRoomActivity extends AppCompatActivity implements AdapterView
                         Geocoder geocoder = new Geocoder(AddNewRoomActivity.this, Locale.getDefault());
                         List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
                         //Set text to textviews
-                        latitudeText.setText(Double.toString(addresses.get(0).getLatitude()));
-                        longitudeText.setText(Double.toString(addresses.get(0).getLongitude()));
-                        countryText.setText(addresses.get(0).getCountryName());
-                        localityText.setText(addresses.get(0).getLocality());
-                        addressText.setText(addresses.get(0).getAddressLine(0));
+                        latitude = Double.toString(addresses.get(0).getLatitude());
+                        longitude = Double.toString(addresses.get(0).getLongitude());
+                        country = addresses.get(0).getCountryName();
+                        locality = addresses.get(0).getLocality();
+                        address = addresses.get(0).getAddressLine(0);
+                        latitudeText.setText(latitude);
+                        longitudeText.setText(longitude);
+                        countryText.setText(country);
+                        localityText.setText(locality);
+                        addressText.setText(address);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -166,9 +166,11 @@ public class AddNewRoomActivity extends AppCompatActivity implements AdapterView
                 else {
                     progressBar.setVisibility(View.VISIBLE);
                     //addRoomToFirebase();
-                    //ADD HERE ROOM
                     locationLayout.setVisibility(View.GONE);
                     progressBar.setVisibility(View.GONE);
+                    //ADD HERE ROOM
+                    //Use locality variable to store locality in heroku
+                    //locality
                 }
             }
         });
