@@ -1,33 +1,34 @@
 package pt.ulisboa.tecnico.cmov.conversational_ist.view.activities;
 
+import static android.content.ContentValues.TAG;
+
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Bitmap;
 import android.net.Uri;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
@@ -37,14 +38,16 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 
 import pt.ulisboa.tecnico.cmov.conversational_ist.AdapterChat;
+import pt.ulisboa.tecnico.cmov.conversational_ist.BuildConfig;
 import pt.ulisboa.tecnico.cmov.conversational_ist.R;
 import pt.ulisboa.tecnico.cmov.conversational_ist.database.FeedReaderDbHelper;
 import pt.ulisboa.tecnico.cmov.conversational_ist.database.Message;
@@ -80,6 +83,10 @@ public class RoomActivity extends AppCompatActivity {
 
     private String username = "bcv";
     private String roomID;
+
+    private ActivityResultLauncher<String> pickPhoto;
+    private ActivityResultLauncher<Uri> takePhoto;
+
 
     private final String BASE_URL = "https://cmuapi.herokuapp.com/api";
 
@@ -128,10 +135,85 @@ public class RoomActivity extends AppCompatActivity {
             }
         });
 
+
+        attach.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showAttachDialog();
+            }
+        });
+
+        pickPhoto = registerForActivityResult(
+                new ActivityResultContracts.GetContent(),
+                new ActivityResultCallback<Uri>() {
+                    @Override
+                    public void onActivityResult(Uri result) {
+
+                    }
+                });
+
+        takePhoto = registerForActivityResult(
+                new ActivityResultContracts.TakePicture(),
+                new ActivityResultCallback<Boolean>() {
+                    @Override
+                    public void onActivityResult(Boolean result) {
+                        Log.d(TAG,"returned : " + result);
+                    }
+
+                });
+
+
+
         loadMessages();
 
         registerReceiver(Updated, new IntentFilter("message_inserted_" + roomID));
 
+    }
+
+    public void showAttachDialog() {
+        CharSequence[] options = {"Take Photo", "Choose from Library", "Cancel"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(
+                RoomActivity.this);
+
+        builder.setItems(options, new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int item) {
+                if (options[item].equals("Take Photo")) {
+                    String uuid = UUID.randomUUID().toString();
+                    File outputDir = getCacheDir();
+                    File file;
+                    
+                    try
+                    {
+                        file = File.createTempFile( uuid, ".jpg", outputDir );
+                    }
+                    catch( IOException e )
+                    {
+                        return;
+                    }
+
+                    Uri photoTakenUri;
+                    try
+                    {
+                        photoTakenUri = FileProvider.getUriForFile( Objects.requireNonNull(
+                                        getApplicationContext()),
+                                BuildConfig.APPLICATION_ID + ".fileProvider", file );
+                    }
+                    catch( IllegalArgumentException e )
+                    {
+                        return;
+                    }
+
+                    takePhoto.launch(photoTakenUri);
+                } else if (options[item].equals("Choose from Library")) {
+                    pickPhoto.launch("image/*");
+                } else if (options[item].equals("Cancel")) {
+                    dialog.dismiss();
+                }
+            }
+        });
+        builder.show();
     }
 
     private void loadMessages() {
