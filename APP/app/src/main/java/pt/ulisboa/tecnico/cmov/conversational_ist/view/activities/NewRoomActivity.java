@@ -16,6 +16,7 @@ public class NewRoomActivity extends AppCompatActivity {
 
     protected FloatingActionButton fabAdd;
     protected ImageButton btn_back;
+    protected ImageButton btn_location;
     protected RecyclerView recyclerView;
 
     @Override

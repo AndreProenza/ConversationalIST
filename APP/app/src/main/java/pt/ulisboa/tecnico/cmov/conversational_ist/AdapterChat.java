@@ -8,6 +8,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -20,6 +21,7 @@ import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -31,6 +33,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageRequest;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -43,6 +46,7 @@ import java.util.List;
 import java.util.Locale;
 
 import pt.ulisboa.tecnico.cmov.conversational_ist.database.Message;
+import pt.ulisboa.tecnico.cmov.conversational_ist.view.activities.MapsActivity;
 import pt.ulisboa.tecnico.cmov.conversational_ist.view.activities.RoomActivity;
 
 
@@ -84,12 +88,30 @@ public class AdapterChat extends RecyclerView.Adapter<pt.ulisboa.tecnico.cmov.co
         holder.time.setText(timeStamp);
 
         if (!isPhoto) {
-            holder.message.setVisibility(View.VISIBLE);
-            holder.mimage.setVisibility(View.GONE);
-            holder.message.setText(message);
+            if(message.startsWith("https://www.google.com/maps/@")) {
+                String[] half = message.split("@")[1].split(",");
+                holder.message.setVisibility(View.GONE);
+                holder.mimage.setVisibility(View.GONE);
+                holder.map_icon.setVisibility(View.VISIBLE);
+                holder.map_icon.setImageResource(R.drawable.ic_map_image);
+
+                holder.map_icon.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent it = new Intent(context, MapsActivity.class).putExtra("markedPosition", new LatLng(Double.parseDouble(half[0]), Double.parseDouble(half[1])));
+                        context.startActivity(it);
+                    }
+                });
+            } else {
+                holder.message.setVisibility(View.VISIBLE);
+                holder.mimage.setVisibility(View.GONE);
+                holder.map_icon.setVisibility(View.GONE);
+                holder.message.setText(message);
+            }
         } else {
             holder.message.setVisibility(View.GONE);
             holder.mimage.setVisibility(View.VISIBLE);
+            holder.map_icon.setVisibility(View.GONE);
             try {
                 Bitmap image = getPhotoFromMedia(messageID);
                 holder.mimage.setImageBitmap(image);
@@ -174,12 +196,14 @@ public class AdapterChat extends RecyclerView.Adapter<pt.ulisboa.tecnico.cmov.co
         ImageView mimage;
         TextView message, time;
         LinearLayout msglayput;
+        ImageButton map_icon;
 
         public Myholder(@NonNull View itemView) {
             super(itemView);
             message = itemView.findViewById(R.id.msgc);
             time = itemView.findViewById(R.id.timetv);
             msglayput = itemView.findViewById(R.id.msglayout);
+            map_icon = itemView.findViewById(R.id.map_button);
             mimage = itemView.findViewById(R.id.images);
         }
     }

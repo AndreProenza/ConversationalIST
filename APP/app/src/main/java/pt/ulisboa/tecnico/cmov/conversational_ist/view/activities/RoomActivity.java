@@ -32,6 +32,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -56,6 +57,7 @@ import pt.ulisboa.tecnico.cmov.conversational_ist.database.NotifyActive;
 public class RoomActivity extends AppCompatActivity {
 
     ImageButton backBtn;
+    ImageButton btn_location;
     RecyclerView recyclerView;
     TextView name;
     TextView rId;
@@ -110,6 +112,14 @@ public class RoomActivity extends AppCompatActivity {
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(linearLayoutManager);
 
+        btn_location = findViewById(R.id.btn_sticker);
+        btn_location.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent it = new Intent(RoomActivity.this, MapsActivity.class).putExtra("markedPosition", new LatLng(-50, 100));
+                startActivity(it);
+            }
+        });
 
         //********* DATA FROM MAIN ACTIVITY **********
         String roomName = getIntent().getStringExtra("roomName"); //TODO Nome da sala
