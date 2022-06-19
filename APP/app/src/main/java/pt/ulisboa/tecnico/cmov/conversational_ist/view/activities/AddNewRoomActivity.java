@@ -26,6 +26,7 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -44,9 +45,12 @@ public class AddNewRoomActivity extends AppCompatActivity implements AdapterView
     //private DatabaseReference db;
     private String latitude, longitude, country, locality, address;
     private TextView latitudeText, longitudeText, countryText, localityText, addressText;
+    private TextInputEditText radiusInputText;
+    private String radius;
     private LinearLayout locationLayout;
     private ProgressBar progressBar;
     private FusedLocationProviderClient locationProvider;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -140,6 +144,17 @@ public class AddNewRoomActivity extends AppCompatActivity implements AdapterView
                         countryText.setText(country);
                         localityText.setText(locality);
                         addressText.setText(address);
+
+                        radiusInputText = findViewById(R.id.radius);
+                        String radiusText = radiusInputText.getText().toString();
+
+                        if (TextUtils.isEmpty(radiusText)){
+                            radiusInputText.setError("Radius cannot be empty");
+                            radiusInputText.requestFocus();
+                        } else {
+                            radius = radiusText;
+                        }
+
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -169,8 +184,8 @@ public class AddNewRoomActivity extends AppCompatActivity implements AdapterView
                     locationLayout.setVisibility(View.GONE);
                     progressBar.setVisibility(View.GONE);
                     //ADD HERE ROOM
-                    //Use locality variable to store locality in heroku
-                    //locality
+                    //Use radius variable to store locality in heroku
+                    //radius
                 }
             }
         });

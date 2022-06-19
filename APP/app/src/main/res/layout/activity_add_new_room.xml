@@ -129,6 +129,23 @@
             android:orientation="horizontal"
             android:layout_gravity="center">
 
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/radius"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:hint="Radius (km)"
+                android:inputType="numberDecimal"
+                android:maxLength="5" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="15dp"
+            android:orientation="horizontal"
+            android:layout_gravity="center">
+
             <LinearLayout
                 android:layout_width="190dp"
                 android:layout_height="wrap_content"
