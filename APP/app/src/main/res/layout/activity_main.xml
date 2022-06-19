@@ -74,6 +74,7 @@
 
         </LinearLayout>
 
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycle_view_rooms"
             android:layout_width="match_parent"
@@ -88,13 +89,14 @@
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
+
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/nav_layout"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:fitsSystemWindows="false"
-        android:layout_gravity="start">
-        <!-- android:visibility="gone" -->
+        android:layout_gravity="start"
+        android:visibility="visible">
 
         <LinearLayout
             android:layout_width="match_parent"

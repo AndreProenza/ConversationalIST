@@ -133,6 +133,13 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
 
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                drawerLayout.open();
+            }
+        });
+
         //Drawer
         final NavigationView nav_view =  findViewById(R.id.nav_layout);
         ActionBarDrawerToggle toggle =  new ActionBarDrawerToggle(this, drawerLayout, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
