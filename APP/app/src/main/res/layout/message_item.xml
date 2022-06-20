@@ -67,6 +67,14 @@
                     android:maxLength="500"
                     android:text="This is the Message..."/>
 
+                <com.google.android.gms.maps.MapView
+                    android:id="@+id/mapImageView"
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
+                    app:cameraZoom="15"
+                    app:liteMode="true"
+                    app:mapType="normal" />
+
                 <ImageView
                     android:id="@+id/images"
                     android:layout_width="150dp"

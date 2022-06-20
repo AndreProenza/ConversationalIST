@@ -214,7 +214,6 @@ public class AdapterChat extends RecyclerView.Adapter<pt.ulisboa.tecnico.cmov.co
     class Myholder extends RecyclerView.ViewHolder implements OnMapReadyCallback {
 
         ImageView mimage;
-        LinearLayout msglayput;
         GoogleMap gMap;
         MapView map;
         TextView username, message, time;

@@ -1,8 +1,6 @@
 package pt.ulisboa.tecnico.cmov.conversational_ist.view.activities;
 
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.databinding.DataBindingUtil;
+
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
@@ -66,13 +64,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         LocationManager lm = (LocationManager)getSystemService(LOCATION_SERVICE);
         @SuppressLint("MissingPermission") Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        double longitude = location.getLongitude();
-        double latitude = location.getLatitude();
-        LatLng loc = new LatLng(location.getLatitude(),location.getLongitude());
+        if(location != null) {
+            LatLng loc = new LatLng(location.getLatitude(), location.getLongitude());
 
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(loc));
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(loc, 15.0f));
-
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(loc));
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(loc, 15.0f));
+        }
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener()
         {
             @Override
