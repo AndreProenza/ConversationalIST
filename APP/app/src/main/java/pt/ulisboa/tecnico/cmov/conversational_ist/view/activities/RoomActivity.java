@@ -116,8 +116,10 @@ public class RoomActivity extends AppCompatActivity {
         btn_location.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 Intent it = new Intent(RoomActivity.this, MapsActivity.class).putExtra("markedPosition", new LatLng(-50, 100));
-                startActivity(it);
+                startActivityForResult(it,504);
+
             }
         });
 
@@ -178,6 +180,18 @@ public class RoomActivity extends AppCompatActivity {
 
         registerReceiver(Updated, new IntentFilter("message_inserted_" + roomID));
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+        // check if the request code is same as what is passed  here it is 2
+        if(requestCode==504)
+        {
+            String message=data.getStringExtra("message2send");
+            msg.setText(message);
+        }
     }
 
     public void showAttachDialog() {

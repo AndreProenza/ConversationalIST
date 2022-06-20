@@ -10,13 +10,17 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -48,6 +52,7 @@ import pt.ulisboa.tecnico.cmov.conversational_ist.view.activities.profiles.MyPro
 
 public class MainActivity extends AppCompatActivity implements RecyclerViewEnterChatInterface {
 
+    private static final int REQUEST_LOCATION_CODE = 501;
     private ActionBar actionBar;
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
@@ -75,6 +80,15 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
         initUser();
         init();
         initProfile();
+
+        int permissionCheck = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION);
+        if(permissionCheck != PackageManager.PERMISSION_GRANTED) {
+            // ask permissions here using below code
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    REQUEST_LOCATION_CODE);
+        }
 
         recyclerView = (RecyclerView) findViewById(R.id.recycle_view_rooms);
         recyclerView.setHasFixedSize(true);
