@@ -190,6 +190,7 @@ public class RoomActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int item) {
                 if (options[item].equals("Take Photo")) {
+                    Log.d(TAG,"entrou");
                     String uuid = UUID.randomUUID().toString();
                     File outputDir = getCacheDir();
                     File file;
@@ -202,16 +203,18 @@ public class RoomActivity extends AppCompatActivity {
                     {
                         return;
                     }
-
+                    Log.d(TAG,"aqui");
                     Uri photoTakenUri;
                     try
                     {
-                        photoTakenUri = FileProvider.getUriForFile( Objects.requireNonNull(
-                                        getApplicationContext()),
-                                BuildConfig.APPLICATION_ID + ".fileProvider", file );
+                        photoTakenUri = FileProvider.getUriForFile(
+                                        RoomActivity.this,
+                                getApplicationContext().getPackageName() + ".provider", file );
+                        Log.d(TAG,"chegou");
                     }
                     catch( IllegalArgumentException e )
                     {
+                        e.printStackTrace();
                         return;
                     }
 
