@@ -5,6 +5,8 @@ import static android.content.ContentValues.TAG;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
@@ -12,12 +14,17 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.BroadcastReceiver;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -28,6 +35,7 @@ import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
@@ -39,7 +47,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -49,7 +62,9 @@ import java.util.UUID;
 
 import pt.ulisboa.tecnico.cmov.conversational_ist.AdapterChat;
 import pt.ulisboa.tecnico.cmov.conversational_ist.BuildConfig;
+import pt.ulisboa.tecnico.cmov.conversational_ist.PhotoMultipartRequest;
 import pt.ulisboa.tecnico.cmov.conversational_ist.R;
+import pt.ulisboa.tecnico.cmov.conversational_ist.VolleySingleton;
 import pt.ulisboa.tecnico.cmov.conversational_ist.database.FeedReaderDbHelper;
 import pt.ulisboa.tecnico.cmov.conversational_ist.database.Message;
 import pt.ulisboa.tecnico.cmov.conversational_ist.database.NotifyActive;
@@ -88,6 +103,7 @@ public class RoomActivity extends AppCompatActivity {
 
     private ActivityResultLauncher<String> pickPhoto;
     private ActivityResultLauncher<Uri> takePhoto;
+    private Uri photoTakenUri;
 
 
     private final String BASE_URL = "https://cmuapi.herokuapp.com/api";
@@ -160,7 +176,7 @@ public class RoomActivity extends AppCompatActivity {
                 new ActivityResultCallback<Uri>() {
                     @Override
                     public void onActivityResult(Uri result) {
-
+                        sendPhotoMessage(result);
                     }
                 });
 
@@ -169,7 +185,7 @@ public class RoomActivity extends AppCompatActivity {
                 new ActivityResultCallback<Boolean>() {
                     @Override
                     public void onActivityResult(Boolean result) {
-                        Log.d(TAG,"returned : " + result);
+                        sendPhotoMessage(photoTakenUri);
                     }
 
                 });
@@ -180,6 +196,87 @@ public class RoomActivity extends AppCompatActivity {
 
         registerReceiver(Updated, new IntentFilter("message_inserted_" + roomID));
 
+    }
+
+    public void sendPhotoMessage(Uri uri){
+
+        String surl = "http://10.0.2.2:8080/api/messages";
+
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("sender", username);
+        params.put("roomID", roomID);
+        params.put("message", "");
+        params.put("isPhoto", "true");
+
+        JSONObject jsonObj = new JSONObject(params);
+
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, surl, jsonObj, new com.android.volley.Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    uploadImage(uri,response.getString("id"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new com.android.volley.Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(RoomActivity.this, "Fail to get response = " + error, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        VolleySingleton.getInstance(getApplicationContext()).getmRequestQueue().add(request);
+
+    }
+
+    public void uploadImage(Uri uri, String messageID){
+        File imageFile = new File(createCopyAndReturnRealPath(getApplicationContext(),uri));
+        String url = "http://10.0.2.2:8080/api/photos?messageID=" + messageID;
+        PhotoMultipartRequest imageUploadReq = new PhotoMultipartRequest(url, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d(TAG,"ta dificl");
+            }
+        }, new Response.Listener() {
+            @Override
+            public void onResponse(Object response) {
+                Log.d(TAG,"ta facil");
+            }
+        }, imageFile);
+        VolleySingleton.getInstance(getApplicationContext()).getmRequestQueue().add(imageUploadReq);
+    }
+
+    @Nullable
+    public static String createCopyAndReturnRealPath(
+            @NonNull Context context, @NonNull Uri uri) {
+        final ContentResolver contentResolver = context.getContentResolver();
+        if (contentResolver == null)
+            return null;
+
+        // Create file path inside app's data dir
+        String filePath = context.getApplicationInfo().dataDir + File.separator
+                + System.currentTimeMillis();
+
+        File file = new File(filePath);
+        try {
+            InputStream inputStream = contentResolver.openInputStream(uri);
+            if (inputStream == null)
+                return null;
+
+            OutputStream outputStream = new FileOutputStream(file);
+            byte[] buf = new byte[1024];
+            int len;
+            while ((len = inputStream.read(buf)) > 0)
+                outputStream.write(buf, 0, len);
+
+            outputStream.close();
+            inputStream.close();
+        } catch (IOException ignore) {
+            return null;
+        }
+
+        return file.getAbsolutePath();
     }
 
     @Override
@@ -204,34 +301,21 @@ public class RoomActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int item) {
                 if (options[item].equals("Take Photo")) {
-                    Log.d(TAG,"entrou");
                     String uuid = UUID.randomUUID().toString();
                     File outputDir = getCacheDir();
                     File file;
-                    
                     try
                     {
                         file = File.createTempFile( uuid, ".jpg", outputDir );
-                    }
-                    catch( IOException e )
-                    {
-                        return;
-                    }
-                    Log.d(TAG,"aqui");
-                    Uri photoTakenUri;
-                    try
-                    {
                         photoTakenUri = FileProvider.getUriForFile(
                                         RoomActivity.this,
                                 getApplicationContext().getPackageName() + ".provider", file );
-                        Log.d(TAG,"chegou");
                     }
-                    catch( IllegalArgumentException e )
+                    catch( IllegalArgumentException | IOException e )
                     {
-                        e.printStackTrace();
+                        Toast.makeText(RoomActivity.this, "Take picture not available!", Toast.LENGTH_SHORT).show();
                         return;
                     }
-
                     takePhoto.launch(photoTakenUri);
                 } else if (options[item].equals("Choose from Library")) {
                     pickPhoto.launch("image/*");
@@ -264,7 +348,7 @@ public class RoomActivity extends AppCompatActivity {
         params.put("sender", username);
         params.put("roomID", roomID);
         params.put("message", message);
-        params.put("isPhoto", "false"); //TODO implement photo
+        params.put("isPhoto", "false");
 
         JSONObject jsonObj = new JSONObject(params);
 
