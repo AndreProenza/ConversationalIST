@@ -1,6 +1,7 @@
 package pt.ulisboa.tecnico.cmov.conversational_ist.view.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -39,6 +40,7 @@ public class RoomsActivity extends AppCompatActivity implements RecyclerViewAddR
     DatabaseReference db;
     RoomsAdapter roomsAdapter;
     private RequestQueue queue;
+    private SearchView searchView;
 
 
     @Override
@@ -67,6 +69,7 @@ public class RoomsActivity extends AppCompatActivity implements RecyclerViewAddR
         //************************************************
 
         fetchRooms();
+        initSearch();
 
         //TODO call to save channel in db
         //FeedReaderDbHelper.getInstance(getApplicationContext()).createChannel("628e1fa903146c7d0cc43b23","b");
@@ -105,6 +108,37 @@ public class RoomsActivity extends AppCompatActivity implements RecyclerViewAddR
         });
          */
 
+    }
+
+    private void initSearch() {
+        searchView = findViewById(R.id.search_view);
+        searchView.clearFocus();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                filterRooms(newText);
+                return true;
+            }
+        });
+    }
+
+    private void filterRooms(String text) {
+        ArrayList<Room> filteredRooms = new ArrayList<>();
+        for (Room r : rooms) {
+            if (r.getRoomName().toLowerCase().contains(text.toLowerCase())) {
+                filteredRooms.add(r);
+            }
+        }
+        if (filteredRooms.isEmpty()) {
+            Toast.makeText(this, "No room found", Toast.LENGTH_SHORT).show();
+        } else {
+            roomsAdapter.setFilteredRooms(filteredRooms);
+        }
     }
 
     private void fetchRooms() {

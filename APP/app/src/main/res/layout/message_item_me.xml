@@ -5,7 +5,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:cardElevation="12dp"
     app:cardCornerRadius="12dp"
-    android:layout_margin="16dp">
+    android:layout_margin="5dp"
+    android:layout_gravity="right">
 
     <LinearLayout
         android:orientation="horizontal"
@@ -14,7 +15,7 @@
         android:gravity="right">
 
         <LinearLayout
-            android:layout_width="290dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
@@ -35,28 +36,40 @@
                     android:paddingEnd="10dp"/>
 
                 <TextView
-                    android:id="@+id/message_user_name"
+                    android:id="@+id/message_username"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textStyle="bold"
                     android:text="Username"
                     android:maxLength="25"
-                    android:textSize="17dp"
+                    android:textSize="19dp"
                     android:textColor="@android:color/holo_blue_light"/>
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_margin="2dp">
 
                 <TextView
-                    android:id="@+id/message_message"
+                    android:id="@+id/message_data"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:maxHeight="300dp"
                     android:maxLength="500"
                     android:textAlignment="textEnd"
                     android:text="This is the Message..." />
+
+                <ImageView
+                    android:id="@+id/images"
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
+                    android:adjustViewBounds="true"
+                    android:layout_marginTop="10dp"
+                    android:scaleType="fitCenter"
+                    android:layout_gravity="right"
+                    android:visibility="gone"/>
             </LinearLayout>
 
         </LinearLayout>
