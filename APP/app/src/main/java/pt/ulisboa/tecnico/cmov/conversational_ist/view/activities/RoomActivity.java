@@ -189,9 +189,7 @@ public class RoomActivity extends AppCompatActivity {
                     }
 
                 });
-
-
-
+        
         loadMessages();
 
         registerReceiver(Updated, new IntentFilter("message_inserted_" + roomID));
@@ -200,7 +198,7 @@ public class RoomActivity extends AppCompatActivity {
 
     public void sendPhotoMessage(Uri uri){
 
-        String surl = "http://10.0.2.2:8080/api/messages";
+        String url = BASE_URL + "/messages";
 
         Map<String, String> params = new HashMap<String, String>();
         params.put("sender", username);
@@ -210,7 +208,7 @@ public class RoomActivity extends AppCompatActivity {
 
         JSONObject jsonObj = new JSONObject(params);
 
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, surl, jsonObj, new com.android.volley.Response.Listener<JSONObject>() {
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, jsonObj, new com.android.volley.Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -232,7 +230,7 @@ public class RoomActivity extends AppCompatActivity {
 
     public void uploadImage(Uri uri, String messageID){
         File imageFile = new File(createCopyAndReturnRealPath(getApplicationContext(),uri));
-        String url = "http://10.0.2.2:8080/api/photos?messageID=" + messageID;
+        String url = BASE_URL + "/photos?messageID=" + messageID;
         PhotoMultipartRequest imageUploadReq = new PhotoMultipartRequest(url, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
