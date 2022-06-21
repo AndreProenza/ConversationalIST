@@ -81,9 +81,16 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
         init();
         initProfile();
 
+        String appLinkAction = getIntent().getAction();
+        Uri appLinkData = getIntent().getData();
+        if (appLinkData != null) {
+            String roomID = appLinkData.getLastPathSegment();
+            FeedReaderDbHelper.getInstance(this).createChannel(roomID, "Private Channel");
+        }
+
         int permissionCheck = ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION);
-        if(permissionCheck != PackageManager.PERMISSION_GRANTED) {
+        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
             // ask permissions here using below code
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
@@ -95,6 +102,10 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         getRoomsSubscribed();
+
+        // ATTENTION: This was auto-generated to handle app links.
+
+        // ATTENTION: This was auto-generated to handle app links.
     }
 
     private void getRoomsSubscribed() {

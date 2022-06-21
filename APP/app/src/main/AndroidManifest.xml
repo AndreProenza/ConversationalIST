@@ -13,8 +13,8 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission
         android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage" />
@@ -66,7 +66,7 @@
             android:exported="false" />
         <activity
             android:name=".view.activities.RoomsActivity"
-            android:exported="false" />
+            android:exported="false"></activity>
         <activity
             android:name=".view.activities.profiles.MyProfileActivity"
             android:exported="false" />
@@ -75,7 +75,7 @@
             android:exported="false" />
         <activity
             android:name=".view.activities.RoomActivity"
-            android:exported="false" />
+            android:exported="false"></activity>
         <activity
             android:name=".view.activities.NewRoomActivity"
             android:exported="false" />
@@ -84,7 +84,19 @@
             android:exported="false" />
         <activity
             android:name=".view.activities.MainActivity"
-            android:exported="false" />
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:scheme="https"
+                    android:host="github.com"
+                    android:pathPrefix="/AndreProenza/ConversationalIST/room/" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".view.activities.StartUpActivity"
             android:exported="false" />

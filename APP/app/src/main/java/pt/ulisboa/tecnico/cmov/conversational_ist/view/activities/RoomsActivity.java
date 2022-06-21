@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
@@ -98,13 +99,12 @@ public class RoomsActivity extends AppCompatActivity implements RecyclerViewAddR
         //************************************************
 
         /**
-        loadRoomsBtn = findViewById(R.id.load_rooms);
-        loadRoomsBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(RoomsActivity.this, RoomListActivity.class));
-                finish();
-            }
+         loadRoomsBtn = findViewById(R.id.load_rooms);
+         loadRoomsBtn.setOnClickListener(new View.OnClickListener() {
+        @Override public void onClick(View v) {
+        startActivity(new Intent(RoomsActivity.this, RoomListActivity.class));
+        finish();
+        }
         });
          */
 
