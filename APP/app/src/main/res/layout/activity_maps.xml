@@ -11,20 +11,37 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".view.activities.MapsActivity"
-        tools:layout_editor_absoluteX="194dp"
-        tools:layout_editor_absoluteY="0dp" />
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="-16dp" />
 
     <ImageButton
         android:id="@+id/send_map"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="37dp"
+        android:layout_height="40dp"
+        android:background="@color/white"
         android:src="@android:drawable/ic_menu_send"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.954"
+        app:layout_constraintHorizontal_bias="0.957"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.023" />
+        app:layout_constraintVertical_bias="0.024" />
+
+    <SearchView
+        android:id="@+id/map_searchView"
+        android:layout_width="315dp"
+        android:layout_height="42dp"
+        android:layout_margin="10dp"
+        android:background="@color/white"
+        android:elevation="5dp"
+        app:iconifiedByDefault="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/send_map"
+        app:layout_constraintHorizontal_bias="0.625"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.01"
+        app:queryHint="Search Here" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
