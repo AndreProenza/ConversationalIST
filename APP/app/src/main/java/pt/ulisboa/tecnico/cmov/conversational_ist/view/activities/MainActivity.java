@@ -257,6 +257,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
         Intent intent = new Intent(MainActivity.this, RoomActivity.class);
         intent.putExtra("roomName", roomName);
         intent.putExtra("roomId", roomId);
+        intent.putExtra("username", userId);
         startActivity(intent);
     }
 }

@@ -98,7 +98,7 @@ public class RoomActivity extends AppCompatActivity {
 
     private AdapterChat adapterChat;
 
-    private String username = "bcv";
+    private String username;
     private String roomID;
 
     private ActivityResultLauncher<String> pickPhoto;
@@ -142,7 +142,8 @@ public class RoomActivity extends AppCompatActivity {
         //********* DATA FROM MAIN ACTIVITY **********
         String roomName = getIntent().getStringExtra("roomName"); //TODO Nome da sala
         roomID = getIntent().getStringExtra("roomId");
-        System.out.println("HERE: " + roomName + "\n");
+        username = getIntent().getStringExtra("username");
+        System.out.println(username + " HERE: " + roomName + "\n");
         name.setText(roomName);
         rId.setText(roomID);
         //********************************************
@@ -335,7 +336,7 @@ public class RoomActivity extends AppCompatActivity {
     }
 
     public void initAdapter() {
-        adapterChat = new AdapterChat(RoomActivity.this, getContentResolver(), messageList, username);
+        adapterChat = new AdapterChat(RoomActivity.this, messageList, username);
         recyclerView.setAdapter(adapterChat);
     }
 

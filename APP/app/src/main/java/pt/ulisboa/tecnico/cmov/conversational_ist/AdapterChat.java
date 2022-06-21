@@ -61,15 +61,13 @@ public class AdapterChat extends RecyclerView.Adapter<pt.ulisboa.tecnico.cmov.co
     private static final int MSG_TYPE_RIGHT = 1;
     private Context context;
     private List<Message> list;
-    private ContentResolver resolver;
 
     private final String username;
 
-    public AdapterChat(Context context, ContentResolver resolver, List<Message> list, String username) {
+    public AdapterChat(Context context, List<Message> list, String username) {
         this.context = context;
         this.list = list;
         this.username = username;
-        this.resolver = resolver;
     }
 
     @NonNull
@@ -90,9 +88,10 @@ public class AdapterChat extends RecyclerView.Adapter<pt.ulisboa.tecnico.cmov.co
         String message = list.get(position).getMessage();
         String timeStamp = list.get(position).getCreatedAt();
         boolean isPhoto = list.get(position).isPhoto();
+        String sender = list.get(position).getSender();
         holder.message.setText(message);
         holder.time.setText(timeStamp);
-        holder.username.setText(username);
+        holder.username.setText(sender);
 
         if (!isPhoto) {
             if(message.startsWith("https://www.google.com/maps/@")) {
