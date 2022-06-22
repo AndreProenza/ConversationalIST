@@ -73,6 +73,7 @@ public class RoomActivity extends AppCompatActivity {
 
     ImageButton backBtn;
     ImageButton btn_location;
+    ImageButton btn_share;
     RecyclerView recyclerView;
     TextView name;
     TextView rId;
@@ -80,6 +81,8 @@ public class RoomActivity extends AppCompatActivity {
     ImageButton send, attach;
     RequestQueue queue;
     List<Message> messageList;
+
+    private final String deepLink = "https://github.com/AndreProenza/ConversationalIST/room/";
 
     private final BroadcastReceiver Updated = new BroadcastReceiver() {
 
@@ -134,10 +137,29 @@ public class RoomActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 Intent it = new Intent(RoomActivity.this, MapsActivity.class).putExtra("markedPosition", new LatLng(-50, 100));
-                startActivityForResult(it,504);
+                startActivityForResult(it, 504);
 
             }
         });
+
+        btn_share = findViewById(R.id.share_room_button);
+        btn_share.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent sendIntent = new Intent();
+                sendIntent.setAction(Intent.ACTION_SEND);
+                //sendIntent.putExtra("id", roomID);
+                sendIntent.setType("text/plain");
+                sendIntent.putExtra(Intent.EXTRA_TEXT, deepLink+roomID);
+               //sendIntent.setType("vnd.android-dir/mms-sms");
+
+                Intent shareIntent = Intent.createChooser(sendIntent, "Share room");
+                startActivity(shareIntent);
+
+            }
+        });
+
 
         //********* DATA FROM MAIN ACTIVITY **********
         String roomName = getIntent().getStringExtra("roomName"); //TODO Nome da sala
@@ -190,11 +212,10 @@ public class RoomActivity extends AppCompatActivity {
                     }
 
                 });
-        
+
         loadMessages();
 
         registerReceiver(Updated, new IntentFilter("message_inserted_" + roomID));
-
     }
 
     public void sendPhotoMessage(Uri uri){
@@ -283,7 +304,7 @@ public class RoomActivity extends AppCompatActivity {
     {
         super.onActivityResult(requestCode, resultCode, data);
         // check if the request code is same as what is passed  here it is 2
-        if(requestCode==504)
+        if(requestCode==504 && data!=null)
         {
             String message=data.getStringExtra("message2send");
             msg.setText(message);
