@@ -15,9 +15,11 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.format.DateFormat;
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +30,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.volley.Response;
@@ -46,8 +49,13 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -86,7 +94,10 @@ public class AdapterChat extends RecyclerView.Adapter<pt.ulisboa.tecnico.cmov.co
     public void onBindViewHolder(@NonNull Myholder holder, @SuppressLint("RecyclerView") final int position) {
         String messageID = list.get(position).getId();
         String message = list.get(position).getMessage();
-        String timeStamp = list.get(position).getCreatedAt();
+        String timeStamp = formatDate(list.get(position).getCreatedAt());
+
+
+
         boolean isPhoto = list.get(position).isPhoto();
         String sender = list.get(position).getSender();
         holder.message.setText(message);
@@ -129,6 +140,28 @@ public class AdapterChat extends RecyclerView.Adapter<pt.ulisboa.tecnico.cmov.co
                 }
             }
         }
+    }
+
+    private String formatDate(String unformatted) {
+
+        if(!unformatted.isEmpty()) {
+            String[] result = unformatted.split("T");
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-mm-dd");
+            Date date = null;
+
+            try {
+                date = format.parse(result[0]);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            if(DateUtils.isToday(date.getTime())) {
+                unformatted = "Today at "+result[1];
+            } else {
+                unformatted = result[0];
+            }
+        }
+
+        return unformatted;
     }
 
     //TODO: Recycle and un-recycle to be more efficient

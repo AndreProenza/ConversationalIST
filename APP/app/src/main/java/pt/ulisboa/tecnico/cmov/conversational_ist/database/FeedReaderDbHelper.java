@@ -19,7 +19,7 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
 
     public static FeedReaderDbHelper sInstance;
 
-    public static final int DATABASE_VERSION = 16;
+    public static final int DATABASE_VERSION = 18;
     public static final String DATABASE_NAME = "FeedReader.db";
     private Context dbContext;
 
@@ -75,7 +75,7 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
         values.put(FeedReaderContract.FeedEntry.KEY_MESSAGE_CREATEDAT, m.getCreatedAt());
         values.put(FeedReaderContract.FeedEntry.KEY_MESSAGE_ISPHOTO, m.isPhoto());
 
-        db.insert(FeedReaderContract.FeedEntry.MESSAGES_TABLE_NAME, null, values);
+        db.insertWithOnConflict(FeedReaderContract.FeedEntry.MESSAGES_TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_IGNORE);
 
         if(sendBroadcast) {
             Intent i = new Intent("message_inserted_" + m.getRoomID());
@@ -119,15 +119,29 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
     }
 
     public void createChannel(String id, String name) {
-        SQLiteDatabase db = this.getWritableDatabase();
+            SQLiteDatabase db = this.getWritableDatabase();
 
-        ContentValues values = new ContentValues();
-        values.put(FeedReaderContract.FeedEntry.KEY_CHANNEL_ID, id);
-        values.put(FeedReaderContract.FeedEntry.KEY_CHANNEL_NAME, name);
+            ContentValues values = new ContentValues();
+            values.put(FeedReaderContract.FeedEntry.KEY_CHANNEL_ID, id);
+            values.put(FeedReaderContract.FeedEntry.KEY_CHANNEL_NAME, name);
 
-        db.insert(FeedReaderContract.FeedEntry.CHANNELS_TABLE_NAME, null, values);
+            db.insertWithOnConflict(FeedReaderContract.FeedEntry.CHANNELS_TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_IGNORE);
+            db.close();
+    }
+
+    public String getChannelName(String id) {
+        String selectQuery = "SELECT * FROM " + FeedReaderContract.FeedEntry.CHANNELS_TABLE_NAME + " WHERE channel_id = '" +  id + "';";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        String result = "";
+
+        if (c.moveToFirst()) {
+            result = c.getString(1);
+        }
 
         db.close();
+        return result;
     }
 
     public ArrayList<Room> getAllChannels() {
