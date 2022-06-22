@@ -31,6 +31,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -38,12 +42,19 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.mikhaellopez.circularimageview.CircularImageView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 
 import pt.ulisboa.tecnico.cmov.conversational_ist.R;
+import pt.ulisboa.tecnico.cmov.conversational_ist.RoomType;
+import pt.ulisboa.tecnico.cmov.conversational_ist.VolleySingleton;
 import pt.ulisboa.tecnico.cmov.conversational_ist.adapter.MainRoomsAdapter;
 import pt.ulisboa.tecnico.cmov.conversational_ist.adapter.RoomsAdapter;
 import pt.ulisboa.tecnico.cmov.conversational_ist.database.FeedReaderDbHelper;
+import pt.ulisboa.tecnico.cmov.conversational_ist.database.Message;
 import pt.ulisboa.tecnico.cmov.conversational_ist.firebase.FirebaseHandler;
 import pt.ulisboa.tecnico.cmov.conversational_ist.interfaces.RecyclerViewEnterChatInterface;
 import pt.ulisboa.tecnico.cmov.conversational_ist.model.Room;
@@ -85,7 +96,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
         Uri appLinkData = getIntent().getData();
         if (appLinkData != null) {
             String roomID = appLinkData.getLastPathSegment();
-            FeedReaderDbHelper.getInstance(this).createChannel(roomID, "Private Channel");
+            fetchRoomAndCreate(roomID);
         }
 
         int permissionCheck = ContextCompat.checkSelfPermission(this,
@@ -106,6 +117,40 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
         // ATTENTION: This was auto-generated to handle app links.
 
         // ATTENTION: This was auto-generated to handle app links.
+    }
+
+    private void fetchRoomAndCreate(String roomID) {
+
+        String url = "https://cmuapi.herokuapp.com/api/rooms/room?roomID=" + roomID;
+
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null, new com.android.volley.Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                Toast.makeText(MainActivity.this, "Messages received!", Toast.LENGTH_SHORT).show();
+                System.out.println(response);
+
+                try {
+                    boolean isGeoFenced = response.getInt("roomType") == RoomType.GEOFENCED.ordinal();
+                    Room r = new Room(response.getString("id"),
+                            response.getString("name"),
+                            isGeoFenced,
+                            response.getDouble("lat"),
+                            response.getDouble("lng"),
+                            response.getInt("radius")
+                            );
+                    FeedReaderDbHelper.getInstance(getApplicationContext()).createChannel(r);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                
+            }
+        }, new com.android.volley.Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(MainActivity.this, "Fail to get response = " + error, Toast.LENGTH_SHORT).show();
+            }
+        });
+        VolleySingleton.getInstance(getApplicationContext()).getmRequestQueue().add(request);
     }
 
     private void getRoomsSubscribed() {

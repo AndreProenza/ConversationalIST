@@ -385,7 +385,7 @@ public class RoomActivity extends AppCompatActivity {
             }
         });
 
-        queue.add(request);
+        VolleySingleton.getInstance(getApplicationContext()).getmRequestQueue().add(request);
 
     }
 
