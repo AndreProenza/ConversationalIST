@@ -19,12 +19,12 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
 
     public static FeedReaderDbHelper sInstance;
 
-    public static final int DATABASE_VERSION = 16;
+    public static final int DATABASE_VERSION = 17;
     public static final String DATABASE_NAME = "FeedReader.db";
     private Context dbContext;
 
     public static final String SQL_CREATE_CHANNELS = "CREATE TABLE channels ( channel_id TEXT PRIMARY KEY," +
-            "channel_name TEXT NOT NULL);";
+            "channel_name TEXT NOT NULL, channel_isGeoFenced BOOLEAN NOT NULL, channel_lat REAL NOT NULL, channel_lng REAL NOT NULL, channel_radius INTEGER NOT NULL);";
 
     public static final String SQL_CREATE_MESSAGES = "CREATE TABLE messages ( message_id TEXT PRIMARY KEY," +
             "sender TEXT NOT NULL, roomID TEXT NOT NULL, message TEXT NOT NULL, createdAt DATETIME NOT NULL, isPhoto BOOLEAN NOT NULL);";
@@ -118,16 +118,37 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
         return result;
     }
 
-    public void createChannel(String id, String name) {
+    public void createChannel(Room r) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(FeedReaderContract.FeedEntry.KEY_CHANNEL_ID, id);
-        values.put(FeedReaderContract.FeedEntry.KEY_CHANNEL_NAME, name);
+        values.put(FeedReaderContract.FeedEntry.KEY_CHANNEL_ID, r.getRoomId());
+        values.put(FeedReaderContract.FeedEntry.KEY_CHANNEL_NAME, r.getRoomName());
+        values.put(FeedReaderContract.FeedEntry.KEY_CHANNEL_ISGEOFENCED, r.isGeoFenced());
+        values.put(FeedReaderContract.FeedEntry.KEY_CHANNEL_LAT, r.getLat());
+        values.put(FeedReaderContract.FeedEntry.KEY_CHANNEL_LNG, r.getLng());
+        values.put(FeedReaderContract.FeedEntry.KEY_CHANNEL_RADIUS, r.getRadius());
 
         db.insert(FeedReaderContract.FeedEntry.CHANNELS_TABLE_NAME, null, values);
 
         db.close();
+    }
+
+    public Room getRoom(String roomID) {
+        String selectQuery = "SELECT  * FROM " + FeedReaderContract.FeedEntry.CHANNELS_TABLE_NAME +
+                " WHERE " + FeedReaderContract.FeedEntry.KEY_CHANNEL_ID + "='" + roomID + "';";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(selectQuery, null);
+        Room r = null;
+
+        if (c.moveToFirst()) {
+            boolean isGeoFenced = c.getInt(2) == 2;
+            r = new Room(c.getString(0), c.getString(1),isGeoFenced,c.getDouble(3),c.getDouble(4),c.getInt(5));
+            c.moveToNext();
+        }
+
+        db.close();
+        return r;
     }
 
     public ArrayList<Room> getAllChannels() {
@@ -138,7 +159,8 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
 
         if (c.moveToFirst()) {
             while (!c.isAfterLast()) {
-                rooms.add(new Room(c.getString(1),c.getString(0)));
+                boolean isGeoFenced = c.getInt(2) == 2;
+                rooms.add(new Room(c.getString(0), c.getString(1),isGeoFenced,c.getDouble(3),c.getDouble(4),c.getInt(5)));
                 c.moveToNext();
             }
         }

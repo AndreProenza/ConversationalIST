@@ -1,23 +1,28 @@
 package pt.ulisboa.tecnico.cmov.conversational_ist.model;
 
-import java.util.List;
-
 public class Room {
 
+    private String roomId;
     private String roomName;
-    public String roomId;
-    //private String roomDescription;
-    //private String roomVisibility;
+    private boolean isGeoFenced;
+    private double lat;
+    private double lng;
+    private int radius;
 
 
+    //TODO change notification received
 
     public Room() {
         // Does nothing
     }
 
-    public Room(String roomName, String roomId) {
-        this.roomName = roomName;
+    public Room(String roomId, String roomName, boolean isGeoFenced, double lat, double lng, int radius) {
         this.roomId = roomId;
+        this.roomName = roomName;
+        this.isGeoFenced = isGeoFenced;
+        this.lat = lat;
+        this.lng = lng;
+        this.radius = radius;
     }
 
     public String getRoomName() {
@@ -34,5 +39,21 @@ public class Room {
 
     public void setRoomId(String roomId) {
         this.roomId = roomId;
+    }
+
+    public boolean isGeoFenced() {
+        return isGeoFenced;
+    }
+
+    public double getLat() {
+        return lat;
+    }
+
+    public double getLng() {
+        return lng;
+    }
+
+    public int getRadius() {
+        return radius;
     }
 }

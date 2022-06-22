@@ -17,6 +17,7 @@ import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.ArrayList;
 
+import pt.ulisboa.tecnico.cmov.conversational_ist.AdapterChat;
 import pt.ulisboa.tecnico.cmov.conversational_ist.R;
 import pt.ulisboa.tecnico.cmov.conversational_ist.database.FeedReaderDbHelper;
 import pt.ulisboa.tecnico.cmov.conversational_ist.model.Room;
@@ -53,8 +54,6 @@ public class RoomsAdapter extends RecyclerView.Adapter<RoomsAdapter.RoomsViewHol
         Room room = rooms.get(position);
         holder.roomName.setText(room.getRoomName());
         holder.roomId.setText(room.getRoomId());
-        //holder.roomDescription.setText(room.getRoomDescription());
-        //holder.roomVisibility.setText(room.getRoomVisibility());
     }
 
     @Override
@@ -62,25 +61,25 @@ public class RoomsAdapter extends RecyclerView.Adapter<RoomsAdapter.RoomsViewHol
         return rooms.size();
     }
 
-    public static class RoomsViewHolder extends RecyclerView.ViewHolder {
-        TextView roomName, roomId, roomDescription, roomVisibility;
+    public class RoomsViewHolder extends RecyclerView.ViewHolder {
+        TextView roomName, roomId;
         FloatingActionButton addRoomBtn;
+
         public RoomsViewHolder(@NonNull View itemView, RecyclerViewAddRoomsInterface rvAddRoomsInterface) {
             super(itemView);
             roomName = itemView.findViewById(R.id.room_name);
             roomId = itemView.findViewById(R.id.room_id);
-            //roomDescription = itemView.findViewById(R.id.room_description);
-            //roomVisibility = itemView.findViewById(R.id.room_visibility);
 
             addRoomBtn = itemView.findViewById(R.id.add_room_btn);
             addRoomBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (rvAddRoomsInterface != null) {
-                        int position = getAdapterPosition();
+                        int position = getBindingAdapterPosition();
                         if (position != RecyclerView.NO_POSITION) {
                             rvAddRoomsInterface.onItemClick(position);
-                            FeedReaderDbHelper.getInstance(v.getContext()).createChannel(roomId.getText().toString(),roomName.getText().toString());
+                            Room r = rooms.get(position);
+                            FeedReaderDbHelper.getInstance(v.getContext()).createChannel(r);
                             FirebaseMessaging.getInstance().subscribeToTopic(roomId.getText().toString()).addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {

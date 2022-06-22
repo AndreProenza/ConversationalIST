@@ -1,11 +1,17 @@
 package pt.ulisboa.tecnico.cmov.conversational_ist.view.activities;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
+import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
@@ -16,6 +22,10 @@ import com.android.volley.RequestQueue;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DatabaseReference;
 
 import org.json.JSONArray;
@@ -25,6 +35,8 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import pt.ulisboa.tecnico.cmov.conversational_ist.R;
+import pt.ulisboa.tecnico.cmov.conversational_ist.RoomType;
+import pt.ulisboa.tecnico.cmov.conversational_ist.VolleySingleton;
 import pt.ulisboa.tecnico.cmov.conversational_ist.adapter.RoomsAdapter;
 import pt.ulisboa.tecnico.cmov.conversational_ist.database.FeedReaderDbHelper;
 import pt.ulisboa.tecnico.cmov.conversational_ist.model.Room;
@@ -41,6 +53,7 @@ public class RoomsActivity extends AppCompatActivity implements RecyclerViewAddR
     RoomsAdapter roomsAdapter;
     private RequestQueue queue;
     private SearchView searchView;
+    private FusedLocationProviderClient locationProvider;
 
 
     @Override
@@ -68,7 +81,9 @@ public class RoomsActivity extends AppCompatActivity implements RecyclerViewAddR
         //db = FirebaseDatabase.getInstance().getReference("room");
         //************************************************
 
-        fetchRooms();
+        locationProvider = LocationServices.getFusedLocationProviderClient(this);
+
+        getLocationAndFetchRooms();
         initSearch();
 
         //TODO call to save channel in db
@@ -141,10 +156,42 @@ public class RoomsActivity extends AppCompatActivity implements RecyclerViewAddR
         }
     }
 
-    private void fetchRooms() {
+    private void getLocationAndFetchRooms(){
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(
+                    this,
+                    new String[]{
+                            Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.ACCESS_COARSE_LOCATION
+                    },
+                    44
+            );
+            fetchRooms("","");
+        } else {
+            getLocation();
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private void getLocation() {
+        locationProvider.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
+            @Override
+            public void onComplete(@NonNull Task<Location> task) {
+                Location location = task.getResult();
+                if (location != null) {
+                    fetchRooms(String.valueOf(location.getLatitude()),String.valueOf(location.getLongitude()));
+                }
+                else {
+                    fetchRooms("","");
+                }
+            }
+        });
+    }
+
+    private void fetchRooms(String lat, String lng) {
         rooms = new ArrayList<>();
 
-        String url = "https://cmuapi.herokuapp.com/api/rooms";
+        String url = "http://cmuapi.herokuapp.com/api/rooms?lat=" + lat + "&lng=" + lng;
 
         JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, url, null, new com.android.volley.Response.Listener<JSONArray>() {
             @Override
@@ -155,7 +202,8 @@ public class RoomsActivity extends AppCompatActivity implements RecyclerViewAddR
                 for (int i = 0; i < response.length(); i++) {
                     try {
                         JSONObject jresponse = response.getJSONObject(i);
-                        Room room = new Room(jresponse.getString("name"), jresponse.getString("id"));
+                        boolean isGeoFenced = Integer.parseInt(jresponse.getString("roomType")) == RoomType.GEOFENCED.ordinal();
+                        Room room = new Room(jresponse.getString("id"), jresponse.getString("name"), isGeoFenced, Double.parseDouble(jresponse.getString("lat")), Double.parseDouble(jresponse.getString("lng")), Integer.parseInt(jresponse.getString("radius")));
                         if(FeedReaderDbHelper.getInstance(getApplicationContext()).isChannelSubscribed(jresponse.getString("id"))) {
                             System.out.println("Name: " + jresponse.getString("name") + "; ID: " + jresponse.getString("id") +"\n");
                             rooms.add(room);
@@ -174,7 +222,7 @@ public class RoomsActivity extends AppCompatActivity implements RecyclerViewAddR
             }
         });
 
-        queue.add(request);
+        VolleySingleton.getInstance(getApplicationContext()).getmRequestQueue().add(request);
     }
 
     @Override

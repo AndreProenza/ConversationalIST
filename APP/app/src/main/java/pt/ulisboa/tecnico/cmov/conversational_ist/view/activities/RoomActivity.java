@@ -403,7 +403,7 @@ public class RoomActivity extends AppCompatActivity {
                 Toast.makeText(RoomActivity.this, "Fail to get response = " + error, Toast.LENGTH_SHORT).show();
             }
         });
-        queue.add(request);
+        VolleySingleton.getInstance(getApplicationContext()).getmRequestQueue().add(request);
     }
 
     private void fetchMessagesBefore() {
@@ -445,7 +445,7 @@ public class RoomActivity extends AppCompatActivity {
             }
         });
 
-        queue.add(request);
+        VolleySingleton.getInstance(getApplicationContext()).getmRequestQueue().add(request);
     }
 
 
