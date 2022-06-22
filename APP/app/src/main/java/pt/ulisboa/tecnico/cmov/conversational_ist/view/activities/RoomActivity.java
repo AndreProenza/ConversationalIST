@@ -163,6 +163,12 @@ public class RoomActivity extends AppCompatActivity {
 
         //********* DATA FROM MAIN ACTIVITY **********
         String roomName = getIntent().getStringExtra("roomName"); //TODO Nome da sala
+
+        if(roomName == null || roomName.isEmpty()) {
+            roomName = FeedReaderDbHelper.getInstance(this).getChannelName(roomID);
+        }
+
+
         roomID = getIntent().getStringExtra("roomId");
         username = getIntent().getStringExtra("username");
         System.out.println(username + " HERE: " + roomName + "\n");

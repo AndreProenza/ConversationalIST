@@ -75,7 +75,8 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
         values.put(FeedReaderContract.FeedEntry.KEY_MESSAGE_CREATEDAT, m.getCreatedAt());
         values.put(FeedReaderContract.FeedEntry.KEY_MESSAGE_ISPHOTO, m.isPhoto());
 
-        db.insert(FeedReaderContract.FeedEntry.MESSAGES_TABLE_NAME, null, values);
+        db.insertWithOnConflict(FeedReaderContract.FeedEntry.MESSAGES_TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_IGNORE);
+
 
         if(sendBroadcast) {
             Intent i = new Intent("message_inserted_" + m.getRoomID());
@@ -129,7 +130,7 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
         values.put(FeedReaderContract.FeedEntry.KEY_CHANNEL_LNG, r.getLng());
         values.put(FeedReaderContract.FeedEntry.KEY_CHANNEL_RADIUS, r.getRadius());
 
-        db.insert(FeedReaderContract.FeedEntry.CHANNELS_TABLE_NAME, null, values);
+        db.insertWithOnConflict(FeedReaderContract.FeedEntry.CHANNELS_TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_IGNORE);
 
         db.close();
     }
@@ -149,6 +150,21 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
 
         db.close();
         return r;
+    }
+
+    public String getChannelName(String id) {
+        String selectQuery = "SELECT * FROM " + FeedReaderContract.FeedEntry.CHANNELS_TABLE_NAME + " WHERE channel_id = '" +  id + "';";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        String result = "";
+
+        if (c.moveToFirst()) {
+            result = c.getString(1);
+        }
+
+        db.close();
+        return result;
     }
 
     public ArrayList<Room> getAllChannels() {
