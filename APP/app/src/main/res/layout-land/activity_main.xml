@@ -22,7 +22,8 @@
             android:id="@+id/appbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            android:background="@color/purple_700">
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
@@ -53,7 +54,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="15dp">
+                android:padding="15dp"
+                android:background="@color/purple_700">
 
                 <TextView
                     android:id="@+id/tv_name"
@@ -108,12 +110,13 @@
                     android:layout_height="match_parent"
                     android:orientation="vertical"
                     android:scrollbars="vertical"
-                    android:isScrollContainer="true">
+                    android:isScrollContainer="true"
+                    android:background="@color/teal_700">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="@color/purple_500"
+                        android:background="@color/purple_700"
                         android:orientation="vertical"
                         android:padding="15dp">
 
@@ -152,18 +155,21 @@
                             android:gravity="center_vertical"
                             android:orientation="horizontal"
                             android:paddingHorizontal="15dp"
-                            android:paddingVertical="10dp">
+                            android:paddingVertical="10dp"
+                            android:background="@color/teal_700">
 
                             <ImageView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:src="@drawable/ic_baseline_group_24" />
+                                android:src="@drawable/ic_baseline_group_24"
+                                app:tint="@color/black"/>
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="15dp"
-                                android:text="Rooms" />
+                                android:text="Rooms"
+                                android:textColor="@color/black"/>
 
                         </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -183,18 +189,21 @@
                             android:gravity="center_vertical"
                             android:orientation="horizontal"
                             android:paddingHorizontal="15dp"
-                            android:paddingVertical="10dp">
+                            android:paddingVertical="10dp"
+                            android:background="@color/teal_700">
 
                             <ImageView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:src="@drawable/ic_baseline_group_add_24" />
+                                android:src="@drawable/ic_baseline_group_add_24"
+                                app:tint="@color/black"/>
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="15dp"
-                                android:text="New Room" />
+                                android:text="New Room"
+                                android:textColor="@color/black"/>
 
                         </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -310,18 +319,21 @@
                             android:gravity="center_vertical"
                             android:orientation="horizontal"
                             android:paddingHorizontal="15dp"
-                            android:paddingVertical="10dp">
+                            android:paddingVertical="10dp"
+                            android:background="@color/teal_700">
 
                             <ImageView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:src="@drawable/ic_baseline_settings_24" />
+                                android:src="@drawable/ic_baseline_settings_24"
+                                app:tint="@color/black"/>
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="15dp"
-                                android:text="Settings" />
+                                android:text="Settings"
+                                android:textColor="@color/black"/>
 
                         </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -366,6 +378,7 @@
                     -->
 
                     <LinearLayout
+                        android:id="@+id/recommendations_btn"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@android:color/white"
@@ -378,18 +391,21 @@
                             android:gravity="center_vertical"
                             android:orientation="horizontal"
                             android:paddingHorizontal="15dp"
-                            android:paddingVertical="10dp">
+                            android:paddingVertical="10dp"
+                            android:background="@color/teal_700">
 
                             <ImageView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:src="@drawable/ic_baseline_verified_24" />
+                                android:src="@drawable/ic_baseline_verified_24"
+                                app:tint="@color/black"/>
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="15dp"
-                                android:text="Recommendations" />
+                                android:text="Recommendations"
+                                android:textColor="@color/black"/>
 
                         </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -409,18 +425,21 @@
                             android:gravity="center_vertical"
                             android:orientation="horizontal"
                             android:paddingHorizontal="15dp"
-                            android:paddingVertical="10dp">
+                            android:paddingVertical="10dp"
+                            android:background="@color/teal_700">
 
                             <ImageView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:src="@drawable/ic_outline_privacy_tip_24" />
+                                android:src="@drawable/ic_outline_privacy_tip_24"
+                                app:tint="@color/black"/>
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="15dp"
-                                android:text="ConversationalIST Policy" />
+                                android:text="ConversationalIST Policy"
+                                android:textColor="@color/black"/>
 
                         </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -473,18 +492,21 @@
                             android:gravity="center_vertical"
                             android:orientation="horizontal"
                             android:paddingHorizontal="15dp"
-                            android:paddingVertical="10dp">
+                            android:paddingVertical="10dp"
+                            android:background="@color/teal_700">
 
                             <ImageView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:src="@drawable/ic_twotone_login_24" />
+                                android:src="@drawable/ic_twotone_login_24"
+                                app:tint="@color/black"/>
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="15dp"
-                                android:text="Delete Account" />
+                                android:text="Delete Account"
+                                android:textColor="@color/black"/>
 
                         </androidx.appcompat.widget.LinearLayoutCompat>
 

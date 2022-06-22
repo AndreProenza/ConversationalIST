@@ -246,6 +246,11 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
             drawerLayout.closeDrawers();
         });
 
+        nav_view.findViewById(R.id.recommendations_btn).setOnClickListener(v -> {
+            startActivity(new Intent(MainActivity.this, RecommendationsActivity.class));
+            drawerLayout.closeDrawers();
+        });
+
         nav_view.findViewById(R.id.ll_policy).setOnClickListener(v -> {
             initPolicy();
             drawerLayout.closeDrawers();

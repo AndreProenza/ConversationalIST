@@ -214,6 +214,8 @@ public class AddNewRoomActivity extends AppCompatActivity implements AdapterView
                     }
                     postRequestRoom(edRoomName.getText().toString(), selectedRoomType, latitude, longitude, radius );
 
+                    // Go to Main activity
+                    startActivity(new Intent(AddNewRoomActivity.this, MainActivity.class));
                 }
             }
         });
