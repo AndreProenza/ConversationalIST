@@ -68,12 +68,19 @@ public class FirebaseMessageReceiver extends FirebaseMessagingService {
         }
     }
 
+    @SuppressLint("UnspecifiedImmutableFlag")
     private void sendNotification(String title, String message, String roomID) {
         Intent notificationIntent = new Intent(getApplicationContext(), RoomActivity.class);
 
         notificationIntent.putExtra("roomId", roomID);
 
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_MUTABLE);
+        PendingIntent contentIntent = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
+        }
+        else {
+            contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        }
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel("MyNotification", "MyNotification", NotificationManager.IMPORTANCE_DEFAULT);

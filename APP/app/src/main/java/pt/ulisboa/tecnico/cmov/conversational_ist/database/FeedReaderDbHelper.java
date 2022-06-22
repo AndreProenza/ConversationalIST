@@ -153,7 +153,8 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
     }
 
     public String getChannelName(String id) {
-        String selectQuery = "SELECT * FROM " + FeedReaderContract.FeedEntry.CHANNELS_TABLE_NAME + " WHERE channel_id = '" +  id + "';";
+        String selectQuery = "SELECT * FROM " + FeedReaderContract.FeedEntry.CHANNELS_TABLE_NAME +
+                " WHERE " +  FeedReaderContract.FeedEntry.KEY_CHANNEL_ID + " = '" +  id + "';";
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.rawQuery(selectQuery, null);
 
