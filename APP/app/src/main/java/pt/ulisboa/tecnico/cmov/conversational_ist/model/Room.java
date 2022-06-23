@@ -8,6 +8,7 @@ public class Room {
     private double lat;
     private double lng;
     private int radius;
+    private int unread;
 
 
     //TODO change notification received
@@ -16,18 +17,23 @@ public class Room {
         // Does nothing
     }
 
-    public Room(String roomId, String roomName, boolean isGeoFenced, double lat, double lng, int radius) {
+    public Room(String roomId, String roomName, boolean isGeoFenced, double lat, double lng, int radius, int unread) {
         this.roomId = roomId;
         this.roomName = roomName;
         this.isGeoFenced = isGeoFenced;
         this.lat = lat;
         this.lng = lng;
         this.radius = radius;
+        this.unread = unread;
     }
 
     public String getRoomName() {
         return roomName;
     }
+
+    public int getUnreadNum() {return unread;}
+
+    public void setUnreadNum(int num) {unread = num;}
 
     public void setRoomName(String roomName) {
         this.roomName = roomName;

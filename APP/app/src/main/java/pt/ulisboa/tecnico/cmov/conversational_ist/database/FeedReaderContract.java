@@ -18,6 +18,7 @@ public final class FeedReaderContract {
         public static final String KEY_CHANNEL_LAT = "channel_lat";
         public static final String KEY_CHANNEL_LNG = "channel_lng";
         public static final String KEY_CHANNEL_RADIUS = "channel_radius";
+        public static final String KEY_CHANNEL_UNREAD = "channel_unread";
 
         public static final String MESSAGES_TABLE_NAME = "messages";
         public static final String KEY_MESSAGE_ID = "message_id";

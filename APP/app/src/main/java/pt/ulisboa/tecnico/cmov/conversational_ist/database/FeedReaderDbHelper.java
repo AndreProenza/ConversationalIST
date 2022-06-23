@@ -19,12 +19,12 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
 
     public static FeedReaderDbHelper sInstance;
 
-    public static final int DATABASE_VERSION = 17;
+    public static final int DATABASE_VERSION = 20;
     public static final String DATABASE_NAME = "FeedReader.db";
     private Context dbContext;
 
     public static final String SQL_CREATE_CHANNELS = "CREATE TABLE channels ( channel_id TEXT PRIMARY KEY," +
-            "channel_name TEXT NOT NULL, channel_isGeoFenced BOOLEAN NOT NULL, channel_lat REAL NOT NULL, channel_lng REAL NOT NULL, channel_radius INTEGER NOT NULL);";
+            "channel_name TEXT NOT NULL, channel_isGeoFenced BOOLEAN NOT NULL, channel_lat REAL NOT NULL, channel_lng REAL NOT NULL, channel_radius INTEGER NOT NULL, channel_unread INTEGER NOT NULL);";
 
     public static final String SQL_CREATE_MESSAGES = "CREATE TABLE messages ( message_id TEXT PRIMARY KEY," +
             "sender TEXT NOT NULL, roomID TEXT NOT NULL, message TEXT NOT NULL, createdAt DATETIME NOT NULL, isPhoto BOOLEAN NOT NULL);";
@@ -79,7 +79,7 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
 
 
         if(sendBroadcast) {
-            Intent i = new Intent("message_inserted_" + m.getRoomID());
+            Intent i = new Intent("message_inserted");
 
             i.putExtra("message", (Serializable) m);
 
@@ -108,6 +108,37 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
         return messages;
     }
 
+    public void clearUnreadMessages(String id) {
+        String query = "UPDATE " + FeedReaderContract.FeedEntry.CHANNELS_TABLE_NAME + " SET " + FeedReaderContract.FeedEntry.KEY_CHANNEL_UNREAD
+                + " = 0  WHERE " + FeedReaderContract.FeedEntry.KEY_CHANNEL_ID + "= '" + id + "';";
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        Cursor c = db.rawQuery(query, null);
+
+        c.moveToFirst();
+
+        db.close();
+
+        Intent i = new Intent("messages_read");
+
+        i.putExtra("roomID", id);
+
+        dbContext.sendBroadcast(i);
+    }
+
+    public void incrementUnreadMessages(String id, int amount) {
+       String query = "UPDATE " + FeedReaderContract.FeedEntry.CHANNELS_TABLE_NAME + " SET " + FeedReaderContract.FeedEntry.KEY_CHANNEL_UNREAD
+               + " = " + FeedReaderContract.FeedEntry.KEY_CHANNEL_UNREAD + " + " + amount + " WHERE " + FeedReaderContract.FeedEntry.KEY_CHANNEL_ID + "= '" + id + "';";
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        Cursor c = db.rawQuery(query, null);
+
+        c.moveToFirst();
+        db.close();
+    }
+
     public boolean isChannelSubscribed(String ID) {
         String selectQuery = "SELECT * FROM " + FeedReaderContract.FeedEntry.CHANNELS_TABLE_NAME + " WHERE channel_id = '" +  ID + "';";
         SQLiteDatabase db = this.getReadableDatabase();
@@ -129,6 +160,7 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
         values.put(FeedReaderContract.FeedEntry.KEY_CHANNEL_LAT, r.getLat());
         values.put(FeedReaderContract.FeedEntry.KEY_CHANNEL_LNG, r.getLng());
         values.put(FeedReaderContract.FeedEntry.KEY_CHANNEL_RADIUS, r.getRadius());
+        values.put(FeedReaderContract.FeedEntry.KEY_CHANNEL_UNREAD, r.getUnreadNum());
 
         db.insertWithOnConflict(FeedReaderContract.FeedEntry.CHANNELS_TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_IGNORE);
 
@@ -144,7 +176,7 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
 
         if (c.moveToFirst()) {
             boolean isGeoFenced = c.getInt(2) == 2;
-            r = new Room(c.getString(0), c.getString(1),isGeoFenced,c.getDouble(3),c.getDouble(4),c.getInt(5));
+            r = new Room(c.getString(0), c.getString(1),isGeoFenced,c.getDouble(3),c.getDouble(4),c.getInt(5), c.getInt(6));
             c.moveToNext();
         }
 
@@ -176,7 +208,7 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
         if (c.moveToFirst()) {
             while (!c.isAfterLast()) {
                 boolean isGeoFenced = c.getInt(2) == 2;
-                rooms.add(new Room(c.getString(0), c.getString(1),isGeoFenced,c.getDouble(3),c.getDouble(4),c.getInt(5)));
+                rooms.add(new Room(c.getString(0), c.getString(1),isGeoFenced,c.getDouble(3),c.getDouble(4),c.getInt(5), c.getInt(6)));
                 c.moveToNext();
             }
         }

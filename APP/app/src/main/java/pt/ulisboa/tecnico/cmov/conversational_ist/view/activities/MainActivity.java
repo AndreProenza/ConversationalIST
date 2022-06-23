@@ -17,8 +17,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -80,6 +82,36 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
 
     SharedPreferences sharedPref;
 
+    private final BroadcastReceiver Updated = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Bundle extras = intent.getExtras();
+            if(intent.getAction().equals("messages_read")) {
+                for (int i = 0; i != rooms.size(); i++) {
+                    if (rooms.get(i).getRoomId().equals(extras.get("roomID"))) {
+                        rooms.get(i).setUnreadNum(0);
+                        roomsAdapter.notifyItemChanged(i);
+                        break;
+                    }
+                }
+            } else {
+                if (extras != null) {
+                    Message m = (Message) extras.get("message");
+                    for (int i = 0; i != rooms.size(); i++) {
+                        if (rooms.get(i).getRoomId().equals(m.getRoomID())) {
+                            rooms.get(i).setUnreadNum(rooms.get(i).getUnreadNum() + 1);
+                            roomsAdapter.notifyItemChanged(i);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+    };
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -114,9 +146,8 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
 
         getRoomsSubscribed();
 
-        // ATTENTION: This was auto-generated to handle app links.
-
-        // ATTENTION: This was auto-generated to handle app links.
+        registerReceiver(Updated, new IntentFilter("message_inserted"));
+        registerReceiver(Updated, new IntentFilter("messages_read"));
     }
 
     private void fetchRoomAndCreate(String roomID) {
@@ -137,7 +168,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
                             response.getDouble("lat"),
                             response.getDouble("lng"),
                             response.getInt("radius")
-                            );
+                            ,0);
                     FeedReaderDbHelper.getInstance(getApplicationContext()).createChannel(r);
                 } catch (JSONException e) {
                     e.printStackTrace();

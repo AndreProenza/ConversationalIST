@@ -237,7 +237,7 @@ public class AddNewRoomActivity extends AppCompatActivity implements AdapterView
             public void onResponse(JSONObject response) {
                 try {
                     String id = response.getString("id");
-                    Room r = new Room(id,name,roomType==2,lat,lng,Integer.parseInt(radius));
+                    Room r = new Room(id,name,roomType==2,lat,lng,Integer.parseInt(radius),0);
                     FeedReaderDbHelper.getInstance(getApplicationContext()).createChannel(r);
                     FirebaseMessaging.getInstance().subscribeToTopic(id).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override

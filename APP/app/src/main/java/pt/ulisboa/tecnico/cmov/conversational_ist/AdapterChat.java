@@ -272,17 +272,26 @@ public class AdapterChat extends RecyclerView.Adapter<pt.ulisboa.tecnico.cmov.co
             int pos = getAbsoluteAdapterPosition();
             //get 'location' by 'pos' from data list
             //then move to 'location'
+            if(pos<0) {
+                return;
+            }
             String m = list.get(pos).getMessage();
 
             String[] half = m.split("@");
 
             if(half.length>1) {
                 half = half[1].split(",");
-                LatLng loc = new LatLng(Double.parseDouble(half[0]), Double.parseDouble(half[1]));
+                if(half.length>1) {
+                    LatLng loc = new LatLng(Double.parseDouble(half[0]), Double.parseDouble(half[1]));
 
-                gMap.addMarker(new MarkerOptions().position(loc).title("Marker"));
-                gMap.moveCamera(CameraUpdateFactory.newLatLng(loc));
-                //gMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(Double.parseDouble(half[0]), Double.parseDouble(half[1])), 16.0f));
+                    gMap.addMarker(new MarkerOptions().position(loc).title("Marker"));
+                    gMap.moveCamera(CameraUpdateFactory.newLatLng(loc));
+                    //gMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(Double.parseDouble(half[0]), Double.parseDouble(half[1])), 16.0f));
+                } else {
+                    map.setVisibility(View.GONE);
+                }
+            } else {
+            map.setVisibility(View.GONE);
             }
         }
     }

@@ -77,10 +77,12 @@ public class RoomActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     TextView name;
     TextView rId;
+    TextView scrollButton;
     EditText msg;
     ImageButton send, attach;
     RequestQueue queue;
     List<Message> messageList;
+
 
     private final String deepLink = "https://github.com/AndreProenza/ConversationalIST/room/";
 
@@ -90,10 +92,18 @@ public class RoomActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             Bundle extras = intent.getExtras();
             if (extras != null) {
-                System.out.println("HEOEEKEFKEFKEEF\n");
                 Message m = (Message) extras.get("message");
-                messageList.add(m);
-                adapterChat.notifyItemInserted(messageList.size() - 1);
+                if(m.getRoomID().equals(roomID)) {
+                    messageList.add(m);
+                    adapterChat.notifyItemInserted(messageList.size() - 1);
+                    LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+                    int pos = layoutManager.findLastVisibleItemPosition();
+                    if(pos >= messageList.size() - 2) {
+                        recyclerView.smoothScrollToPosition(messageList.size() - 1);
+                    } else {
+                        scrollButton.setVisibility(View.VISIBLE);
+                    }
+                }
             }
         }
     };
@@ -122,6 +132,16 @@ public class RoomActivity extends AppCompatActivity {
         rId = findViewById(R.id.room_id);
         backBtn = findViewById(R.id.btn_back);
 
+        scrollButton = findViewById(R.id.scroll_button);
+
+        scrollButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                recyclerView.smoothScrollToPosition(messageList.size() - 1);
+                scrollButton.setVisibility(View.INVISIBLE);
+            }
+        });
+
         msg = findViewById(R.id.ed_msg);
         send = findViewById(R.id.room_send_btn);
         attach = findViewById(R.id.btn_attach_file);
@@ -131,7 +151,19 @@ public class RoomActivity extends AppCompatActivity {
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(linearLayoutManager);
 
-        btn_location = findViewById(R.id.btn_sticker);
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                                             @Override
+                                             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                                                 super.onScrollStateChanged(recyclerView, newState);
+                                                 int pos = linearLayoutManager.findLastVisibleItemPosition();
+                                                 if(pos >= messageList.size() - 1) {
+                                                     scrollButton.setVisibility(View.INVISIBLE);
+                                                 }
+                                             }
+                                         });
+
+
+                btn_location = findViewById(R.id.btn_sticker);
         btn_location.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -162,7 +194,7 @@ public class RoomActivity extends AppCompatActivity {
 
 
         //********* DATA FROM MAIN ACTIVITY **********
-        String roomName = getIntent().getStringExtra("roomName"); //TODO Nome da sala
+        String roomName = getIntent().getStringExtra("roomName");
 
         if(roomName == null || roomName.isEmpty()) {
             roomName = FeedReaderDbHelper.getInstance(this).getChannelName(roomID);
@@ -188,6 +220,7 @@ public class RoomActivity extends AppCompatActivity {
                     Toast.makeText(RoomActivity.this, "Please Write Something Here", Toast.LENGTH_LONG).show();
                 } else {
                     sendMessage(message);
+                    recyclerView.scrollToPosition(messageList.size() - 1);
                 }
             }
         });
@@ -221,7 +254,9 @@ public class RoomActivity extends AppCompatActivity {
 
         loadMessages();
 
-        registerReceiver(Updated, new IntentFilter("message_inserted_" + roomID));
+        registerReceiver(Updated, new IntentFilter("message_inserted"));
+
+        FeedReaderDbHelper.getInstance(this).clearUnreadMessages(roomID);
     }
 
     public void sendPhotoMessage(Uri uri){

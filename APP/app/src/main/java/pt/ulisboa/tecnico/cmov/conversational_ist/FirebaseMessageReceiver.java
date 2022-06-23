@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
+
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -53,19 +54,22 @@ public class FirebaseMessageReceiver extends FirebaseMessagingService {
                 date,
                 isPhoto);
 
-        FeedReaderDbHelper db = FeedReaderDbHelper.getInstance(getApplicationContext());
-        db.createMessage(m,true);
+        boolean broadcast = false;
 
-
-        if (isGeoFenced){
-            System.out.println("entrou no geofenced");
-            sendNotificationWithinRoomLocation(title,message,roomID);
-        } else {
-            System.out.println("entrou no outro");
-            if (!NotifyActive.getInstance().getActive().equals(roomID)) {
-                sendNotification(title, message, roomID);
+        if (!NotifyActive.getInstance().getActive().equals(roomID)) { //TODO Geofenced before adding to db
+            broadcast = true;
+            if (isGeoFenced) {
+                System.out.println("entrou no geofenced");
+                sendNotificationWithinRoomLocation(title, message, roomID);
+            } else {
+                System.out.println("entrou no outro");
+                    sendNotification(title, message, roomID);
             }
+            FeedReaderDbHelper.getInstance(getApplicationContext()).incrementUnreadMessages(roomID,1);
         }
+
+        FeedReaderDbHelper db = FeedReaderDbHelper.getInstance(getApplicationContext());
+        db.createMessage(m,broadcast);
     }
 
     private void sendNotification(String title, String message, String roomID) {

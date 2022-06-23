@@ -39,6 +39,16 @@ public class MainRoomsAdapter extends RecyclerView.Adapter<MainRoomsAdapter.Room
         Room room = rooms.get(position);
         holder.roomName.setText(room.getRoomName());
         holder.roomId.setText(room.getRoomId());
+        if(room.getUnreadNum() > 0) {
+            holder.notif_badge.setVisibility(View.VISIBLE);
+            if(room.getUnreadNum() > 99) {
+                holder.notif_badge.setText("99+");
+            } else {
+                holder.notif_badge.setText(String.valueOf(room.getUnreadNum()));
+            }
+        } else {
+            holder.notif_badge.setVisibility(View.GONE);
+        }
         //holder.roomDescription.setText(room.getRoomDescription());
         //holder.roomVisibility.setText(room.getRoomVisibility());
     }
@@ -49,11 +59,12 @@ public class MainRoomsAdapter extends RecyclerView.Adapter<MainRoomsAdapter.Room
     }
 
     public static class RoomsViewHolder extends RecyclerView.ViewHolder {
-        TextView roomName, roomId, roomDescription, roomVisibility;
+        TextView roomName, roomId, roomDescription, roomVisibility, notif_badge;
         public RoomsViewHolder(@NonNull View itemView,  RecyclerViewEnterChatInterface rvEnterChatInterface) {
             super(itemView);
             roomName = itemView.findViewById(R.id.room_name);
             roomId = itemView.findViewById(R.id.room_id);
+            notif_badge = itemView.findViewById(R.id.notif_badge);
             //roomDescription = itemView.findViewById(R.id.room_description);
             //roomVisibility = itemView.findViewById(R.id.room_visibility);
 

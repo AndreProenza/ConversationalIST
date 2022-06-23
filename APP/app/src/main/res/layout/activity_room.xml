@@ -12,6 +12,7 @@
         android:id="@+id/app_bar_layout"
         android:layout_width="match_parent"
         android:layout_height="65dp">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -108,6 +109,7 @@
 
 
         </LinearLayout>
+
     </com.google.android.material.appbar.AppBarLayout>
 
     <!--
@@ -128,10 +130,26 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_chat"
         android:layout_width="match_parent"
-        android:layout_height="580dp"
+        android:layout_height="586dp"
         android:layout_marginTop="75dp"
         android:isScrollContainer="true"
-        android:scrollbars="vertical" />
+        android:scrollbars="vertical">
+
+    </androidx.recyclerview.widget.RecyclerView>
+
+    <TextView
+        android:id="@+id/scroll_button"
+        android:layout_width="match_parent"
+        android:layout_height="35dp"
+        android:layout_marginTop="65dp"
+        android:background="#8F8F8F"
+        android:gravity="center|center_horizontal"
+        android:text="New Messages: Scroll to bottom ⤵️"
+        android:textAlignment="center"
+        android:textColor="#FFFFFF"
+        android:visibility="invisible"
+        app:layout_anchor="@+id/recycler_chat"
+        app:layout_anchorGravity="top|center" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -146,7 +164,7 @@
             android:layout_height="wrap_content"
             android:padding="15dp"
             app:tint="#A5A5A5"
-            android:src="@drawable/ic_baseline_insert_emoticon_24"
+            android:src="@drawable/ic_map_image"
             android:background="@android:color/white"/>
 
         <EditText
