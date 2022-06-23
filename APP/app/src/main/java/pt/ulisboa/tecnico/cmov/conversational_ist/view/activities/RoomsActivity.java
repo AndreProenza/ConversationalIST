@@ -68,6 +68,7 @@ public class RoomsActivity extends AppCompatActivity implements RecyclerViewAddR
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                finish();
                 startActivity(new Intent(RoomsActivity.this, MainActivity.class));
             }
         });
@@ -234,6 +235,7 @@ public class RoomsActivity extends AppCompatActivity implements RecyclerViewAddR
 
     @Override
     public void onItemClick(int position) {
-
+        finish();
+        startActivity(new Intent(RoomsActivity.this, MainActivity.class));
     }
 }

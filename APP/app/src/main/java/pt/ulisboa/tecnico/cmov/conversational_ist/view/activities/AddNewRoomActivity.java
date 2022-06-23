@@ -184,7 +184,13 @@ public class AddNewRoomActivity extends AppCompatActivity implements AdapterView
     }
 
     private void initClick() {
-        findViewById(R.id.btn_back).setOnClickListener(view -> finish());
+        findViewById(R.id.btn_back).setOnClickListener(v -> {
+            // Go to Main activity
+            startActivity(new Intent(AddNewRoomActivity.this, MainActivity.class));
+            finish();
+        });
+
+
         progressBar = findViewById(R.id.progress_bar);
         findViewById(R.id.btn_done).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -245,6 +251,9 @@ public class AddNewRoomActivity extends AppCompatActivity implements AdapterView
                             Log.d(TAG, "Subscribe successful");
                         }
                     });
+                    // Go to Main activity
+                    startActivity(new Intent(AddNewRoomActivity.this, MainActivity.class));
+                    finish();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

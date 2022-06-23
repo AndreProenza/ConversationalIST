@@ -56,9 +56,19 @@
         <entry key="..\:/Users/nioal/Documents/GitHub/ConversationalIST/APP/app/src/main/res/layout/row_chat_right.xml" value="0.4666666666666667" />
         <entry key="..\:/Users/nioal/Documents/GitHub/ConversationalIST/APP/app/src/main/res/layout/text_row_item.xml" value="0.358695652173913" />
         <entry key="..\:/Users/nioal/Documents/IST/Android/ConversationalIST/app/src/main/res/layout/activity_main.xml" value="0.35260416666666666" />
+        <entry key="app/src/main/res/layout-land/activity_add_new_room.xml" value="0.21" />
+        <entry key="app/src/main/res/layout-land/activity_main.xml" value="0.25" />
+        <entry key="app/src/main/res/layout-land/activity_my_profile.xml" value="0.24010416666666667" />
+        <entry key="app/src/main/res/layout-land/activity_room.xml" value="0.25" />
+        <entry key="app/src/main/res/layout-land/activity_rooms.xml" value="0.21" />
+        <entry key="app/src/main/res/layout/activity_add_new_room.xml" value="0.23333333333333334" />
         <entry key="app/src/main/res/layout/activity_chat.xml" value="0.16770833333333332" />
-        <entry key="app/src/main/res/layout/activity_main.xml" value="0.2185430463576159" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/activity_my_profile.xml" value="0.26927083333333335" />
+        <entry key="app/src/main/res/layout/activity_recommendations.xml" value="0.26927083333333335" />
+        <entry key="app/src/main/res/layout/activity_register.xml" value="0.26927083333333335" />
         <entry key="app/src/main/res/layout/activity_room.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/activity_rooms.xml" value="0.23333333333333334" />
         <entry key="app/src/main/res/layout/row_chat_left.xml" value="0.16770833333333332" />
         <entry key="app/src/main/res/layout/row_chat_list.xml" value="0.16770833333333332" />
         <entry key="app/src/main/res/layout/row_chat_right.xml" value="0.16770833333333332" />

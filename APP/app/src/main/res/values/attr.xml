@@ -4,5 +4,8 @@
         <attr name="background_color" format="color"/>
         <attr name="text_color" format="color"/>
         <attr name="settings_add_btn_color" format="color"/>
+        <attr name="blue" format="color"/>
+        <attr name="white_color" format="color"/>
+        <attr name="black_color" format="color"/>
     </declare-styleable>
 </resources>
