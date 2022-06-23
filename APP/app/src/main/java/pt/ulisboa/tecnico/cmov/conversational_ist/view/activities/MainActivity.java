@@ -232,13 +232,15 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
 
         // initClick
         nav_view.findViewById(R.id.btn_groups).setOnClickListener(v -> {
-            startActivity(new Intent(MainActivity.this, RoomsActivity.class));
             drawerLayout.closeDrawers();
+            startActivity(new Intent(MainActivity.this, RoomsActivity.class));
+            finish();
         });
 
         nav_view.findViewById(R.id.ln_new_group).setOnClickListener(v -> {
-            startActivity(new Intent(MainActivity.this, AddNewRoomActivity.class));
             drawerLayout.closeDrawers();
+            startActivity(new Intent(MainActivity.this, AddNewRoomActivity.class));
+            finish();
         });
 
         nav_view.findViewById(R.id.settings_btn).setOnClickListener(v -> {
@@ -275,6 +277,12 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
     @Override
     protected void onStart() {
         super.onStart();
+
+        recyclerView = (RecyclerView) findViewById(R.id.recycle_view_rooms);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        getRoomsSubscribed();
 
         /** FIREBASE AUTH
         FirebaseUser user = mAuth.getCurrentUser();
