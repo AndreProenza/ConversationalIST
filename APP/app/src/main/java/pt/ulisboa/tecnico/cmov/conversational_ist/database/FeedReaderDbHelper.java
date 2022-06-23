@@ -187,4 +187,22 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
         return rooms;
     }
 
+    public ArrayList<Room> getGeoFencedRooms(int i) {
+        ArrayList<Room> rooms = new ArrayList<>();
+        String selectQuery = "SELECT  * FROM " + FeedReaderContract.FeedEntry.CHANNELS_TABLE_NAME + " WHERE " + FeedReaderContract.FeedEntry.KEY_CHANNEL_ISGEOFENCED + "=" + i + ";";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        if (c.moveToFirst()) {
+            while (!c.isAfterLast()) {
+                boolean isGeoFenced = c.getInt(2) == 2;
+                rooms.add(new Room(c.getString(0), c.getString(1),isGeoFenced,c.getDouble(3),c.getDouble(4),c.getInt(5)));
+                c.moveToNext();
+            }
+        }
+
+        db.close();
+        return rooms;
+    }
+
 }

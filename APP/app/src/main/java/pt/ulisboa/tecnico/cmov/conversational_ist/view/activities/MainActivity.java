@@ -17,12 +17,17 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -35,7 +40,11 @@ import com.android.volley.Request;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -46,7 +55,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 import pt.ulisboa.tecnico.cmov.conversational_ist.R;
 import pt.ulisboa.tecnico.cmov.conversational_ist.RoomType;
@@ -154,9 +166,42 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
     }
 
     private void getRoomsSubscribed() {
-        rooms = FeedReaderDbHelper.getInstance(getApplicationContext()).getAllChannels();
+        rooms = FeedReaderDbHelper.getInstance(getApplicationContext()).getGeoFencedRooms(0);
+        System.out.println(rooms);
+        filterGeoRooms();
+    }
+
+    private void initAdapter(){
         roomsAdapter = new MainRoomsAdapter(MainActivity.this, rooms, this);
         recyclerView.setAdapter(roomsAdapter);
+    }
+
+    @SuppressLint("MissingPermission")
+    private void filterGeoRooms() {
+        FusedLocationProviderClient locationProvider = LocationServices.getFusedLocationProviderClient(this);
+        locationProvider.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
+            @Override
+            public void onComplete(@NonNull Task<Location> task) {
+                Location location = task.getResult();
+                if (location != null) {
+                    ArrayList<Room> geoRooms = FeedReaderDbHelper.getInstance(getApplicationContext()).getGeoFencedRooms(1);
+
+                    double latitude = location.getLatitude();
+                    double longitude = location.getLongitude();
+
+                    for(Room r : geoRooms) {
+                        float[] result = new float[1];
+                        Location.distanceBetween(latitude,longitude,r.getLat(),r.getLng(),result);
+                        System.out.println("Location distance : " + result[0]/1000);
+                        if((result[0]/1000) < r.getRadius()){
+                            rooms.add(r);
+                        }
+                    }
+
+                }
+                initAdapter();
+            }
+        });
     }
 
     private void initUser() {
@@ -282,7 +327,6 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        getRoomsSubscribed();
 
         /** FIREBASE AUTH
         FirebaseUser user = mAuth.getCurrentUser();
