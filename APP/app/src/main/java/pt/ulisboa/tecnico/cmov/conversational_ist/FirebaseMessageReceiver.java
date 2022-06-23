@@ -45,6 +45,7 @@ public class FirebaseMessageReceiver extends FirebaseMessagingService {
         String date = remoteMessage.getData().get("createdAt");
         boolean isPhoto = Boolean.parseBoolean(remoteMessage.getData().get("isPhoto"));
         boolean isGeoFenced = Boolean.parseBoolean(remoteMessage.getData().get("isGeoFenced"));
+        int notificationID = Integer.parseInt(remoteMessage.getData().get("notificationID"));
 
         Message m = new Message(remoteMessage.getData().get("id"),
                 remoteMessage.getData().get("sender"),
@@ -58,18 +59,16 @@ public class FirebaseMessageReceiver extends FirebaseMessagingService {
 
 
         if (isGeoFenced){
-            System.out.println("entrou no geofenced");
-            sendNotificationWithinRoomLocation(title,message,roomID);
+            sendNotificationWithinRoomLocation(title,message,roomID,notificationID);
         } else {
-            System.out.println("entrou no outro");
             if (!NotifyActive.getInstance().getActive().equals(roomID)) {
-                sendNotification(title, message, roomID);
+                sendNotification(title, message, roomID,notificationID);
             }
         }
     }
 
     @SuppressLint("UnspecifiedImmutableFlag")
-    private void sendNotification(String title, String message, String roomID) {
+    private void sendNotification(String title, String message, String roomID, int notificationID) {
         Intent notificationIntent = new Intent(getApplicationContext(), RoomActivity.class);
 
         notificationIntent.putExtra("roomId", roomID);
@@ -95,12 +94,12 @@ public class FirebaseMessageReceiver extends FirebaseMessagingService {
                 .setAutoCancel(true);
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-        //TODO change notification id
-        notificationManager.notify(123, notificationBuilder.build());
+
+        notificationManager.notify(notificationID, notificationBuilder.build());
     }
 
     @SuppressLint("MissingPermission")
-    private void sendNotificationWithinRoomLocation(String title, String message, String roomID) {
+    private void sendNotificationWithinRoomLocation(String title, String message, String roomID, int notificationID) {
         FusedLocationProviderClient locationProvider = LocationServices.getFusedLocationProviderClient(this);
 
         Room r = FeedReaderDbHelper.sInstance.getRoom(roomID);
@@ -114,7 +113,7 @@ public class FirebaseMessageReceiver extends FirebaseMessagingService {
                     Location.distanceBetween(location.getLatitude(),location.getLongitude(),r.getLat(),r.getLng(),result);
                     System.out.println("Location distance : " + result[0]/1000);
                     if((result[0]/1000) < r.getRadius()){
-                        sendNotification(title, message, roomID);
+                        sendNotification(title, message, roomID, notificationID);
                     }
                 }
             }

@@ -90,7 +90,8 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
 
     public List<Message> getAllMessages(String roomID) {
         List<Message> messages = new ArrayList<>();
-        String selectQuery = "SELECT  * FROM " + FeedReaderContract.FeedEntry.MESSAGES_TABLE_NAME + " WHERE roomID = '" + roomID + "';";
+        String selectQuery = "SELECT  * FROM " + FeedReaderContract.FeedEntry.MESSAGES_TABLE_NAME +
+                " WHERE roomID = '" + roomID + "' ORDER BY " + FeedReaderContract.FeedEntry.KEY_MESSAGE_CREATEDAT + ";";
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.rawQuery(selectQuery, null);
