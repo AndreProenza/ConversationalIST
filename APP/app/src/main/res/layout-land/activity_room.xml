@@ -4,14 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#E4E4E4"
+    android:background="@color/teal_200"
     tools:context=".view.activities.RoomActivity"
     android:orientation="vertical">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/app_bar_layout"
         android:layout_width="match_parent"
-        android:layout_height="65dp">
+        android:layout_height="65dp"
+        android:background="@color/purple_700">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -73,8 +74,10 @@
                 android:id="@+id/share_room_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:srcCompat="?attr/actionModeShareDrawable" />
-
+                app:srcCompat="?attr/actionModeShareDrawable"
+                app:tint="@color/purple_200"
+                android:background="@color/purple_700"
+                android:layout_marginEnd="10dp"/>
 
             <!--
             <LinearLayout
@@ -161,10 +164,10 @@
             android:id="@+id/btn_sticker"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@android:color/white"
             android:padding="15dp"
-            android:src="@drawable/ic_map_image"
-            app:tint="#A5A5A5" />
+            app:tint="#A5A5A5"
+            android:src="@drawable/ic_baseline_location_on_24"
+            android:background="@android:color/white"/>
 
         <EditText
             android:id="@+id/ed_msg"
@@ -174,7 +177,9 @@
             android:hint="Message"
             android:paddingVertical="10dp"
             android:paddingEnd="10dp"
-            android:background="@android:color/transparent"/>
+            android:background="@android:color/transparent"
+            android:textColor="#A5A5A5"
+            android:textColorHint="#A5A5A5"/>
 
         <ImageButton
             android:id="@+id/btn_attach_file"

@@ -51,8 +51,6 @@ public class RegisterActivity extends AppCompatActivity {
     private Button btnRegister;
     private ProgressBar loadingPB;
 
-    private DatabaseReference db;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -102,10 +100,9 @@ public class RegisterActivity extends AppCompatActivity {
 
                 Toast.makeText(RegisterActivity.this, "User registered successfully", Toast.LENGTH_SHORT).show();
                 try {
+                    String id = response.getString("id");
                     String name = response.getString("name");
-                    saveUsername(name);
-                    String userId = name;
-                    FirebaseHandler.registerUser(db, userId, name);
+                    saveUsername(name,id);
                     switchToMain();
 
                 } catch (JSONException e) {
@@ -136,9 +133,10 @@ public class RegisterActivity extends AppCompatActivity {
         queue.add(request);
     }
 
-    public void saveUsername(String username) {
+    public void saveUsername(String username,String userID) {
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString("saved_username", username);
+        editor.putString("saved_userid", userID);
         editor.apply();
     }
 

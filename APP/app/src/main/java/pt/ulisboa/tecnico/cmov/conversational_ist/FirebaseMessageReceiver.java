@@ -6,14 +6,10 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.location.Location;
-import android.util.Log;
-import static android.content.ContentValues.TAG;
-
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
-
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -46,6 +42,7 @@ public class FirebaseMessageReceiver extends FirebaseMessagingService {
         String date = remoteMessage.getData().get("createdAt");
         boolean isPhoto = Boolean.parseBoolean(remoteMessage.getData().get("isPhoto"));
         boolean isGeoFenced = Boolean.parseBoolean(remoteMessage.getData().get("isGeoFenced"));
+        int notificationID = Integer.parseInt(remoteMessage.getData().get("notificationID"));
 
         Message m = new Message(remoteMessage.getData().get("id"),
                 remoteMessage.getData().get("sender"),
@@ -60,10 +57,10 @@ public class FirebaseMessageReceiver extends FirebaseMessagingService {
             broadcast = true;
             if (isGeoFenced) {
                 System.out.println("entrou no geofenced");
-                sendNotificationWithinRoomLocation(title, message, roomID);
+                sendNotificationWithinRoomLocation(title, message, roomID,notificationID);
             } else {
                 System.out.println("entrou no outro");
-                    sendNotification(title, message, roomID);
+                    sendNotification(title, message, roomID ,notificationID);
             }
             FeedReaderDbHelper.getInstance(getApplicationContext()).incrementUnreadMessages(roomID,1);
         }
@@ -72,12 +69,19 @@ public class FirebaseMessageReceiver extends FirebaseMessagingService {
         db.createMessage(m,broadcast);
     }
 
-    private void sendNotification(String title, String message, String roomID) {
+    @SuppressLint("UnspecifiedImmutableFlag")
+    private void sendNotification(String title, String message, String roomID, int notificationID) {
         Intent notificationIntent = new Intent(getApplicationContext(), RoomActivity.class);
 
         notificationIntent.putExtra("roomId", roomID);
 
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_MUTABLE);
+        PendingIntent contentIntent = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
+        }
+        else {
+            contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        }
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel("MyNotification", "MyNotification", NotificationManager.IMPORTANCE_DEFAULT);
@@ -92,12 +96,12 @@ public class FirebaseMessageReceiver extends FirebaseMessagingService {
                 .setAutoCancel(true);
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-        //TODO change notification id
-        notificationManager.notify(123, notificationBuilder.build());
+
+        notificationManager.notify(notificationID, notificationBuilder.build());
     }
 
     @SuppressLint("MissingPermission")
-    private void sendNotificationWithinRoomLocation(String title, String message, String roomID) {
+    private void sendNotificationWithinRoomLocation(String title, String message, String roomID, int notificationID) {
         FusedLocationProviderClient locationProvider = LocationServices.getFusedLocationProviderClient(this);
 
         Room r = FeedReaderDbHelper.sInstance.getRoom(roomID);
@@ -111,7 +115,7 @@ public class FirebaseMessageReceiver extends FirebaseMessagingService {
                     Location.distanceBetween(location.getLatitude(),location.getLongitude(),r.getLat(),r.getLng(),result);
                     System.out.println("Location distance : " + result[0]/1000);
                     if((result[0]/1000) < r.getRadius()){
-                        sendNotification(title, message, roomID);
+                        sendNotification(title, message, roomID, notificationID);
                     }
                 }
             }

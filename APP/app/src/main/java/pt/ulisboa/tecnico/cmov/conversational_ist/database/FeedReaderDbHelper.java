@@ -90,7 +90,8 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
 
     public List<Message> getAllMessages(String roomID) {
         List<Message> messages = new ArrayList<>();
-        String selectQuery = "SELECT  * FROM " + FeedReaderContract.FeedEntry.MESSAGES_TABLE_NAME + " WHERE roomID = '" + roomID + "';";
+        String selectQuery = "SELECT  * FROM " + FeedReaderContract.FeedEntry.MESSAGES_TABLE_NAME +
+                " WHERE roomID = '" + roomID + "' ORDER BY " + FeedReaderContract.FeedEntry.KEY_MESSAGE_CREATEDAT + ";";
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.rawQuery(selectQuery, null);
@@ -185,7 +186,8 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
     }
 
     public String getChannelName(String id) {
-        String selectQuery = "SELECT * FROM " + FeedReaderContract.FeedEntry.CHANNELS_TABLE_NAME + " WHERE channel_id = '" +  id + "';";
+        String selectQuery = "SELECT * FROM " + FeedReaderContract.FeedEntry.CHANNELS_TABLE_NAME +
+                " WHERE " +  FeedReaderContract.FeedEntry.KEY_CHANNEL_ID + " = '" +  id + "';";
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.rawQuery(selectQuery, null);
 
@@ -209,6 +211,24 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
             while (!c.isAfterLast()) {
                 boolean isGeoFenced = c.getInt(2) == 2;
                 rooms.add(new Room(c.getString(0), c.getString(1),isGeoFenced,c.getDouble(3),c.getDouble(4),c.getInt(5), c.getInt(6)));
+                c.moveToNext();
+            }
+        }
+
+        db.close();
+        return rooms;
+    }
+
+    public ArrayList<Room> getGeoFencedRooms(int i) {
+        ArrayList<Room> rooms = new ArrayList<>();
+        String selectQuery = "SELECT  * FROM " + FeedReaderContract.FeedEntry.CHANNELS_TABLE_NAME + " WHERE " + FeedReaderContract.FeedEntry.KEY_CHANNEL_ISGEOFENCED + "=" + i + ";";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        if (c.moveToFirst()) {
+            while (!c.isAfterLast()) {
+                boolean isGeoFenced = c.getInt(2) == 2;
+                rooms.add(new Room(c.getString(0), c.getString(1),isGeoFenced,c.getDouble(3),c.getDouble(4),c.getInt(5)));
                 c.moveToNext();
             }
         }

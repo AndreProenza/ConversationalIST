@@ -19,6 +19,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -63,6 +64,7 @@ import java.util.UUID;
 import pt.ulisboa.tecnico.cmov.conversational_ist.AdapterChat;
 import pt.ulisboa.tecnico.cmov.conversational_ist.BuildConfig;
 import pt.ulisboa.tecnico.cmov.conversational_ist.PhotoMultipartRequest;
+import pt.ulisboa.tecnico.cmov.conversational_ist.PhotoUtils;
 import pt.ulisboa.tecnico.cmov.conversational_ist.R;
 import pt.ulisboa.tecnico.cmov.conversational_ist.VolleySingleton;
 import pt.ulisboa.tecnico.cmov.conversational_ist.database.FeedReaderDbHelper;
@@ -110,6 +112,7 @@ public class RoomActivity extends AppCompatActivity {
 
 
     private AdapterChat adapterChat;
+    private RecyclerView.OnScrollListener scrollListener;
 
     private String username;
     private String roomID;
@@ -128,6 +131,7 @@ public class RoomActivity extends AppCompatActivity {
 
         // initialise the text views and layouts
         messageList = new ArrayList<>();
+
         name = findViewById(R.id.room_name);
         rId = findViewById(R.id.room_id);
         backBtn = findViewById(R.id.btn_back);
@@ -145,6 +149,7 @@ public class RoomActivity extends AppCompatActivity {
         msg = findViewById(R.id.ed_msg);
         send = findViewById(R.id.room_send_btn);
         attach = findViewById(R.id.btn_attach_file);
+
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setStackFromEnd(true);
         recyclerView = findViewById(R.id.recycler_chat);
@@ -164,6 +169,25 @@ public class RoomActivity extends AppCompatActivity {
 
 
                 btn_location = findViewById(R.id.btn_sticker);
+        scrollListener = new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                int totalItemCount = linearLayoutManager.getItemCount();
+                int visibleItemCount = linearLayoutManager.getChildCount();
+                int pastVisiblesItems = linearLayoutManager.findFirstVisibleItemPosition();
+                if ((visibleItemCount + pastVisiblesItems) < totalItemCount && pastVisiblesItems == 0) {
+                    recyclerView.clearOnScrollListeners();
+                    System.out.println("pedidoooooooo");
+                    fetchMessagesBefore();
+                }
+            }
+        };
+
+        recyclerView.addOnScrollListener(scrollListener);
+
+        btn_location = findViewById(R.id.btn_sticker);
         btn_location.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -196,14 +220,20 @@ public class RoomActivity extends AppCompatActivity {
         //********* DATA FROM MAIN ACTIVITY **********
         String roomName = getIntent().getStringExtra("roomName");
 
+        roomID = getIntent().getStringExtra("roomId");
+
         if(roomName == null || roomName.isEmpty()) {
             roomName = FeedReaderDbHelper.getInstance(this).getChannelName(roomID);
         }
 
-
-        roomID = getIntent().getStringExtra("roomId");
         username = getIntent().getStringExtra("username");
+        if(username == null){
+            SharedPreferences sh = getApplicationContext().getSharedPreferences("MyPrefs",MODE_PRIVATE);
+            username = sh.getString("saved_username","");
+        }
+
         System.out.println(username + " HERE: " + roomName + "\n");
+
         name.setText(roomName);
         rId.setText(roomID);
         //********************************************
@@ -292,52 +322,22 @@ public class RoomActivity extends AppCompatActivity {
     }
 
     public void uploadImage(Uri uri, String messageID){
-        File imageFile = new File(createCopyAndReturnRealPath(getApplicationContext(),uri));
+        File imageFile = new File(Objects.requireNonNull(PhotoUtils.createCopyAndReturnRealPath(getApplicationContext(), uri)));
+        Bitmap bmp = BitmapFactory.decodeFile(imageFile.getAbsolutePath());
+        PhotoUtils.savePhotoFile(getApplicationContext(),messageID,bmp);
         String url = BASE_URL + "/photos?messageID=" + messageID;
-        PhotoMultipartRequest imageUploadReq = new PhotoMultipartRequest(url, new Response.ErrorListener() {
+        PhotoMultipartRequest<Object> imageUploadReq = new PhotoMultipartRequest<Object>(url, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.d(TAG,"ta dificl");
             }
-        }, new Response.Listener() {
+        }, new Response.Listener<Object>() {
             @Override
             public void onResponse(Object response) {
                 Log.d(TAG,"ta facil");
             }
         }, imageFile);
         VolleySingleton.getInstance(getApplicationContext()).getmRequestQueue().add(imageUploadReq);
-    }
-
-    @Nullable
-    public static String createCopyAndReturnRealPath(
-            @NonNull Context context, @NonNull Uri uri) {
-        final ContentResolver contentResolver = context.getContentResolver();
-        if (contentResolver == null)
-            return null;
-
-        // Create file path inside app's data dir
-        String filePath = context.getApplicationInfo().dataDir + File.separator
-                + System.currentTimeMillis();
-
-        File file = new File(filePath);
-        try {
-            InputStream inputStream = contentResolver.openInputStream(uri);
-            if (inputStream == null)
-                return null;
-
-            OutputStream outputStream = new FileOutputStream(file);
-            byte[] buf = new byte[1024];
-            int len;
-            while ((len = inputStream.read(buf)) > 0)
-                outputStream.write(buf, 0, len);
-
-            outputStream.close();
-            inputStream.close();
-        } catch (IOException ignore) {
-            return null;
-        }
-
-        return file.getAbsolutePath();
     }
 
     @Override
@@ -471,14 +471,14 @@ public class RoomActivity extends AppCompatActivity {
     private void fetchMessagesBefore() {
         ArrayList<Message> chatList = new ArrayList<>();
 
-        String last = ""; //TODO get last and sort
+        String last = messageList.get(0).getCreatedAt();
 
         String url = BASE_URL + "/messages/before?roomID=" + roomID + "&last=" + last;
 
         JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, url, null, new com.android.volley.Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
-                Toast.makeText(RoomActivity.this, "Messages received!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(RoomActivity.this, response.length() + " Messages received!", Toast.LENGTH_SHORT).show();
                 System.out.println(response);
 
                 for (int i = 0; i < response.length(); i++) {
@@ -497,8 +497,11 @@ public class RoomActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 }
-                Toast.makeText(RoomActivity.this, "Data " + chatList.get(0), Toast.LENGTH_SHORT).show();
-                adapterChat.notifyDataSetChanged();
+
+                messageList.addAll(0,chatList);
+                adapterChat.notifyItemRangeInserted(0,chatList.size());
+                adapterChat.notifyItemChanged(chatList.size());
+                recyclerView.addOnScrollListener(scrollListener);
             }
         }, new com.android.volley.Response.ErrorListener() {
             @Override

@@ -18,11 +18,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
 import android.content.BroadcastReceiver;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -37,14 +39,13 @@ import com.android.volley.Request;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.messaging.FirebaseMessaging;
 import com.mikhaellopez.circularimageview.CircularImageView;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -54,13 +55,10 @@ import pt.ulisboa.tecnico.cmov.conversational_ist.R;
 import pt.ulisboa.tecnico.cmov.conversational_ist.RoomType;
 import pt.ulisboa.tecnico.cmov.conversational_ist.VolleySingleton;
 import pt.ulisboa.tecnico.cmov.conversational_ist.adapter.MainRoomsAdapter;
-import pt.ulisboa.tecnico.cmov.conversational_ist.adapter.RoomsAdapter;
 import pt.ulisboa.tecnico.cmov.conversational_ist.database.FeedReaderDbHelper;
-import pt.ulisboa.tecnico.cmov.conversational_ist.database.Message;
 import pt.ulisboa.tecnico.cmov.conversational_ist.firebase.FirebaseHandler;
 import pt.ulisboa.tecnico.cmov.conversational_ist.interfaces.RecyclerViewEnterChatInterface;
 import pt.ulisboa.tecnico.cmov.conversational_ist.model.Room;
-import pt.ulisboa.tecnico.cmov.conversational_ist.model.User;
 import pt.ulisboa.tecnico.cmov.conversational_ist.view.activities.profiles.MyProfileActivity;
 
 public class MainActivity extends AppCompatActivity implements RecyclerViewEnterChatInterface {
@@ -69,12 +67,10 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
     private ActionBar actionBar;
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
-    private LinearLayout btnLogOut;
     private CircularImageView profileImage;
     private TextView userName;
 
-    //private FirebaseAuth mAuth;
-    private String userId;
+    private String username;
 
     RecyclerView recyclerView = null;
     private ArrayList<Room> rooms = new ArrayList<>();
@@ -119,7 +115,6 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
 
         sharedPref = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
 
-        //isUserLoggedIn();
         initUser();
         init();
         initProfile();
@@ -131,13 +126,15 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
             fetchRoomAndCreate(roomID);
         }
 
-        int permissionCheck = ContextCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION);
-        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
-            // ask permissions here using below code
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    REQUEST_LOCATION_CODE);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(
+                    this,
+                    new String[]{
+                            Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.ACCESS_COARSE_LOCATION
+                    },
+                    44
+            );
         }
 
         recyclerView = (RecyclerView) findViewById(R.id.recycle_view_rooms);
@@ -185,23 +182,54 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
     }
 
     private void getRoomsSubscribed() {
-        rooms = FeedReaderDbHelper.getInstance(getApplicationContext()).getAllChannels();
+        rooms = FeedReaderDbHelper.getInstance(getApplicationContext()).getGeoFencedRooms(0);
+        System.out.println(rooms);
+        filterGeoRooms();
+    }
+
+    private void initAdapter(){
         roomsAdapter = new MainRoomsAdapter(MainActivity.this, rooms, this);
         recyclerView.setAdapter(roomsAdapter);
     }
 
+    @SuppressLint("MissingPermission")
+    private void filterGeoRooms() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            FusedLocationProviderClient locationProvider = LocationServices.getFusedLocationProviderClient(this);
+            locationProvider.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
+                @Override
+                public void onComplete(@NonNull Task<Location> task) {
+                    Location location = task.getResult();
+                    if (location != null) {
+                        ArrayList<Room> geoRooms = FeedReaderDbHelper.getInstance(getApplicationContext()).getGeoFencedRooms(1);
+
+                        double latitude = location.getLatitude();
+                        double longitude = location.getLongitude();
+
+                        for (Room r : geoRooms) {
+                            float[] result = new float[1];
+                            Location.distanceBetween(latitude, longitude, r.getLat(), r.getLng(), result);
+                            System.out.println("Location distance : " + result[0] / 1000);
+                            if ((result[0] / 1000) < r.getRadius()) {
+                                rooms.add(r);
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        initAdapter();
+    }
+
     private void initUser() {
         SharedPreferences sh = getApplicationContext().getSharedPreferences("MyPrefs",MODE_PRIVATE);
-        userId = sh.getString("saved_username","");
-        Log.d("UserId: ", userId);
+        username = sh.getString("saved_username","");
+        Log.d("Username: ", username);
     }
 
     private void initProfile() {
         userName = findViewById(R.id.name);
         profileImage = findViewById(R.id.profile);
-
-        //String userId = mAuth.getUid().toString();
-        FirebaseHandler.getCurrentProfileInfoMain(userId, userName, profileImage);
 
         profileImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -210,18 +238,6 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
             }
         });
     }
-
-    /**
-    private void isUserLoggedIn() {
-        btnLogOut = findViewById(R.id.btnLogOut);
-        mAuth = FirebaseAuth.getInstance();
-
-        btnLogOut.setOnClickListener(view ->{
-            mAuth.signOut();
-            startActivity(new Intent(MainActivity.this, LoginActivity.class));
-        });
-    }
-     */
 
     private void init() {
         toolbar = findViewById(R.id.toolbar);
@@ -263,17 +279,24 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
 
         // initClick
         nav_view.findViewById(R.id.btn_groups).setOnClickListener(v -> {
-            startActivity(new Intent(MainActivity.this, RoomsActivity.class));
             drawerLayout.closeDrawers();
+            startActivity(new Intent(MainActivity.this, RoomsActivity.class));
+            finish();
         });
 
         nav_view.findViewById(R.id.ln_new_group).setOnClickListener(v -> {
-            startActivity(new Intent(MainActivity.this, AddNewRoomActivity.class));
             drawerLayout.closeDrawers();
+            startActivity(new Intent(MainActivity.this, AddNewRoomActivity.class));
+            finish();
         });
 
         nav_view.findViewById(R.id.settings_btn).setOnClickListener(v -> {
             startActivity(new Intent(MainActivity.this, MyProfileActivity.class));
+            drawerLayout.closeDrawers();
+        });
+
+        nav_view.findViewById(R.id.recommendations_btn).setOnClickListener(v -> {
+            startActivity(new Intent(MainActivity.this, RecommendationsActivity.class));
             drawerLayout.closeDrawers();
         });
 
@@ -287,14 +310,6 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
             startActivity(new Intent(MainActivity.this, RegisterActivity.class));
             drawerLayout.closeDrawers();
         });
-
-        /** Logout
-        nav_view.findViewById(R.id.btnLogOut).setOnClickListener(v -> {
-            FirebaseAuth.getInstance().signOut();
-            startActivity(new Intent(MainActivity.this, LoginActivity.class));
-            drawerLayout.closeDrawers();
-        });
-         */
     }
 
 
@@ -302,12 +317,10 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
     protected void onStart() {
         super.onStart();
 
-        /** FIREBASE AUTH
-        FirebaseUser user = mAuth.getCurrentUser();
-        if (user == null){
-            startActivity(new Intent(MainActivity.this, LoginActivity.class));
-        }
-         */
+        recyclerView = (RecyclerView) findViewById(R.id.recycle_view_rooms);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
     }
 
 
@@ -316,8 +329,6 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
         editor.remove("saved_username");
         editor.clear();
         editor.apply();
-        //Delete Firebase Account
-        FirebaseHandler.deleteUserId(userId);
         //Delete tables
         FeedReaderDbHelper.getInstance(MainActivity.this).getWritableDatabase().execSQL(FeedReaderDbHelper.SQL_DELETE_ENTRIES_CHANNELS);
         FeedReaderDbHelper.getInstance(MainActivity.this).getWritableDatabase().execSQL(FeedReaderDbHelper.SQL_DELETE_ENTRIES_MESSAGES);
@@ -344,7 +355,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
         Intent intent = new Intent(MainActivity.this, RoomActivity.class);
         intent.putExtra("roomName", roomName);
         intent.putExtra("roomId", roomId);
-        intent.putExtra("username", userId);
+        intent.putExtra("username", username);
         startActivity(intent);
     }
 }

@@ -1,30 +1,20 @@
 package pt.ulisboa.tecnico.cmov.conversational_ist;
 
-import static android.content.Context.MODE_PRIVATE;
-
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
-import android.content.ContentResolver;
 import android.content.Context;
-import android.content.ContextWrapper;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
-import android.os.Environment;
-import android.provider.MediaStore;
-import android.text.format.DateFormat;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,21 +32,15 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import pt.ulisboa.tecnico.cmov.conversational_ist.database.Message;
-import pt.ulisboa.tecnico.cmov.conversational_ist.view.activities.MapsActivity;
-import pt.ulisboa.tecnico.cmov.conversational_ist.view.activities.RoomActivity;
 
 
 public class AdapterChat extends RecyclerView.Adapter<pt.ulisboa.tecnico.cmov.conversational_ist.AdapterChat.Myholder> {
@@ -102,6 +86,7 @@ public class AdapterChat extends RecyclerView.Adapter<pt.ulisboa.tecnico.cmov.co
                 holder.message.setVisibility(View.GONE);
                 holder.mimage.setVisibility(View.GONE);
                 holder.map.setVisibility(View.VISIBLE);
+                holder.downloadBtn.setVisibility(View.GONE);
 
                 /* holder.map.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -114,21 +99,33 @@ public class AdapterChat extends RecyclerView.Adapter<pt.ulisboa.tecnico.cmov.co
                 holder.message.setVisibility(View.VISIBLE);
                 holder.mimage.setVisibility(View.GONE);
                 holder.map.setVisibility(View.GONE);
+                holder.downloadBtn.setVisibility(View.GONE);
                 holder.message.setText(message);
             }
         } else {
             holder.message.setVisibility(View.GONE);
             holder.mimage.setVisibility(View.VISIBLE);
             holder.map.setVisibility(View.GONE);
+            holder.downloadBtn.setVisibility(View.GONE);
             try {
                 Bitmap image = getPhotoFromMedia(messageID);
                 holder.mimage.setImageBitmap(image);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
-                //TODO set placeholder and change line below
-                fetchPhoto(messageID,position);
                 if(isWifiEnabled()){
-
+                    System.out.println("ENTROU NO WIFIIIII");
+                    fetchPhoto(messageID,position);
+                }
+                else {
+                    System.out.println("ENTROU NOS DADOS");
+                    holder.mimage.setImageResource(R.drawable.place_holder);
+                    holder.downloadBtn.setVisibility(View.VISIBLE);
+                    holder.downloadBtn.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            fetchPhoto(messageID,position);
+                        }
+                    });
                 }
             }
         }
@@ -176,15 +173,18 @@ public class AdapterChat extends RecyclerView.Adapter<pt.ulisboa.tecnico.cmov.co
         return b;
     }
 
+    @SuppressLint("MissingPermission")
     private boolean isWifiEnabled() {
-        WifiManager wifi_m = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 
-        if (wifi_m.isWifiEnabled()) { // if user opened wifi
-            WifiInfo wifi_i = wifi_m.getConnectionInfo();
-            return wifi_i.getNetworkId() != -1; // Not connected to any wifi device
-        } else {
-            return false; // user turned off wifi
+        boolean isWifiConn = false;
+        for (Network network : connMgr.getAllNetworks()) {
+            NetworkInfo networkInfo = connMgr.getNetworkInfo(network);
+            if (networkInfo.getType() == ConnectivityManager.TYPE_WIFI) {
+                isWifiConn = networkInfo.isConnected();
+            }
         }
+        return isWifiConn;
     }
 
     public void fetchPhoto(String messageID, int position) {
@@ -193,7 +193,7 @@ public class AdapterChat extends RecyclerView.Adapter<pt.ulisboa.tecnico.cmov.co
         ImageRequest imageRequest = new ImageRequest(url, new Response.Listener<Bitmap>() {
             @Override
             public void onResponse(Bitmap response) {
-                savePhotoFile(messageID, response);
+                PhotoUtils.savePhotoFile(context, messageID, response);
                 notifyItemChanged(position);
             }
         },3000,3000, ImageView.ScaleType.CENTER, null, new Response.ErrorListener(){
@@ -203,23 +203,6 @@ public class AdapterChat extends RecyclerView.Adapter<pt.ulisboa.tecnico.cmov.co
             }
         });
         VolleySingleton.getInstance(context).getmRequestQueue().add(imageRequest);
-    }
-
-    public void savePhotoFile(String messageID, Bitmap bitmap){
-        FileOutputStream fos = null;
-        try {
-            fos = context.openFileOutput(messageID + ".jpg", Context.MODE_PRIVATE);
-            // Use the compress method on the BitMap object to write image to the OutputStream
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                fos.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     @Override
@@ -242,6 +225,7 @@ public class AdapterChat extends RecyclerView.Adapter<pt.ulisboa.tecnico.cmov.co
         GoogleMap gMap;
         MapView map;
         TextView username, message, time;
+        ImageButton downloadBtn;
 
         public Myholder(@NonNull View itemView) {
             super(itemView);
@@ -249,6 +233,7 @@ public class AdapterChat extends RecyclerView.Adapter<pt.ulisboa.tecnico.cmov.co
             message = itemView.findViewById(R.id.message_data);
             time = itemView.findViewById(R.id.message_date);
             mimage = itemView.findViewById(R.id.images);
+            downloadBtn = itemView.findViewById(R.id.downloadImage);
 
             map = (MapView) itemView.findViewById(R.id.mapImageView);
 

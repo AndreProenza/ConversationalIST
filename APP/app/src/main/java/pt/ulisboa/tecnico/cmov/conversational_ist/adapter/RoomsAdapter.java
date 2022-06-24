@@ -22,19 +22,22 @@ import pt.ulisboa.tecnico.cmov.conversational_ist.R;
 import pt.ulisboa.tecnico.cmov.conversational_ist.database.FeedReaderDbHelper;
 import pt.ulisboa.tecnico.cmov.conversational_ist.model.Room;
 import pt.ulisboa.tecnico.cmov.conversational_ist.interfaces.RecyclerViewAddRoomsInterface;
+import pt.ulisboa.tecnico.cmov.conversational_ist.view.activities.AddNewRoomActivity;
 
 
 public class RoomsAdapter extends RecyclerView.Adapter<RoomsAdapter.RoomsViewHolder> {
     Context context;
     ArrayList<Room> rooms;
     private final RecyclerViewAddRoomsInterface rvAddRoomsInterface;
+    private String userID;
 
     private FloatingActionButton addRoomBtn;
 
-    public RoomsAdapter(Context context, ArrayList<Room> rooms, RecyclerViewAddRoomsInterface rvAddRoomsInterface) {
+    public RoomsAdapter(Context context, ArrayList<Room> rooms, RecyclerViewAddRoomsInterface rvAddRoomsInterface, String userID) {
         this.context = context;
         this.rooms = rooms;
         this.rvAddRoomsInterface = rvAddRoomsInterface;
+        this.userID = userID;
     }
 
     public void setFilteredRooms(ArrayList<Room> filteredRooms) {
@@ -86,6 +89,7 @@ public class RoomsAdapter extends RecyclerView.Adapter<RoomsAdapter.RoomsViewHol
                                     Log.d(TAG, "Subscribe successful");
                                 }
                             });
+                            AddNewRoomActivity.postSubscribe(context,r.getRoomId(),userID);
                         }
 
                     }

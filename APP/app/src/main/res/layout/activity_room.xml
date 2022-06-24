@@ -4,15 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#E4E4E4"
+    android:background="@color/teal_200"
     tools:context=".view.activities.RoomActivity"
     android:orientation="vertical">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/app_bar_layout"
         android:layout_width="match_parent"
-        android:layout_height="65dp">
-
+        android:layout_height="65dp"
+        android:background="@color/purple_700">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -25,12 +25,12 @@
                 android:src="@drawable/ic_baseline_arrow_back_24"
                 android:background="@android:color/transparent"
                 android:padding="15dp"
-                app:tint="@color/white" />
+                app:tint="@color/purple_200" />
 
             <com.mikhaellopez.circularimageview.CircularImageView
                 android:id="@+id/profile"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
                 android:layout_marginStart="5dp"
                 android:src="@drawable/place_holder"/>
 
@@ -46,7 +46,7 @@
                     android:layout_height="wrap_content"
                     android:text="Room Name"
                     android:textStyle="bold"
-                    android:textSize="20sp"
+                    android:textSize="19sp"
                     android:textColor="@android:color/white"/>
 
 
@@ -55,7 +55,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Room id"
-                    android:textSize="16sp"
+                    android:textSize="14sp"
                     android:textColor="@android:color/white"/>
 
                 <!--
@@ -74,7 +74,10 @@
                 android:id="@+id/share_room_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:srcCompat="?attr/actionModeShareDrawable" />
+                app:srcCompat="?attr/actionModeShareDrawable"
+                app:tint="@color/purple_200"
+                android:background="@color/purple_700"
+                android:layout_marginEnd="10dp"/>
 
             <!--
             <LinearLayout
@@ -130,8 +133,10 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_chat"
         android:layout_width="match_parent"
-        android:layout_height="586dp"
-        android:layout_marginTop="75dp"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="50dp"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:paddingTop="10dp"
         android:isScrollContainer="true"
         android:scrollbars="vertical">
 
@@ -164,7 +169,7 @@
             android:layout_height="wrap_content"
             android:padding="15dp"
             app:tint="#A5A5A5"
-            android:src="@drawable/ic_map_image"
+            android:src="@drawable/ic_baseline_location_on_24"
             android:background="@android:color/white"/>
 
         <EditText
@@ -175,7 +180,9 @@
             android:hint="Message"
             android:paddingVertical="10dp"
             android:paddingEnd="10dp"
-            android:background="@android:color/transparent"/>
+            android:background="@android:color/transparent"
+            android:textColor="#A5A5A5"
+            android:textColorHint="#A5A5A5"/>
 
         <ImageButton
             android:id="@+id/btn_attach_file"
