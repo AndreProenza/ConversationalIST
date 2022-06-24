@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.Uri;
@@ -55,6 +56,7 @@ public class RoomsActivity extends AppCompatActivity implements RecyclerViewAddR
     private RequestQueue queue;
     private SearchView searchView;
     private FusedLocationProviderClient locationProvider;
+    private String userID;
 
 
     @Override
@@ -63,6 +65,9 @@ public class RoomsActivity extends AppCompatActivity implements RecyclerViewAddR
         setContentView(R.layout.activity_rooms);
 
         queue = Volley.newRequestQueue(RoomsActivity.this);
+
+        SharedPreferences sh = getApplicationContext().getSharedPreferences("MyPrefs",MODE_PRIVATE);
+        userID = sh.getString("saved_userid","");
 
         btnBack = findViewById(R.id.btn_back);
         btnBack.setOnClickListener(new View.OnClickListener() {
@@ -78,51 +83,10 @@ public class RoomsActivity extends AppCompatActivity implements RecyclerViewAddR
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        //************************************************
-        //FIREBASE DATABASE
-        //db = FirebaseDatabase.getInstance().getReference("room");
-        //************************************************
-
         locationProvider = LocationServices.getFusedLocationProviderClient(this);
 
         getLocationAndFetchRooms();
         initSearch();
-
-        //TODO call to save channel in db
-        //FeedReaderDbHelper.getInstance(getApplicationContext()).createChannel("628e1fa903146c7d0cc43b23","b");
-
-
-        //************************************************
-        //FIREBASE DATABASE
-
-        /*
-        db.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    Room room = dataSnapshot.getValue(Room.class);
-                    rooms.add(room);
-                }
-                roomsAdapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });*/
-
-        //************************************************
-
-        /**
-         loadRoomsBtn = findViewById(R.id.load_rooms);
-         loadRoomsBtn.setOnClickListener(new View.OnClickListener() {
-        @Override public void onClick(View v) {
-        startActivity(new Intent(RoomsActivity.this, RoomListActivity.class));
-        finish();
-        }
-        });
-         */
 
     }
 
@@ -213,7 +177,7 @@ public class RoomsActivity extends AppCompatActivity implements RecyclerViewAddR
                         e.printStackTrace();
                     }
                 }
-                roomsAdapter = new RoomsAdapter(RoomsActivity.this, rooms, RoomsActivity.this);
+                roomsAdapter = new RoomsAdapter(RoomsActivity.this, rooms, RoomsActivity.this,userID);
                 recyclerView.setAdapter(roomsAdapter);
             }
         }, new com.android.volley.Response.ErrorListener() {

@@ -8,7 +8,9 @@ import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -58,7 +60,6 @@ public class AddNewRoomActivity extends AppCompatActivity implements AdapterView
 
     private EditText edRoomName;
     private Spinner spinner;
-    //private DatabaseReference db;
     private double latitude, longitude;
     private String country, locality, address;
     private TextView latitudeText, longitudeText, countryText, localityText, addressText;
@@ -68,6 +69,7 @@ public class AddNewRoomActivity extends AppCompatActivity implements AdapterView
     private ProgressBar progressBar;
     private FusedLocationProviderClient locationProvider;
     private int selectedRoomType;
+    private String userID;
 
 
     @Override
@@ -82,8 +84,10 @@ public class AddNewRoomActivity extends AppCompatActivity implements AdapterView
 
     private void init() {
         edRoomName = findViewById(R.id.ed_room_name);
-        //edRoomDescription = findViewById(R.id.ed_room_description);
         spinner = findViewById(R.id.sp_new_room);
+
+        SharedPreferences sh = getApplicationContext().getSharedPreferences("MyPrefs",MODE_PRIVATE);
+        userID = sh.getString("saved_userid","");
     }
 
     private void initSpinnerAndLocation() {
@@ -130,7 +134,6 @@ public class AddNewRoomActivity extends AppCompatActivity implements AdapterView
             }
         });
 
-        //spinner.setOnItemSelectedListener(this);
     }
 
     @SuppressLint("MissingPermission")
@@ -198,21 +201,14 @@ public class AddNewRoomActivity extends AppCompatActivity implements AdapterView
                 // Check Validate
                 if (TextUtils.isEmpty(edRoomName.getText().toString())) {
                     edRoomName.setError("Field required!");
-                } //else if (TextUtils.isEmpty(edRoomDescription.getText().toString())) {
-                    //edRoomDescription.setError("Field required!");
-                //}
+                }
                 else if (spinner.getSelectedItem().toString() == null) {
                     Toast.makeText(getApplicationContext(), "Please Select Room visibility", Toast.LENGTH_SHORT).show();
                 }
                 else {
                     progressBar.setVisibility(View.VISIBLE);
-                    //addRoomToFirebase();
                     locationLayout.setVisibility(View.GONE);
                     progressBar.setVisibility(View.GONE);
-                    //TODO
-                    //ADD HERE ROOM
-                    //Use radius variable to store locality in heroku
-                    //radius
                     if(selectedRoomType != 2) {
                         radius = "0";
                     } else {
@@ -251,6 +247,7 @@ public class AddNewRoomActivity extends AppCompatActivity implements AdapterView
                             Log.d(TAG, "Subscribe successful");
                         }
                     });
+                    postSubscribe(getApplicationContext(),id,userID);
                     // Go to Main activity
                     startActivity(new Intent(AddNewRoomActivity.this, MainActivity.class));
                     finish();
@@ -270,35 +267,26 @@ public class AddNewRoomActivity extends AppCompatActivity implements AdapterView
 
     }
 
+    public static void postSubscribe(Context context, String id, String userID) {
+        String url = "https://cmuapi.herokuapp.com/api/rooms/subscribe";
 
-    /**
-    private void addRoomToFirebase() {
-        String roomName = edRoomName.getText().toString();
-        String roomDescription = edRoomDescription.getText().toString();
-        String roomVisibility = spinner.getSelectedItem().toString();
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("roomID", id);
+        params.put("userID", userID);
+        JSONObject jsonObj = new JSONObject(params);
 
-        Room room = new Room(roomName, roomDescription, roomVisibility);
-
-        //*********************
-        //FIREBASE DATABASE
-        db = FirebaseDatabase.getInstance().getReference("room");
-        String roomId = db.push().getKey();
-        db.child(roomId).setValue(room).addOnCompleteListener(new OnCompleteListener<Void>() {
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, jsonObj, new com.android.volley.Response.Listener<JSONObject>() {
             @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if (task.isSuccessful()) {
-                    Toast.makeText(AddNewRoomActivity.this, "Room created", Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(AddNewRoomActivity.this, MainActivity.class));
-                }
-                else {
-                    Toast.makeText(AddNewRoomActivity.this, "Room not created\nTry again", Toast.LENGTH_SHORT).show();
-                }
+            public void onResponse(JSONObject response) {
+            }
+        }, new com.android.volley.Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
             }
         });
-        //*********************
 
+        VolleySingleton.getInstance(context).getmRequestQueue().add(request);
     }
-     */
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
