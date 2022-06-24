@@ -2,10 +2,6 @@ package pt.ulisboa.tecnico.cmov.conversational_ist.view.activities;
 
 import static android.content.ContentValues.TAG;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -28,28 +24,25 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+
 import com.android.volley.Request;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 import pt.ulisboa.tecnico.cmov.conversational_ist.R;
 import pt.ulisboa.tecnico.cmov.conversational_ist.VolleySingleton;
@@ -91,7 +84,7 @@ public class AddNewRoomActivity extends AppCompatActivity implements AdapterView
     }
 
     private void initSpinnerAndLocation() {
-        locationLayout = (LinearLayout) findViewById(R.id.location_ll);
+        locationLayout = findViewById(R.id.location_ll);
         latitudeText = findViewById(R.id.latitude_coor);
         longitudeText = findViewById(R.id.longitude_coor);
         countryText = findViewById(R.id.country_coor);
@@ -110,8 +103,6 @@ public class AddNewRoomActivity extends AppCompatActivity implements AdapterView
                 selectedRoomType = position;
                 switch (position) {
                     case 0:
-                        locationLayout.setVisibility(View.GONE);
-                        break;
                     case 1:
                         locationLayout.setVisibility(View.GONE);
                         break;
@@ -136,7 +127,7 @@ public class AddNewRoomActivity extends AppCompatActivity implements AdapterView
 
     }
 
-    @SuppressLint("MissingPermission")
+    @SuppressLint({"MissingPermission", "SetTextI18n"})
     private void getLocation() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
@@ -148,39 +139,36 @@ public class AddNewRoomActivity extends AppCompatActivity implements AdapterView
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
-        locationProvider.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
-            @Override
-            public void onComplete(@NonNull Task<Location> task) {
-                Location location = task.getResult();
-                if (location != null) {
-                    try {
-                        Geocoder geocoder = new Geocoder(AddNewRoomActivity.this, Locale.getDefault());
-                        List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
-                        //Set text to textviews
-                        latitude = addresses.get(0).getLatitude();
-                        longitude = addresses.get(0).getLongitude();
-                        country = addresses.get(0).getCountryName();
-                        locality = addresses.get(0).getLocality();
-                        address = addresses.get(0).getAddressLine(0);
-                        latitudeText.setText(Double.toString(latitude));
-                        longitudeText.setText(Double.toString(longitude));
-                        countryText.setText(country);
-                        localityText.setText(locality);
-                        addressText.setText(address);
+        locationProvider.getLastLocation().addOnCompleteListener(task -> {
+            Location location = task.getResult();
+            if (location != null) {
+                try {
+                    Geocoder geocoder = new Geocoder(AddNewRoomActivity.this, Locale.getDefault());
+                    List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+                    //Set text to textviews
+                    latitude = addresses.get(0).getLatitude();
+                    longitude = addresses.get(0).getLongitude();
+                    country = addresses.get(0).getCountryName();
+                    locality = addresses.get(0).getLocality();
+                    address = addresses.get(0).getAddressLine(0);
+                    latitudeText.setText(Double.toString(latitude));
+                    longitudeText.setText(Double.toString(longitude));
+                    countryText.setText(country);
+                    localityText.setText(locality);
+                    addressText.setText(address);
 
-                        radiusInputText = findViewById(R.id.radius);
-                        String radiusText = radiusInputText.getText().toString();
+                    radiusInputText = findViewById(R.id.radius);
+                    String radiusText = Objects.requireNonNull(radiusInputText.getText()).toString();
 
-                        if (TextUtils.isEmpty(radiusText)){
-                            radiusInputText.setError("Radius cannot be empty");
-                            radiusInputText.requestFocus();
-                        } else {
-                            radius = radiusText;
-                        }
-
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                    if (TextUtils.isEmpty(radiusText)){
+                        radiusInputText.setError("Radius cannot be empty");
+                        radiusInputText.requestFocus();
+                    } else {
+                        radius = radiusText;
                     }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
         });
@@ -195,28 +183,23 @@ public class AddNewRoomActivity extends AppCompatActivity implements AdapterView
 
 
         progressBar = findViewById(R.id.progress_bar);
-        findViewById(R.id.btn_done).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Check Validate
-                if (TextUtils.isEmpty(edRoomName.getText().toString())) {
-                    edRoomName.setError("Field required!");
+        findViewById(R.id.btn_done).setOnClickListener(v -> {
+            // Check Validate
+            if (TextUtils.isEmpty(edRoomName.getText().toString())) {
+                edRoomName.setError("Field required!");
+            }
+            else {
+                spinner.getSelectedItem().toString();
+                progressBar.setVisibility(View.VISIBLE);
+                locationLayout.setVisibility(View.GONE);
+                progressBar.setVisibility(View.GONE);
+                if(selectedRoomType != 2) {
+                    radius = "0";
+                } else {
+                    radius = Objects.requireNonNull(radiusInputText.getText()).toString();
                 }
-                else if (spinner.getSelectedItem().toString() == null) {
-                    Toast.makeText(getApplicationContext(), "Please Select Room visibility", Toast.LENGTH_SHORT).show();
-                }
-                else {
-                    progressBar.setVisibility(View.VISIBLE);
-                    locationLayout.setVisibility(View.GONE);
-                    progressBar.setVisibility(View.GONE);
-                    if(selectedRoomType != 2) {
-                        radius = "0";
-                    } else {
-                        radius = radiusInputText.getText().toString();
-                    }
-                    postRequestRoom(edRoomName.getText().toString(), selectedRoomType, latitude, longitude, radius );
+                postRequestRoom(edRoomName.getText().toString(), selectedRoomType, latitude, longitude, radius );
 
-                }
             }
         });
     }
@@ -225,7 +208,7 @@ public class AddNewRoomActivity extends AppCompatActivity implements AdapterView
     private void postRequestRoom(String name, int roomType, double lat, double lng, String radius) {
         String url = "https://cmuapi.herokuapp.com/api/rooms";
 
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         params.put("name", name);
         params.put("roomType", String.valueOf(roomType));
         params.put("lat", Double.toString(lat));
@@ -234,34 +217,21 @@ public class AddNewRoomActivity extends AppCompatActivity implements AdapterView
 
         JSONObject jsonObj = new JSONObject(params);
 
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, jsonObj, new com.android.volley.Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    String id = response.getString("id");
-                    Room r = new Room(id,name,roomType==2,lat,lng,Integer.parseInt(radius),0);
-                    FeedReaderDbHelper.getInstance(getApplicationContext()).createChannel(r);
-                    FirebaseMessaging.getInstance().subscribeToTopic(id).addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            Log.d(TAG, "Subscribe successful");
-                        }
-                    });
-                    postSubscribe(getApplicationContext(),id,userID);
-                    // Go to Main activity
-                    startActivity(new Intent(AddNewRoomActivity.this, MainActivity.class));
-                    finish();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                Toast.makeText(AddNewRoomActivity.this, "Room added!", Toast.LENGTH_SHORT).show();
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, jsonObj, response -> {
+            try {
+                String id = response.getString("id");
+                Room r = new Room(id,name,roomType==2,lat,lng,Integer.parseInt(radius),0);
+                FeedReaderDbHelper.getInstance(getApplicationContext()).createChannel(r);
+                FirebaseMessaging.getInstance().subscribeToTopic(id).addOnSuccessListener(aVoid -> Log.d(TAG, "Subscribe successful"));
+                postSubscribe(getApplicationContext(),id,userID);
+                // Go to Main activity
+                startActivity(new Intent(AddNewRoomActivity.this, MainActivity.class));
+                finish();
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
-        }, new com.android.volley.Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Toast.makeText(AddNewRoomActivity.this, "Fail to get response = " + error, Toast.LENGTH_SHORT).show();
-            }
-        });
+            Toast.makeText(AddNewRoomActivity.this, "Room added!", Toast.LENGTH_SHORT).show();
+        }, error -> Toast.makeText(AddNewRoomActivity.this, "Fail to get response = " + error, Toast.LENGTH_SHORT).show());
 
         VolleySingleton.getInstance(getApplicationContext()).getmRequestQueue().add(request);
 
@@ -270,19 +240,13 @@ public class AddNewRoomActivity extends AppCompatActivity implements AdapterView
     public static void postSubscribe(Context context, String id, String userID) {
         String url = "https://cmuapi.herokuapp.com/api/rooms/subscribe";
 
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         params.put("roomID", id);
         params.put("userID", userID);
         JSONObject jsonObj = new JSONObject(params);
 
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, jsonObj, new com.android.volley.Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-            }
-        }, new com.android.volley.Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-            }
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, jsonObj, response -> {
+        }, error -> {
         });
 
         VolleySingleton.getInstance(context).getmRequestQueue().add(request);

@@ -1,23 +1,24 @@
 package pt.ulisboa.tecnico.cmov.conversational_ist.view.activities;
 
 
-import androidx.annotation.NonNull;
-import androidx.fragment.app.FragmentActivity;
-
-
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
-
+import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.location.LocationManager;
-
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.SearchView;
 
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.FragmentActivity;
+
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -46,7 +47,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         pt.ulisboa.tecnico.cmov.conversational_ist.databinding.ActivityMapsBinding binding = ActivityMapsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map_embed);
 
@@ -65,17 +65,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    @SuppressLint("MissingPermission")
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
 
-        LocationManager lm = (LocationManager)getSystemService(LOCATION_SERVICE);
-        @SuppressLint("MissingPermission") Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        if(location != null) {
-            LatLng loc = new LatLng(location.getLatitude(), location.getLongitude());
-
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(loc));
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(loc, 15.0f));
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            FusedLocationProviderClient locationProvider = LocationServices.getFusedLocationProviderClient(this);
+            locationProvider.getLastLocation().addOnCompleteListener(task -> {
+                Location location = task.getResult();
+                if (location != null) {
+                    LatLng loc = new LatLng(location.getLatitude(), location.getLongitude());
+                    mMap.moveCamera(CameraUpdateFactory.newLatLng(loc));
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(loc, 15.0f));
+                }
+            });
         }
         mMap.setOnMapClickListener(arg0 -> {
             send_map.setVisibility(View.VISIBLE);
@@ -94,30 +98,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 List<Address> addressList = null;
 
-                if (location != null || location.equals("")) {
+                Geocoder geocoder = new Geocoder(MapsActivity.this);
+                try {
 
-                    Geocoder geocoder = new Geocoder(MapsActivity.this);
-                    try {
+                    addressList = geocoder.getFromLocationName(location, 1);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
-                        addressList = geocoder.getFromLocationName(location, 1);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                if (addressList != null && addressList.size() > 0) {
+                    Address address = addressList.get(0);
 
-                    if(addressList.size()>0) {
-                        Address address = addressList.get(0);
+                    LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
 
-                        LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+                    send_map.setVisibility(View.VISIBLE);
+                    mMap.clear();
 
-                        send_map.setVisibility(View.VISIBLE);
-                        mMap.clear();
+                    mMap.addMarker(new MarkerOptions().position(latLng).title(location));
 
-                        mMap.addMarker(new MarkerOptions().position(latLng).title(location));
+                    loc2send = latLng;
 
-                        loc2send = latLng;
-
-                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15.0f));
-                    }
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15.0f));
                 }
                 return false;
             }
@@ -128,11 +129,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-        map_searchView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                map_searchView.setIconified(false);
-            }
-        });
+        map_searchView.setOnClickListener(v -> map_searchView.setIconified(false));
     }
 }

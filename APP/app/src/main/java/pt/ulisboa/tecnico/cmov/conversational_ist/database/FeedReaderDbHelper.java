@@ -7,11 +7,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import pt.ulisboa.tecnico.cmov.conversational_ist.model.Channel;
 import pt.ulisboa.tecnico.cmov.conversational_ist.model.Room;
 
 public class FeedReaderDbHelper extends SQLiteOpenHelper {
@@ -19,9 +17,9 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
 
     public static FeedReaderDbHelper sInstance;
 
-    public static final int DATABASE_VERSION = 21;
+    public static final int DATABASE_VERSION = 25;
     public static final String DATABASE_NAME = "FeedReader.db";
-    private Context dbContext;
+    private final Context dbContext;
 
     public static final String SQL_CREATE_CHANNELS = "CREATE TABLE channels ( channel_id TEXT PRIMARY KEY," +
             "channel_name TEXT NOT NULL, channel_isGeoFenced BOOLEAN NOT NULL, channel_lat REAL NOT NULL, channel_lng REAL NOT NULL, channel_radius INTEGER NOT NULL, channel_unread INTEGER NOT NULL);";
@@ -81,7 +79,7 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
         if(sendBroadcast) {
             Intent i = new Intent("message_inserted");
 
-            i.putExtra("message", (Serializable) m);
+            i.putExtra("message", m);
 
             dbContext.sendBroadcast(i);
         }
@@ -105,6 +103,7 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
             }
         }
 
+        c.close();
         db.close();
         return messages;
     }
@@ -120,6 +119,7 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
         c.moveToFirst();
 
         db.close();
+        c.close();
 
         Intent i = new Intent("messages_read");
 
@@ -138,6 +138,7 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
 
         c.moveToFirst();
         db.close();
+        c.close();
     }
 
     public boolean isChannelSubscribed(String ID) {
@@ -148,6 +149,7 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
         boolean result = c.getCount() == 0;
 
         db.close();
+        c.close();
         return result;
     }
 
@@ -182,6 +184,7 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
         }
 
         db.close();
+        c.close();
         return r;
     }
 
@@ -198,25 +201,21 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
         }
 
         db.close();
+        c.close();
         return result;
     }
 
-    public ArrayList<Room> getAllChannels() {
-        ArrayList<Room> rooms = new ArrayList<>();
-        String selectQuery = "SELECT  * FROM " + FeedReaderContract.FeedEntry.CHANNELS_TABLE_NAME + ";";
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor c = db.rawQuery(selectQuery, null);
+    public void leaveRoom(String id) {
+        String query = "DELETE FROM " + FeedReaderContract.FeedEntry.CHANNELS_TABLE_NAME +
+                " WHERE " + FeedReaderContract.FeedEntry.KEY_CHANNEL_ID + " = '" + id + "' ;";
 
-        if (c.moveToFirst()) {
-            while (!c.isAfterLast()) {
-                boolean isGeoFenced = c.getInt(2) == 2;
-                rooms.add(new Room(c.getString(0), c.getString(1),isGeoFenced,c.getDouble(3),c.getDouble(4),c.getInt(5), c.getInt(6)));
-                c.moveToNext();
-            }
-        }
+        SQLiteDatabase db = this.getWritableDatabase();
 
+        Cursor c = db.rawQuery(query, null);
+
+        c.moveToFirst();
         db.close();
-        return rooms;
+        c.close();
     }
 
     public ArrayList<Room> getGeoFencedRooms(int i) {
@@ -234,6 +233,7 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
         }
 
         db.close();
+        c.close();
         return rooms;
     }
 

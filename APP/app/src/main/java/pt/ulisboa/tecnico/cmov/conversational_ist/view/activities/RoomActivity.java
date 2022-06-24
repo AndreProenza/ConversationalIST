@@ -2,32 +2,19 @@ package pt.ulisboa.tecnico.cmov.conversational_ist.view.activities;
 
 import static android.content.ContentValues.TAG;
 
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.FileProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
-import android.content.ContentResolver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.database.Cursor;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -37,6 +24,18 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -53,12 +52,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -66,8 +60,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
-import pt.ulisboa.tecnico.cmov.conversational_ist.AdapterChat;
-import pt.ulisboa.tecnico.cmov.conversational_ist.BuildConfig;
+import pt.ulisboa.tecnico.cmov.conversational_ist.adapter.AdapterChat;
 import pt.ulisboa.tecnico.cmov.conversational_ist.PhotoMultipartRequest;
 import pt.ulisboa.tecnico.cmov.conversational_ist.PhotoUtils;
 import pt.ulisboa.tecnico.cmov.conversational_ist.R;
@@ -78,6 +71,7 @@ import pt.ulisboa.tecnico.cmov.conversational_ist.database.NotifyActive;
 
 public class RoomActivity extends AppCompatActivity {
 
+    private static final int PERMISSION_REQUEST_CODE = 252;
     ImageButton backBtn;
     ImageButton btn_location;
     ImageButton btn_share;
@@ -89,7 +83,6 @@ public class RoomActivity extends AppCompatActivity {
     ImageButton send, attach;
     RequestQueue queue;
     List<Message> messageList;
-    private FloatingActionButton removeRoomBtn;
     private Dialog dialog;
 
 
@@ -106,7 +99,7 @@ public class RoomActivity extends AppCompatActivity {
                     messageList.add(m);
                     adapterChat.notifyItemInserted(messageList.size() - 1);
                     LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
-                    int pos = layoutManager.findLastVisibleItemPosition();
+                    int pos = layoutManager != null ? layoutManager.findLastVisibleItemPosition() : 0;
                     if(pos >= messageList.size() - 2) {
                         recyclerView.smoothScrollToPosition(messageList.size() - 1);
                     } else {
@@ -119,7 +112,6 @@ public class RoomActivity extends AppCompatActivity {
 
 
     private AdapterChat adapterChat;
-    private RecyclerView.OnScrollListener scrollListener;
 
     private String username;
     private String roomID;
@@ -145,13 +137,10 @@ public class RoomActivity extends AppCompatActivity {
 
         scrollButton = findViewById(R.id.scroll_button);
 
-        scrollButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                recyclerView.smoothScrollToPosition(messageList.size() - 1);
-                scrollButton.setVisibility(View.INVISIBLE);
-                FeedReaderDbHelper.getInstance(getApplicationContext()).clearUnreadMessages(roomID);
-            }
+        scrollButton.setOnClickListener(view -> {
+            recyclerView.smoothScrollToPosition(messageList.size() - 1);
+            scrollButton.setVisibility(View.INVISIBLE);
+            FeedReaderDbHelper.getInstance(getApplicationContext()).clearUnreadMessages(roomID);
         });
 
         msg = findViewById(R.id.ed_msg);
@@ -172,6 +161,9 @@ public class RoomActivity extends AppCompatActivity {
                                                  if(pos >= messageList.size() - 1) {
                                                      scrollButton.setVisibility(View.INVISIBLE);
                                                      FeedReaderDbHelper.getInstance(getApplicationContext()).clearUnreadMessages(roomID);
+                                                 } else if(linearLayoutManager.findFirstVisibleItemPosition()==0) {
+                                                     fetchMessagesBefore();
+                                                     resetScrollListener();
                                                  }
                                              }
                                          });
@@ -179,51 +171,27 @@ public class RoomActivity extends AppCompatActivity {
 
                 btn_location = findViewById(R.id.btn_sticker);
 
-        /*scrollListener = new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-
-                int totalItemCount = linearLayoutManager.getItemCount();
-                int visibleItemCount = linearLayoutManager.getChildCount();
-                int pastVisiblesItems = linearLayoutManager.findFirstVisibleItemPosition();
-                if ((visibleItemCount + pastVisiblesItems) < totalItemCount && pastVisiblesItems == 0) {
-                    recyclerView.clearOnScrollListeners();
-                    System.out.println("pedidoooooooo");
-                    fetchMessagesBefore();
-                }
-            }
-        };*/
-
-        //recyclerView.addOnScrollListener(scrollListener);
-
         btn_location = findViewById(R.id.btn_sticker);
-        btn_location.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        btn_location.setOnClickListener(v -> {
 
-                Intent it = new Intent(RoomActivity.this, MapsActivity.class).putExtra("markedPosition", new LatLng(-50, 100));
-                startActivityForResult(it, 504);
+            Intent it = new Intent(RoomActivity.this, MapsActivity.class).putExtra("markedPosition", new LatLng(-50, 100));
+            startActivityForResult(it, 504);
 
-            }
         });
 
         btn_share = findViewById(R.id.share_room_button);
-        btn_share.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        btn_share.setOnClickListener(v -> {
 
-                Intent sendIntent = new Intent();
-                sendIntent.setAction(Intent.ACTION_SEND);
-                //sendIntent.putExtra("id", roomID);
-                sendIntent.setType("text/plain");
-                sendIntent.putExtra(Intent.EXTRA_TEXT, deepLink+roomID);
-               //sendIntent.setType("vnd.android-dir/mms-sms");
+            Intent sendIntent = new Intent();
+            sendIntent.setAction(Intent.ACTION_SEND);
+            //sendIntent.putExtra("id", roomID);
+            sendIntent.setType("text/plain");
+            sendIntent.putExtra(Intent.EXTRA_TEXT, deepLink+roomID);
+           //sendIntent.setType("vnd.android-dir/mms-sms");
 
-                Intent shareIntent = Intent.createChooser(sendIntent, "Share room");
-                startActivity(shareIntent);
+            Intent shareIntent = Intent.createChooser(sendIntent, "Share room");
+            startActivity(shareIntent);
 
-            }
         });
 
 
@@ -250,37 +218,36 @@ public class RoomActivity extends AppCompatActivity {
 
         initRemoveRoom();
 
-        backBtn.setOnClickListener(v -> finish());
+        backBtn.setOnClickListener(v -> {
+            startActivity(new Intent(RoomActivity.this, MainActivity.class));
+            finish();
+        });
 
         queue = Volley.newRequestQueue(RoomActivity.this);
 
-        send.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String message = msg.getText().toString().trim();
-                if (TextUtils.isEmpty(message)) { //if empty
-                    Toast.makeText(RoomActivity.this, "Please Write Something Here", Toast.LENGTH_LONG).show();
-                } else {
-                    sendMessage(message);
-                    recyclerView.scrollToPosition(messageList.size() - 1);
-                }
+        send.setOnClickListener(v -> {
+            String message = msg.getText().toString().trim();
+            if (TextUtils.isEmpty(message)) { //if empty
+                Toast.makeText(RoomActivity.this, "Please Write Something Here", Toast.LENGTH_LONG).show();
+            } else {
+                sendMessage(message);
+                recyclerView.scrollToPosition(messageList.size() - 1);
             }
         });
 
 
-        attach.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showAttachDialog();
-            }
-        });
+        attach.setOnClickListener(v -> showAttachDialog());
+
+
 
         pickPhoto = registerForActivityResult(
                 new ActivityResultContracts.GetContent(),
                 new ActivityResultCallback<Uri>() {
                     @Override
                     public void onActivityResult(Uri result) {
-                        sendPhotoMessage(result);
+                        if(result!=null) {
+                            sendPhotoMessage(result);
+                        }
                     }
                 });
 
@@ -289,7 +256,9 @@ public class RoomActivity extends AppCompatActivity {
                 new ActivityResultCallback<Boolean>() {
                     @Override
                     public void onActivityResult(Boolean result) {
-                        sendPhotoMessage(photoTakenUri);
+                        if(result) {
+                            sendPhotoMessage(photoTakenUri);
+                        }
                     }
 
                 });
@@ -302,23 +271,17 @@ public class RoomActivity extends AppCompatActivity {
     }
 
     private void initRemoveRoom() {
-        removeRoomBtn = findViewById(R.id.remove_room_btn);
+        FloatingActionButton removeRoomBtn = findViewById(R.id.remove_room_btn);
         initDialog();
-        removeRoomBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.show();
-            }
-        });
+        removeRoomBtn.setOnClickListener(v -> dialog.show());
     }
 
+    @SuppressLint("UseCompatLoadingForDrawables")
     private void initDialog() {
         //Create the Dialog here
         dialog = new Dialog(this);
         dialog.setContentView(R.layout.delete_room_dialog);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            dialog.getWindow().setBackgroundDrawable(getDrawable(R.drawable.delete_account_background));
-        }
+        dialog.getWindow().setBackgroundDrawable(getDrawable(R.drawable.delete_account_background));
         dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         dialog.setCancelable(false); //Optional
         dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation; //Setting the animations to dialog
@@ -326,23 +289,14 @@ public class RoomActivity extends AppCompatActivity {
         Button yesBtn = dialog.findViewById(R.id.btn_yes);
         Button noBtn = dialog.findViewById(R.id.btn_no);
 
-        yesBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(RoomActivity.this, "Room Removed", Toast.LENGTH_SHORT).show();
-                //TODO
-
-                dialog.dismiss();
-                //startActivity(new Intent(RoomActivity.this, MainActivity.class));
-                finish();
-            }
+        yesBtn.setOnClickListener(v -> {
+            FeedReaderDbHelper.getInstance(getApplicationContext()).leaveRoom(roomID);
+            Toast.makeText(RoomActivity.this, "Room Removed", Toast.LENGTH_SHORT).show();
+            dialog.dismiss();
+            startActivity(new Intent(RoomActivity.this, MainActivity.class));
+            finish();
         });
-        noBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-            }
-        });
+        noBtn.setOnClickListener(v -> dialog.dismiss());
 
     }
 
@@ -414,32 +368,35 @@ public class RoomActivity extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(
                 RoomActivity.this);
 
-        builder.setItems(options, new DialogInterface.OnClickListener() {
-
-            @Override
-            public void onClick(DialogInterface dialog, int item) {
-                if (options[item].equals("Take Photo")) {
-                    String uuid = UUID.randomUUID().toString();
-                    File outputDir = getCacheDir();
-                    File file;
-                    try
-                    {
-                        file = File.createTempFile( uuid, ".jpg", outputDir );
-                        photoTakenUri = FileProvider.getUriForFile(
-                                        RoomActivity.this,
-                                getApplicationContext().getPackageName() + ".provider", file );
-                    }
-                    catch( IllegalArgumentException | IOException e )
-                    {
-                        Toast.makeText(RoomActivity.this, "Take picture not available!", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
+        builder.setItems(options, (dialog, item) -> {
+            if (options[item].equals("Take Photo")) {
+                String uuid = UUID.randomUUID().toString();
+                File outputDir = getCacheDir();
+                File file;
+                try
+                {
+                    file = File.createTempFile( uuid, ".jpg", outputDir );
+                    photoTakenUri = FileProvider.getUriForFile(
+                                    RoomActivity.this,
+                            getApplicationContext().getPackageName() + ".provider", file );
+                }
+                catch( IllegalArgumentException | IOException e )
+                {
+                    Toast.makeText(RoomActivity.this, "Take picture not available!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if(checkPermission()) {
                     takePhoto.launch(photoTakenUri);
-                } else if (options[item].equals("Choose from Library")) {
-                    pickPhoto.launch("image/*");
-                } else if (options[item].equals("Cancel")) {
+                } else {
+                    requestPermission();
                     dialog.dismiss();
                 }
+            } else if (options[item].equals("Choose from Library")) {
+
+                    pickPhoto.launch("image/*");
+
+            } else if (options[item].equals("Cancel")) {
+                dialog.dismiss();
             }
         });
         builder.show();
@@ -454,9 +411,43 @@ public class RoomActivity extends AppCompatActivity {
         initAdapter();
     }
 
+    private boolean checkPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+            // Permission is not granted
+            return false;
+        }
+        return true;
+    }
+
+    private void requestPermission() {
+
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.CAMERA},
+                PERMISSION_REQUEST_CODE);
+    }
+
     public void initAdapter() {
         adapterChat = new AdapterChat(RoomActivity.this, messageList, username);
         recyclerView.setAdapter(adapterChat);
+    }
+
+    private void resetScrollListener() {
+
+        recyclerView.clearOnScrollListeners();
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+                assert linearLayoutManager != null;
+                int pos = linearLayoutManager.findLastVisibleItemPosition();
+                if (pos >= messageList.size() - 1) {
+                    scrollButton.setVisibility(View.INVISIBLE);
+                    FeedReaderDbHelper.getInstance(getApplicationContext()).clearUnreadMessages(roomID);
+                }
+            }
+        });
     }
 
     private void sendMessage(final String message) {

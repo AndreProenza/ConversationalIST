@@ -3,6 +3,7 @@ package pt.ulisboa.tecnico.cmov.conversational_ist.view.activities;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,6 +13,7 @@ import android.util.Log;
 
 import pt.ulisboa.tecnico.cmov.conversational_ist.R;
 
+@SuppressLint("CustomSplashScreen")
 public class SplashScreenActivity extends AppCompatActivity {
 
     SharedPreferences sharedPref;
@@ -28,19 +30,15 @@ public class SplashScreenActivity extends AppCompatActivity {
 
         initUser();
         Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (!userId.isEmpty()) { // If user already login
-                    startActivity(new Intent(SplashScreenActivity.this, MainActivity.class)); // Go to MainScreen
-                    finish();
-                } else {
-                    startActivity(new Intent(SplashScreenActivity.this, StartUpActivity.class)); // Go to Startup then Register
-                    finish();
-                }
-
-                finish();
+        handler.postDelayed(() -> {
+            if (!userId.isEmpty()) { // If user already login
+                startActivity(new Intent(SplashScreenActivity.this, MainActivity.class)); // Go to MainScreen
+            } else {
+                startActivity(new Intent(SplashScreenActivity.this, StartUpActivity.class)); // Go to Startup then Register
             }
+            finish();
+
+            finish();
         }, 2000);
     }
 

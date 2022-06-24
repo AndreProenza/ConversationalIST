@@ -1,26 +1,10 @@
 package pt.ulisboa.tecnico.cmov.conversational_ist.view.activities;
 
 
-import static android.content.ContentValues.TAG;
-
-import static android.content.Context.MODE_PRIVATE;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
-import androidx.appcompat.widget.Toolbar;
-import androidx.cardview.widget.CardView;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.Manifest;
-import android.content.BroadcastReceiver;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -28,33 +12,34 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
+import androidx.core.app.ActivityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.android.volley.Request;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
-import com.google.firebase.messaging.FirebaseMessaging;
 import com.mikhaellopez.circularimageview.CircularImageView;
 
-import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -71,12 +56,7 @@ import pt.ulisboa.tecnico.cmov.conversational_ist.view.activities.profiles.MyPro
 
 public class MainActivity extends AppCompatActivity implements RecyclerViewEnterChatInterface {
 
-    private static final int REQUEST_LOCATION_CODE = 501;
-    private ActionBar actionBar;
-    private Toolbar toolbar;
     private DrawerLayout drawerLayout;
-    private CircularImageView profileImage;
-    private TextView userName;
     private LinearLayout initialLayout;
 
     private String username;
@@ -129,7 +109,6 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
         sharedPref = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         sharedPrefMode = getSharedPreferences("mode", Context.MODE_PRIVATE);
 
-        //isUserLoggedIn();
         initUser();
         init();
         initProfile();
@@ -153,11 +132,9 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
             );
         }
 
-        recyclerView = (RecyclerView) findViewById(R.id.recycle_view_rooms);
+        recyclerView = findViewById(R.id.recycle_view_rooms);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-        getRoomsSubscribed();
 
         registerReceiver(Updated, new IntentFilter("message_inserted"));
         registerReceiver(Updated, new IntentFilter("messages_read"));
@@ -167,33 +144,25 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
 
         String url = "https://cmuapi.herokuapp.com/api/rooms/room?roomID=" + roomID;
 
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null, new com.android.volley.Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                Toast.makeText(MainActivity.this, "Messages received!", Toast.LENGTH_SHORT).show();
-                System.out.println(response);
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null, response -> {
+            Toast.makeText(MainActivity.this, "Messages received!", Toast.LENGTH_SHORT).show();
+            System.out.println(response);
 
-                try {
-                    boolean isGeoFenced = response.getInt("roomType") == RoomType.GEOFENCED.ordinal();
-                    Room r = new Room(response.getString("id"),
-                            response.getString("name"),
-                            isGeoFenced,
-                            response.getDouble("lat"),
-                            response.getDouble("lng"),
-                            response.getInt("radius")
-                            ,0);
-                    FeedReaderDbHelper.getInstance(getApplicationContext()).createChannel(r);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                
+            try {
+                boolean isGeoFenced = response.getInt("roomType") == RoomType.GEOFENCED.ordinal();
+                Room r = new Room(response.getString("id"),
+                        response.getString("name"),
+                        isGeoFenced,
+                        response.getDouble("lat"),
+                        response.getDouble("lng"),
+                        response.getInt("radius")
+                        ,0);
+                FeedReaderDbHelper.getInstance(getApplicationContext()).createChannel(r);
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
-        }, new com.android.volley.Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Toast.makeText(MainActivity.this, "Fail to get response = " + error, Toast.LENGTH_SHORT).show();
-            }
-        });
+
+        }, error -> Toast.makeText(MainActivity.this, "Fail to get response = " + error, Toast.LENGTH_SHORT).show());
         VolleySingleton.getInstance(getApplicationContext()).getmRequestQueue().add(request);
     }
 
@@ -201,33 +170,17 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
         rooms = FeedReaderDbHelper.getInstance(getApplicationContext()).getGeoFencedRooms(0);
         System.out.println(rooms);
         initialLayout = findViewById(R.id.initial_layout);
+        initAdapter();
         filterGeoRooms();
     }
-    /**
-    private void getRoomsSubscribed() {
-        rooms = FeedReaderDbHelper.getInstance(getApplicationContext()).getAllChannels();
-        initialLayout = findViewById(R.id.initial_layout);
-        if (rooms.isEmpty()) {
-            initialLayout.setVisibility(View.VISIBLE);
-        }
-        else {
-            initialLayout.setVisibility(View.GONE);
-        }
-        roomsAdapter = new MainRoomsAdapter(MainActivity.this, rooms, this);
-        recyclerView.setAdapter(roomsAdapter);
-
-    }
-     */
 
     private void initAdapter(){
-        /**
         if (rooms.isEmpty()) {
             initialLayout.setVisibility(View.VISIBLE);
         }
         else {
             initialLayout.setVisibility(View.GONE);
         }
-         */
         roomsAdapter = new MainRoomsAdapter(MainActivity.this, rooms, this);
         recyclerView.setAdapter(roomsAdapter);
 
@@ -237,29 +190,31 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
     private void filterGeoRooms() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             FusedLocationProviderClient locationProvider = LocationServices.getFusedLocationProviderClient(this);
-            locationProvider.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
-                @Override
-                public void onComplete(@NonNull Task<Location> task) {
-                    Location location = task.getResult();
-                    if (location != null) {
-                        ArrayList<Room> geoRooms = FeedReaderDbHelper.getInstance(getApplicationContext()).getGeoFencedRooms(1);
+            locationProvider.getLastLocation().addOnCompleteListener(task -> {
+                Location location = task.getResult();
+                if (location != null) {
+                    int size = rooms.size();
+                    //ArrayList<Room> room_list = new ArrayList<>();
+                    ArrayList<Room> geoRooms = FeedReaderDbHelper.getInstance(getApplicationContext()).getGeoFencedRooms(1);
 
-                        double latitude = location.getLatitude();
-                        double longitude = location.getLongitude();
+                    double latitude = location.getLatitude();
+                    double longitude = location.getLongitude();
 
-                        for (Room r : geoRooms) {
-                            float[] result = new float[1];
-                            Location.distanceBetween(latitude, longitude, r.getLat(), r.getLng(), result);
-                            System.out.println("Location distance : " + result[0] / 1000);
-                            if ((result[0] / 1000) < r.getRadius()) {
-                                rooms.add(r);
-                            }
+                    for (Room r : geoRooms) {
+                        float[] result = new float[1];
+                        Location.distanceBetween(latitude, longitude, r.getLat(), r.getLng(), result);
+                        System.out.println("Location distance : " + result[0] / 1000);
+                        if ((result[0] / 1000) < r.getRadius()) {
+                            rooms.add(r);
                         }
                     }
+                    roomsAdapter.notifyItemRangeChanged(size-1, rooms.size());
+                }
+                if (!rooms.isEmpty()) {
+                    initialLayout.setVisibility(View.GONE);
                 }
             });
         }
-        initAdapter();
     }
 
     private void initUser() {
@@ -269,37 +224,29 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
     }
 
     private void initProfile() {
-        userName = findViewById(R.id.name);
+        TextView userName = findViewById(R.id.name);
         userName.setText(username);
-        profileImage = findViewById(R.id.profile);
+        CircularImageView profileImage = findViewById(R.id.profile);
 
         FirebaseHandler.getCurrentProfileInfoMain(username, userName, profileImage);
 
-        profileImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, MyProfileActivity.class));
-            }
-        });
+        profileImage.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, MyProfileActivity.class)));
     }
 
     private void init() {
-        toolbar = findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         drawerLayout =  findViewById(R.id.drawer_layout);
 
-
-        //Set Actionbar
         setSupportActionBar(toolbar);
-        actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setHomeButtonEnabled(true);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+        if (actionBar != null) {
+            actionBar.setHomeButtonEnabled(true);
+        }
 
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                drawerLayout.open();
-            }
-        });
+        toolbar.setNavigationOnClickListener(v -> drawerLayout.open());
 
 
         //Drawer
@@ -311,14 +258,11 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
         drawerLayout.setDrawerListener(toggle);
         toggle.syncState();
 
-        nav_view.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        nav_view.setNavigationItemSelectedListener(item -> {
 
-                //TODO Later
-                drawerLayout.closeDrawers();
-                return true;
-            }
+            //TODO Later
+            drawerLayout.closeDrawers();
+            return true;
         });
 
         // initClick
@@ -361,20 +305,19 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
     protected void onStart() {
         super.onStart();
 
-        recyclerView = (RecyclerView) findViewById(R.id.recycle_view_rooms);
+        recyclerView = findViewById(R.id.recycle_view_rooms);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         getRoomsSubscribed();
     }
 
+    @SuppressLint("UseCompatLoadingForDrawables")
     private void initDialog() {
         //Create the Dialog here
         dialog = new Dialog(this);
         dialog.setContentView(R.layout.delete_account_dialog);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            dialog.getWindow().setBackgroundDrawable(getDrawable(R.drawable.delete_account_background));
-        }
+        dialog.getWindow().setBackgroundDrawable(getDrawable(R.drawable.delete_account_background));
         dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         dialog.setCancelable(false); //Optional
         dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation; //Setting the animations to dialog
@@ -382,23 +325,15 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
         Button yesBtn = dialog.findViewById(R.id.btn_yes);
         Button noBtn = dialog.findViewById(R.id.btn_no);
 
-        yesBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(MainActivity.this, "Account Deleted", Toast.LENGTH_SHORT).show();
-                dialog.dismiss();
-                deleteAccount();
-                startActivity(new Intent(MainActivity.this, RegisterActivity.class));
-                finish();
-            }
+        yesBtn.setOnClickListener(v -> {
+            Toast.makeText(MainActivity.this, "Account Deleted", Toast.LENGTH_SHORT).show();
+            dialog.dismiss();
+            deleteAccount();
+            startActivity(new Intent(MainActivity.this, RegisterActivity.class));
+            finish();
         });
 
-        noBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-            }
-        });
+        noBtn.setOnClickListener(v -> dialog.dismiss());
     }
 
 
@@ -431,10 +366,10 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
     @Override
     public void onItemClick(int position) {
         CardView cardView = (CardView) recyclerView.getChildAt(position);
-        TextView tvRoomName = (TextView) cardView.findViewById(R.id.room_name);
+        TextView tvRoomName = cardView.findViewById(R.id.room_name);
         String roomName = tvRoomName.getText().toString();
         Log.d("RoomName: ", roomName);
-        TextView tvRoomId = (TextView) cardView.findViewById(R.id.room_id);
+        TextView tvRoomId = cardView.findViewById(R.id.room_id);
         String roomId = tvRoomId.getText().toString();
         Log.d("RoomName: ", roomId);
         Intent intent = new Intent(MainActivity.this, RoomActivity.class);
@@ -442,12 +377,13 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
         intent.putExtra("roomId", roomId);
         intent.putExtra("username", username);
         startActivity(intent);
+        finish();
     }
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelableArrayList("rooms", new ArrayList<Room>(roomsAdapter.getList()));
+        outState.putParcelableArrayList("rooms", new ArrayList<>(roomsAdapter.getList()));
     }
 
     @Override

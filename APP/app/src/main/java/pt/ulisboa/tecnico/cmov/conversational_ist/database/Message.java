@@ -4,12 +4,12 @@ import java.io.Serializable;
 
 public class Message implements Serializable {
 
-    private String id;
-    private String sender;
-    private String roomID;
-    private String message;
-    private String createdAt;
-    private boolean isPhoto;
+    private final String id;
+    private final String sender;
+    private final String roomID;
+    private final String message;
+    private final String createdAt;
+    private final boolean isPhoto;
 
     public Message(String id, String sender, String roomID, String message, String createdAt, boolean isPhoto) {
         this.id = id;

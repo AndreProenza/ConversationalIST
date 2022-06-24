@@ -1,6 +1,7 @@
 package pt.ulisboa.tecnico.cmov.conversational_ist.view.activities;
 
-import androidx.annotation.NonNull;
+import static com.android.volley.toolbox.Volley.newRequestQueue;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.app.ActivityCompat;
@@ -13,25 +14,19 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Parcelable;
-import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.VolleyError;
+
 import com.android.volley.toolbox.JsonArrayRequest;
-import com.android.volley.toolbox.Volley;
+
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.database.DatabaseReference;
 
-import org.json.JSONArray;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -47,15 +42,9 @@ import pt.ulisboa.tecnico.cmov.conversational_ist.interfaces.RecyclerViewAddRoom
 
 public class RoomsActivity extends AppCompatActivity implements RecyclerViewAddRoomsInterface {
 
-    private ImageButton btnBack;
-    private ImageButton searchBtn;
-    //Button loadRoomsBtn;
     RecyclerView recyclerView = null;
     private ArrayList<Room> rooms;
-    DatabaseReference db;
     RoomsAdapter roomsAdapter;
-    private RequestQueue queue;
-    private SearchView searchView;
     private FusedLocationProviderClient locationProvider;
     private String userID;
 
@@ -65,18 +54,15 @@ public class RoomsActivity extends AppCompatActivity implements RecyclerViewAddR
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rooms);
 
-        queue = Volley.newRequestQueue(RoomsActivity.this);
+        RequestQueue queue = newRequestQueue(RoomsActivity.this);
 
         SharedPreferences sh = getApplicationContext().getSharedPreferences("MyPrefs",MODE_PRIVATE);
         userID = sh.getString("saved_userid","");
 
-        btnBack = findViewById(R.id.btn_back);
-        btnBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(RoomsActivity.this, MainActivity.class));
-                finish();
-            }
+        ImageButton btnBack = findViewById(R.id.btn_back);
+        btnBack.setOnClickListener(v -> {
+            startActivity(new Intent(RoomsActivity.this, MainActivity.class));
+            finish();
         });
 
         recyclerView = (RecyclerView) findViewById(R.id.recycle_view_rooms);
@@ -88,14 +74,10 @@ public class RoomsActivity extends AppCompatActivity implements RecyclerViewAddR
 
         getLocationAndFetchRooms();
         initSearch();
-
-        //TODO call to save channel in db
-        //FeedReaderDbHelper.getInstance(getApplicationContext()).createChannel("628e1fa903146c7d0cc43b23","b");
-
     }
 
     private void initSearch() {
-        searchView = findViewById(R.id.search_view);
+        SearchView searchView = findViewById(R.id.search_view);
         searchView.clearFocus();
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -144,16 +126,13 @@ public class RoomsActivity extends AppCompatActivity implements RecyclerViewAddR
 
     @SuppressLint("MissingPermission")
     private void getLocation() {
-        locationProvider.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
-            @Override
-            public void onComplete(@NonNull Task<Location> task) {
-                Location location = task.getResult();
-                if (location != null) {
-                    fetchRooms(String.valueOf(location.getLatitude()),String.valueOf(location.getLongitude()));
-                }
-                else {
-                    fetchRooms("","");
-                }
+        locationProvider.getLastLocation().addOnCompleteListener(task -> {
+            Location location = task.getResult();
+            if (location != null) {
+                fetchRooms(String.valueOf(location.getLatitude()),String.valueOf(location.getLongitude()));
+            }
+            else {
+                fetchRooms("","");
             }
         });
     }
@@ -163,34 +142,26 @@ public class RoomsActivity extends AppCompatActivity implements RecyclerViewAddR
 
         String url = "http://cmuapi.herokuapp.com/api/rooms?lat=" + lat + "&lng=" + lng;
 
-        JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, url, null, new com.android.volley.Response.Listener<JSONArray>() {
-            @Override
-            public void onResponse(JSONArray response) {
-                Toast.makeText(RoomsActivity.this, "Rooms received!", Toast.LENGTH_SHORT).show();
-                System.out.println(response);
+        JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, url, null, response -> {
+            Toast.makeText(RoomsActivity.this, "Rooms received!", Toast.LENGTH_SHORT).show();
+            System.out.println(response);
 
-                for (int i = 0; i < response.length(); i++) {
-                    try {
-                        JSONObject jresponse = response.getJSONObject(i);
-                        boolean isGeoFenced = Integer.parseInt(jresponse.getString("roomType")) == RoomType.GEOFENCED.ordinal();
-                        Room room = new Room(jresponse.getString("id"), jresponse.getString("name"), isGeoFenced, Double.parseDouble(jresponse.getString("lat")), Double.parseDouble(jresponse.getString("lng")), Integer.parseInt(jresponse.getString("radius")),0);
-                        if(FeedReaderDbHelper.getInstance(getApplicationContext()).isChannelSubscribed(jresponse.getString("id"))) {
-                            System.out.println("Name: " + jresponse.getString("name") + "; ID: " + jresponse.getString("id") +"\n");
-                            rooms.add(room);
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+            for (int i = 0; i < response.length(); i++) {
+                try {
+                    JSONObject jresponse = response.getJSONObject(i);
+                    boolean isGeoFenced = Integer.parseInt(jresponse.getString("roomType")) == RoomType.GEOFENCED.ordinal();
+                    Room room = new Room(jresponse.getString("id"), jresponse.getString("name"), isGeoFenced, Double.parseDouble(jresponse.getString("lat")), Double.parseDouble(jresponse.getString("lng")), Integer.parseInt(jresponse.getString("radius")),0);
+                    if(FeedReaderDbHelper.getInstance(getApplicationContext()).isChannelSubscribed(jresponse.getString("id"))) {
+                        System.out.println("Name: " + jresponse.getString("name") + "; ID: " + jresponse.getString("id") +"\n");
+                        rooms.add(room);
                     }
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
-                roomsAdapter = new RoomsAdapter(RoomsActivity.this, rooms, RoomsActivity.this,userID);
-                recyclerView.setAdapter(roomsAdapter);
             }
-        }, new com.android.volley.Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Toast.makeText(RoomsActivity.this, "Fail to get response = " + error, Toast.LENGTH_SHORT).show();
-            }
-        });
+            roomsAdapter = new RoomsAdapter(RoomsActivity.this, rooms, RoomsActivity.this,userID);
+            recyclerView.setAdapter(roomsAdapter);
+        }, error -> Toast.makeText(RoomsActivity.this, "Fail to get response = " + error, Toast.LENGTH_SHORT).show());
 
         VolleySingleton.getInstance(getApplicationContext()).getmRequestQueue().add(request);
     }

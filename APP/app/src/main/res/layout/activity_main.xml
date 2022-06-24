@@ -124,15 +124,15 @@
         android:id="@+id/nav_layout"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:fitsSystemWindows="false"
         android:layout_gravity="start"
+        android:fitsSystemWindows="false"
         android:visibility="visible">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:background="@color/teal_700">
+            android:background="@color/teal_700"
+            android:orientation="vertical">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -145,18 +145,18 @@
                     android:id="@+id/profile"
                     android:layout_width="70dp"
                     android:layout_height="70dp"
+                    android:layout_marginStart="5dp"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/conversationalist_icon"
-                    android:layout_marginStart="5dp"/>
+                    android:src="@drawable/conversationalist_icon" />
 
                 <TextView
                     android:id="@+id/name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
                     android:text="Username"
                     android:textColor="@android:color/white"
-                    android:textStyle="bold"
-                    android:layout_marginStart="10dp"/>
+                    android:textStyle="bold" />
 
 
             </LinearLayout>
@@ -171,25 +171,25 @@
                 <androidx.appcompat.widget.LinearLayoutCompat
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="@color/teal_700"
                     android:foreground="?selectableItemBackground"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:paddingHorizontal="15dp"
-                    android:paddingVertical="10dp"
-                    android:background="@color/teal_700">
+                    android:paddingVertical="10dp">
 
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:src="@drawable/ic_baseline_group_24"
-                        app:tint="@color/black"/>
+                        app:tint="@color/black" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="15dp"
                         android:text="Rooms"
-                        android:textColor="@color/black"/>
+                        android:textColor="@color/black" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -205,25 +205,25 @@
                 <androidx.appcompat.widget.LinearLayoutCompat
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="@color/teal_700"
                     android:foreground="?selectableItemBackground"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:paddingHorizontal="15dp"
-                    android:paddingVertical="10dp"
-                    android:background="@color/teal_700">
+                    android:paddingVertical="10dp">
 
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:src="@drawable/ic_baseline_group_add_24"
-                        app:tint="@color/black"/>
+                        app:tint="@color/black" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="15dp"
                         android:text="New Room"
-                        android:textColor="@color/black"/>
+                        android:textColor="@color/black" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -335,25 +335,25 @@
                 <androidx.appcompat.widget.LinearLayoutCompat
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="@color/teal_700"
                     android:foreground="?selectableItemBackground"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:paddingHorizontal="15dp"
-                    android:paddingVertical="10dp"
-                    android:background="@color/teal_700">
+                    android:paddingVertical="10dp">
 
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:src="@drawable/ic_baseline_settings_24"
-                        app:tint="@color/black"/>
+                        app:tint="@color/black" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="15dp"
                         android:text="Settings"
-                        android:textColor="@color/black"/>
+                        android:textColor="@color/black" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -407,25 +407,25 @@
                 <androidx.appcompat.widget.LinearLayoutCompat
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="@color/teal_700"
                     android:foreground="?selectableItemBackground"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:paddingHorizontal="15dp"
-                    android:paddingVertical="10dp"
-                    android:background="@color/teal_700">
+                    android:paddingVertical="10dp">
 
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:src="@drawable/ic_baseline_verified_24"
-                        app:tint="@color/black"/>
+                        app:tint="@color/black" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="15dp"
                         android:text="Recommendations"
-                        android:textColor="@color/black"/>
+                        android:textColor="@color/black" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -441,25 +441,25 @@
                 <androidx.appcompat.widget.LinearLayoutCompat
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="@color/teal_700"
                     android:foreground="?selectableItemBackground"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:paddingHorizontal="15dp"
-                    android:paddingVertical="10dp"
-                    android:background="@color/teal_700">
+                    android:paddingVertical="10dp">
 
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:src="@drawable/ic_outline_privacy_tip_24"
-                        app:tint="@color/black"/>
+                        app:tint="@color/black" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="15dp"
                         android:text="ConversationalIST Policy"
-                        android:textColor="@color/black"/>
+                        android:textColor="@color/black" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -508,25 +508,25 @@
                 <androidx.appcompat.widget.LinearLayoutCompat
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="@color/teal_700"
                     android:foreground="?selectableItemBackground"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:paddingHorizontal="15dp"
-                    android:paddingVertical="10dp"
-                    android:background="@color/teal_700">
+                    android:paddingVertical="10dp">
 
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:src="@drawable/ic_twotone_login_24"
-                        app:tint="@color/black"/>
+                        app:tint="@color/black" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="15dp"
                         android:text="Delete Account"
-                        android:textColor="@color/black"/>
+                        android:textColor="@color/black" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
 

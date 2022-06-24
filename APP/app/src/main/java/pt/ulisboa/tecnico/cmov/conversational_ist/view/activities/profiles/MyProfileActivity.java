@@ -1,15 +1,7 @@
 package pt.ulisboa.tecnico.cmov.conversational_ist.view.activities.profiles;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
-import androidx.appcompat.widget.SwitchCompat;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
-
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -19,11 +11,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.webkit.MimeTypeMap;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -31,15 +21,19 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.appcompat.widget.SwitchCompat;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
+
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 import com.mikhaellopez.circularimageview.CircularImageView;
 
 import java.io.File;
@@ -53,40 +47,24 @@ import pt.ulisboa.tecnico.cmov.conversational_ist.firebase.FirebaseHandler;
 import pt.ulisboa.tecnico.cmov.conversational_ist.model.User;
 import pt.ulisboa.tecnico.cmov.conversational_ist.satic.StaticData;
 import pt.ulisboa.tecnico.cmov.conversational_ist.view.activities.MainActivity;
-import pt.ulisboa.tecnico.cmov.conversational_ist.view.activities.RegisterActivity;
 
 public class MyProfileActivity extends AppCompatActivity {
 
-    private int PERMISSION_CAMERA = 123;
-    private int PERMISSION_STORAGE = 124;
-    private int REQUEST_TAKE_PHOTO = 125;
-    private String TAG = "MyProfile";
+    private final int REQUEST_TAKE_PHOTO = 125;
 
     private SwitchCompat switchBtn;
     private ImageView modeIcon;
     private TextView modeTextContent;
 
-    private LinearLayout policyBtn;
-
     private DatabaseReference db;
-    private StorageReference dbStorageRef;
     private ImageView imageView;
-    private FloatingActionButton uploadBtn;
-    private FloatingActionButton cameraBtn;
     private ProgressBar progressBar;
     private Uri imageUri;
 
-    private CircularImageView profileImage;
-    private TextView userName;
-    private TextView userName2;
     private EditText bio;
-    private FloatingActionButton bioUploadBtn;
 
     private String userId;
-    private SharedPreferences sharedPref;
     private SharedPreferences sharedPrefMode;
-
-    private boolean isDarkMode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,7 +74,7 @@ public class MyProfileActivity extends AppCompatActivity {
 
         initLightDarkMode();
 
-        sharedPref = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        SharedPreferences sharedPref = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
 
         initUser();
         initProfile();
@@ -118,9 +96,9 @@ public class MyProfileActivity extends AppCompatActivity {
     }
 
     private void initProfile() {
-        userName = findViewById(R.id.username);
-        userName2 = findViewById(R.id.tv_username);
-        profileImage = findViewById(R.id.image_profile);
+        TextView userName = findViewById(R.id.username);
+        TextView userName2 = findViewById(R.id.tv_username);
+        CircularImageView profileImage = findViewById(R.id.image_profile);
         bio = findViewById(R.id.tv_bio);
 
         FirebaseHandler.getCurrentProfileInfo(userId, userName, userName2, profileImage, bio);
@@ -132,7 +110,7 @@ public class MyProfileActivity extends AppCompatActivity {
     }
 
     private void uploadBio() {
-        bioUploadBtn = findViewById(R.id.btn_bio_upload);
+        FloatingActionButton bioUploadBtn = findViewById(R.id.btn_bio_upload);
         bioUploadBtn.setOnClickListener(view ->{
             String bioText = getBio();
             if (bioText == null) {
@@ -155,13 +133,8 @@ public class MyProfileActivity extends AppCompatActivity {
 
     private void initCamera() {
         imageView = findViewById(R.id.image_profile);
-        cameraBtn = findViewById(R.id.fab_camera);
-        cameraBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                checkPermissionCameraAndStorage();
-            }
-        });
+        FloatingActionButton cameraBtn = findViewById(R.id.fab_camera);
+        cameraBtn.setOnClickListener(v -> checkPermissionCameraAndStorage());
     }
 
     private void verifyLightDarkMode() {
@@ -176,6 +149,7 @@ public class MyProfileActivity extends AppCompatActivity {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private void initLightDarkMode() {
         switchBtn = findViewById(R.id.switch_btn);
         modeIcon = findViewById(R.id.mode_icon);
@@ -184,7 +158,7 @@ public class MyProfileActivity extends AppCompatActivity {
         sharedPrefMode = getSharedPreferences("mode", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPrefMode.edit();
 
-        isDarkMode = sharedPrefMode.getBoolean("mode_status", false); // False for light mode
+        boolean isDarkMode = sharedPrefMode.getBoolean("mode_status", false); // False for light mode
 
         if (isDarkMode) {
             modeTextContent.setText("Light Mode");
@@ -199,55 +173,51 @@ public class MyProfileActivity extends AppCompatActivity {
 
         System.out.println("isDarkMode: " + isDarkMode);
 
-        switchBtn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-                    modeTextContent.setText("Light Mode");
-                    modeIcon.setImageResource(R.drawable.ic_baseline_wb_sunny_24);
+        switchBtn.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                modeTextContent.setText("Light Mode");
+                modeIcon.setImageResource(R.drawable.ic_baseline_wb_sunny_24);
 
-                    editor.putBoolean("mode_status", true);
-                    editor.apply();
-                    switchBtn.setChecked(true);
+                editor.putBoolean("mode_status", true);
+                editor.apply();
+                switchBtn.setChecked(true);
 
-                    System.out.println("Current mode: Dark Mode");
-                    System.out.println("Change to: Light Mode");
-                }
-                else {
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-                    modeTextContent.setText("Dark Mode");
-                    modeIcon.setImageResource(R.drawable.ic_baseline_dark_mode_24);
+                System.out.println("Current mode: Dark Mode");
+                System.out.println("Change to: Light Mode");
+            }
+            else {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                modeTextContent.setText("Dark Mode");
+                modeIcon.setImageResource(R.drawable.ic_baseline_dark_mode_24);
 
-                    editor.putBoolean("mode_status", false);
-                    editor.apply();
-                    switchBtn.setChecked(false);
+                editor.putBoolean("mode_status", false);
+                editor.apply();
+                switchBtn.setChecked(false);
 
-                    System.out.println("Current mode: Light Mode");
-                    System.out.println("Change to: Dark Mode");
-                }
+                System.out.println("Current mode: Light Mode");
+                System.out.println("Change to: Dark Mode");
             }
         });
     }
 
     private void initPolicy() {
-        policyBtn = findViewById(R.id.ll_policy);
+        LinearLayout policyBtn = findViewById(R.id.ll_policy);
 
-        policyBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Uri uri = Uri.parse("https://github.com/AndreProenza/ConversationalIST");
-                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-                startActivity(intent);
-            }
+        policyBtn.setOnClickListener(v -> {
+            Uri uri = Uri.parse("https://github.com/AndreProenza/ConversationalIST");
+            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+            startActivity(intent);
         });
     }
 
     private void checkPermissionCameraAndStorage() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            int PERMISSION_CAMERA = 123;
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA},
                     PERMISSION_CAMERA);
         } else if(ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            int PERMISSION_STORAGE = 124;
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                     PERMISSION_STORAGE);
         }
@@ -258,6 +228,7 @@ public class MyProfileActivity extends AppCompatActivity {
 
     private void dispatchTakenPictureIntent() {
         Intent takenPictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        String TAG = "MyProfile";
         if (takenPictureIntent.resolveActivity(getPackageManager()) != null) {
             File photoFile = null;
             try {
@@ -315,29 +286,23 @@ public class MyProfileActivity extends AppCompatActivity {
 
     private void uploadPhoto() {
         imageView = findViewById(R.id.image_profile);
-        uploadBtn = findViewById(R.id.btn_upload);
+        FloatingActionButton uploadBtn = findViewById(R.id.btn_upload);
         progressBar = findViewById(R.id.profile_progress_bar);
 
         progressBar.setVisibility(View.INVISIBLE);
 
-        imageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent galleryIntent = new Intent();
-                galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
-                galleryIntent.setType("image/*");
-                startActivityForResult(galleryIntent , 2);
-            }
+        imageView.setOnClickListener(v -> {
+            Intent galleryIntent = new Intent();
+            galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
+            galleryIntent.setType("image/*");
+            startActivityForResult(galleryIntent , 2);
         });
 
-        uploadBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (imageUri != null) {
-                    uploadToFirebase(imageUri);
-                } else{
-                    Toast.makeText(MyProfileActivity.this, "Please Select Image", Toast.LENGTH_SHORT).show();
-                }
+        uploadBtn.setOnClickListener(v -> {
+            if (imageUri != null) {
+                uploadToFirebase(imageUri);
+            } else{
+                Toast.makeText(MyProfileActivity.this, "Please Select Image", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -345,35 +310,19 @@ public class MyProfileActivity extends AppCompatActivity {
     private void uploadToFirebase(Uri uri){
 
         db = FirebaseDatabase.getInstance().getReference("users");
-        dbStorageRef = FirebaseStorage.getInstance().getReference();
+        StorageReference dbStorageRef = FirebaseStorage.getInstance().getReference();
 
         final StorageReference fileRef = dbStorageRef.child(System.currentTimeMillis() + "." + getFileExtension(uri));
-        fileRef.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                fileRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                    @Override
-                    public void onSuccess(Uri uri) {
-                        User user = new User();
-                        db.child(userId).child("photo").setValue(uri.toString());
+        fileRef.putFile(uri).addOnSuccessListener(taskSnapshot -> fileRef.getDownloadUrl().addOnSuccessListener(uri1 -> {
+            User user = new User();
+            db.child(userId).child("photo").setValue(uri1.toString());
 
-                        progressBar.setVisibility(View.INVISIBLE);
-                        Toast.makeText(MyProfileActivity.this, "Uploaded Successfully", Toast.LENGTH_SHORT).show();
-                        imageView.setImageResource(R.drawable.conversationalist_icon);
-                    }
-                });
-            }
-        }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onProgress(@NonNull UploadTask.TaskSnapshot snapshot) {
-                progressBar.setVisibility(View.VISIBLE);
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                progressBar.setVisibility(View.INVISIBLE);
-                Toast.makeText(MyProfileActivity.this, "Uploading Failed", Toast.LENGTH_SHORT).show();
-            }
+            progressBar.setVisibility(View.INVISIBLE);
+            Toast.makeText(MyProfileActivity.this, "Uploaded Successfully", Toast.LENGTH_SHORT).show();
+            imageView.setImageResource(R.drawable.conversationalist_icon);
+        })).addOnProgressListener(snapshot -> progressBar.setVisibility(View.VISIBLE)).addOnFailureListener(e -> {
+            progressBar.setVisibility(View.INVISIBLE);
+            Toast.makeText(MyProfileActivity.this, "Uploading Failed", Toast.LENGTH_SHORT).show();
         });
     }
 

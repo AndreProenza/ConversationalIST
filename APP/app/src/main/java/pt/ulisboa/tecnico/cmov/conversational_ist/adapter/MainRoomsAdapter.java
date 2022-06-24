@@ -1,5 +1,6 @@
 package pt.ulisboa.tecnico.cmov.conversational_ist.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,6 +35,7 @@ public class MainRoomsAdapter extends RecyclerView.Adapter<MainRoomsAdapter.Room
         return new RoomsViewHolder(v, rvEnterChatInterface);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull RoomsViewHolder holder, int position) {
         Room room = rooms.get(position);
@@ -69,17 +71,12 @@ public class MainRoomsAdapter extends RecyclerView.Adapter<MainRoomsAdapter.Room
             roomName = itemView.findViewById(R.id.room_name);
             roomId = itemView.findViewById(R.id.room_id);
             notif_badge = itemView.findViewById(R.id.notif_badge);
-            //roomDescription = itemView.findViewById(R.id.room_description);
-            //roomVisibility = itemView.findViewById(R.id.room_visibility);
 
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (rvEnterChatInterface != null) {
-                        int position = getAdapterPosition();
-                        if (position != RecyclerView.NO_POSITION) {
-                            rvEnterChatInterface.onItemClick(position);
-                        }
+            itemView.setOnClickListener(v -> {
+                if (rvEnterChatInterface != null) {
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION) {
+                        rvEnterChatInterface.onItemClick(position);
                     }
                 }
             });

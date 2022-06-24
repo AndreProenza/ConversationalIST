@@ -1,4 +1,4 @@
-package pt.ulisboa.tecnico.cmov.conversational_ist;
+package pt.ulisboa.tecnico.cmov.conversational_ist.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -7,9 +7,6 @@ import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkInfo;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
-import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,8 +18,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageRequest;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -33,21 +28,20 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
+import pt.ulisboa.tecnico.cmov.conversational_ist.PhotoUtils;
+import pt.ulisboa.tecnico.cmov.conversational_ist.R;
+import pt.ulisboa.tecnico.cmov.conversational_ist.VolleySingleton;
 import pt.ulisboa.tecnico.cmov.conversational_ist.database.Message;
 
 
-public class AdapterChat extends RecyclerView.Adapter<pt.ulisboa.tecnico.cmov.conversational_ist.AdapterChat.Myholder> {
+public class AdapterChat extends RecyclerView.Adapter<AdapterChat.Myholder> {
     private static final int MSG_TYPE_LEFT = 0;
     private static final int MSG_TYPE_RIGHT = 1;
-    private Context context;
-    private List<Message> list;
+    private final Context context;
+    private final List<Message> list;
 
     private final String username;
 
@@ -60,18 +54,18 @@ public class AdapterChat extends RecyclerView.Adapter<pt.ulisboa.tecnico.cmov.co
     @NonNull
     @Override
     public Myholder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view;
         if (viewType == MSG_TYPE_LEFT) {
-            View view = LayoutInflater.from(context).inflate(R.layout.message_item, parent, false);
-            return new Myholder(view);
+            view = LayoutInflater.from(context).inflate(R.layout.message_item, parent, false);
         } else {
-            View view = LayoutInflater.from(context).inflate(R.layout.message_item_me, parent, false);
-            return new Myholder(view);
+            view = LayoutInflater.from(context).inflate(R.layout.message_item_me, parent, false);
         }
+        return new Myholder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull Myholder holder, @SuppressLint("RecyclerView") final int position) {
-        String messageID = list.get(position).getId();
+        AtomicReference<String> messageID = new AtomicReference<>(list.get(position).getId());
         String message = list.get(position).getMessage();
         String timeStamp = formatDate(list.get(position).getCreatedAt());
         boolean isPhoto = list.get(position).isPhoto();
@@ -82,19 +76,12 @@ public class AdapterChat extends RecyclerView.Adapter<pt.ulisboa.tecnico.cmov.co
 
         if (!isPhoto) {
             if(message.startsWith("https://www.google.com/maps/@")) {
-                /*String[] half = message.split("@")[1].split(",");*/
+
                 holder.message.setVisibility(View.GONE);
                 holder.mimage.setVisibility(View.GONE);
                 holder.map.setVisibility(View.VISIBLE);
                 holder.downloadBtn.setVisibility(View.GONE);
 
-                /* holder.map.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent it = new Intent(context, MapsActivity.class).putExtra("markedPosition", new LatLng(Double.parseDouble(half[0]), Double.parseDouble(half[1])));
-                        context.startActivity(it);
-                    }
-                });*/
             } else {
                 holder.message.setVisibility(View.VISIBLE);
                 holder.mimage.setVisibility(View.GONE);
@@ -108,24 +95,17 @@ public class AdapterChat extends RecyclerView.Adapter<pt.ulisboa.tecnico.cmov.co
             holder.map.setVisibility(View.GONE);
             holder.downloadBtn.setVisibility(View.GONE);
             try {
-                Bitmap image = getPhotoFromMedia(messageID);
+                Bitmap image = getPhotoFromMedia(messageID.get());
                 holder.mimage.setImageBitmap(image);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
                 if(isWifiEnabled()){
-                    System.out.println("ENTROU NO WIFIIIII");
-                    fetchPhoto(messageID,position);
+                    fetchPhoto(messageID.get(),position);
                 }
                 else {
-                    System.out.println("ENTROU NOS DADOS");
                     holder.mimage.setImageResource(R.drawable.place_holder);
                     holder.downloadBtn.setVisibility(View.VISIBLE);
-                    holder.downloadBtn.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            fetchPhoto(messageID,position);
-                        }
-                    });
+                    holder.downloadBtn.setOnClickListener(v -> fetchPhoto(messageID.get(),position));
                 }
             }
         }
@@ -135,42 +115,14 @@ public class AdapterChat extends RecyclerView.Adapter<pt.ulisboa.tecnico.cmov.co
 
         if(!unformatted.isEmpty()) {
             String[] result = unformatted.split("T");
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-mm-dd");
-            Date date = null;
-
-            try {
-                date = format.parse(result[0]);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-            if (DateUtils.isToday(date.getTime())) {
-                unformatted = result[0];
-            } else {
-                String fulltime = result[1].split(":")[0] + ":" + result[1].split(":")[1];
-                unformatted = "Today at "+fulltime;
-            }
+            unformatted = result[0] + " at " + result[1].split(":")[0] + ":" + result[1].split(":")[1];
         }
-
         return unformatted;
-    }
 
-    //TODO: Recycle and un-recycle to be more efficient
-/*
-    @Override
-    public void onViewRecycled(Myholder holder)
-    {
-        // Cleanup MapView here?
-        if (holder.gMap != null)
-        {
-            holder.gMap.clear();
-            holder.gMap.setMapType(GoogleMap.MAP_TYPE_NONE);
-        }
     }
-*/
 
     public Bitmap getPhotoFromMedia(String messageID) throws FileNotFoundException {
-        Bitmap b = BitmapFactory.decodeStream(context.openFileInput(messageID + ".jpg"));
-        return b;
+        return BitmapFactory.decodeStream(context.openFileInput(messageID + ".jpg"));
     }
 
     @SuppressLint("MissingPermission")
@@ -190,18 +142,10 @@ public class AdapterChat extends RecyclerView.Adapter<pt.ulisboa.tecnico.cmov.co
     public void fetchPhoto(String messageID, int position) {
         String url = "https://cmuapi.herokuapp.com/api/photos?messageID=" + messageID;
 
-        ImageRequest imageRequest = new ImageRequest(url, new Response.Listener<Bitmap>() {
-            @Override
-            public void onResponse(Bitmap response) {
-                PhotoUtils.savePhotoFile(context, messageID, response);
-                notifyItemChanged(position);
-            }
-        },3000,3000, ImageView.ScaleType.CENTER, null, new Response.ErrorListener(){
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Toast.makeText(context.getApplicationContext(), "Fail to get response = " + error, Toast.LENGTH_SHORT).show();
-            }
-        });
+        ImageRequest imageRequest = new ImageRequest(url, response -> {
+            PhotoUtils.savePhotoFile(context, messageID, response);
+            notifyItemChanged(position);
+        },3000,3000, ImageView.ScaleType.CENTER, null, error -> Toast.makeText(context.getApplicationContext(), "Fail to get response = " + error, Toast.LENGTH_SHORT).show());
         VolleySingleton.getInstance(context).getmRequestQueue().add(imageRequest);
     }
 

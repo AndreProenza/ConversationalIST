@@ -17,7 +17,6 @@ public class Room implements Parcelable {
     //TODO change notification received
 
     public Room() {
-        // Does nothing
     }
 
     public Room(String roomId, String roomName, boolean isGeoFenced, double lat, double lng, int radius, int unread) {
@@ -59,16 +58,8 @@ public class Room implements Parcelable {
 
     public void setUnreadNum(int num) {unread = num;}
 
-    public void setRoomName(String roomName) {
-        this.roomName = roomName;
-    }
-
     public String getRoomId() {
         return roomId;
-    }
-
-    public void setRoomId(String roomId) {
-        this.roomId = roomId;
     }
 
     public boolean isGeoFenced() {

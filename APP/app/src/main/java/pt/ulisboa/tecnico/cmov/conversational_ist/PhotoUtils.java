@@ -5,9 +5,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -26,7 +23,9 @@ public class PhotoUtils {
             e.printStackTrace();
         } finally {
             try {
-                fos.close();
+                if (fos != null) {
+                    fos.close();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }

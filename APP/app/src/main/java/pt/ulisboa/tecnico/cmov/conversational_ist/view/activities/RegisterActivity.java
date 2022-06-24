@@ -1,46 +1,35 @@
 package pt.ulisboa.tecnico.cmov.conversational_ist.view.activities;
 
-import static android.content.ContentValues.TAG;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.messaging.FirebaseMessaging;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import pt.ulisboa.tecnico.cmov.conversational_ist.R;
 import pt.ulisboa.tecnico.cmov.conversational_ist.firebase.FirebaseHandler;
-import pt.ulisboa.tecnico.cmov.conversational_ist.model.User;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -48,7 +37,6 @@ public class RegisterActivity extends AppCompatActivity {
     SharedPreferences sharedPrefMode;
 
     private TextInputEditText etRegUsername;
-    private Button btnRegister;
     private ProgressBar loadingPB;
 
     private DatabaseReference db;
@@ -62,16 +50,14 @@ public class RegisterActivity extends AppCompatActivity {
         sharedPref = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
 
         etRegUsername = findViewById(R.id.etRegUsername);
-        btnRegister = findViewById(R.id.btnRegister);
+        Button btnRegister = findViewById(R.id.btnRegister);
         loadingPB = findViewById(R.id.idLoadingPB);
 
-        btnRegister.setOnClickListener(view ->{
-            createUser();
-        });
+        btnRegister.setOnClickListener(view -> createUser());
     }
 
     private void createUser(){
-        String userName = etRegUsername.getText().toString();
+        String userName = Objects.requireNonNull(etRegUsername.getText()).toString();
 
         if (TextUtils.isEmpty(userName)){
             etRegUsername.setError("Username cannot be empty");
@@ -91,46 +77,36 @@ public class RegisterActivity extends AppCompatActivity {
         // creating a new variable for our request queue
         RequestQueue queue = Volley.newRequestQueue(RegisterActivity.this);
 
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         params.put("name", name);
 
         JSONObject jsonObj = new JSONObject(params);
 
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, jsonObj,new com.android.volley.Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                loadingPB.setVisibility(View.GONE);
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, jsonObj, response -> {
+            loadingPB.setVisibility(View.GONE);
 
-                Toast.makeText(RegisterActivity.this, "User registered successfully", Toast.LENGTH_SHORT).show();
-                try {
-                    String id = response.getString("id");
-                    String name = response.getString("name");
-                    saveUsername(name,id);
-                    FirebaseHandler.registerUser(db, name, name);
-                    switchToMain();
+            Toast.makeText(RegisterActivity.this, "User registered successfully", Toast.LENGTH_SHORT).show();
+            try {
+                String id = response.getString("id");
+                String name1 = response.getString("name");
+                saveUsername(name1,id);
+                FirebaseHandler.registerUser(db, name1, name1);
+                switchToMain();
 
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
-        }, new com.android.volley.Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                loadingPB.setVisibility(View.GONE);
-                String body;
-                //get status code here
-                String statusCode = String.valueOf(error.networkResponse.statusCode);
-                //get response body and parse with appropriate encoding
-                if(error.networkResponse.data!=null) {
-                    try {
-                        body = new String(error.networkResponse.data,"UTF-8");
-                        Toast.makeText(RegisterActivity.this, "Registration Error: " + statusCode + " " + body, Toast.LENGTH_SHORT).show();
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                    }
-                }
-                Toast.makeText(RegisterActivity.this, "Username already exists!", Toast.LENGTH_SHORT).show();
+        }, error -> {
+            loadingPB.setVisibility(View.GONE);
+            String body;
+            //get status code here
+            String statusCode = String.valueOf(error.networkResponse.statusCode);
+            //get response body and parse with appropriate encoding
+            if(error.networkResponse.data!=null) {
+                body = new String(error.networkResponse.data, StandardCharsets.UTF_8);
+                Toast.makeText(RegisterActivity.this, "Registration Error: " + statusCode + " " + body, Toast.LENGTH_SHORT).show();
             }
+            Toast.makeText(RegisterActivity.this, "Username already exists!", Toast.LENGTH_SHORT).show();
         });
         // below line is to make
         // a json object request.
@@ -167,5 +143,6 @@ public class RegisterActivity extends AppCompatActivity {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         }
     }
+
 }
 

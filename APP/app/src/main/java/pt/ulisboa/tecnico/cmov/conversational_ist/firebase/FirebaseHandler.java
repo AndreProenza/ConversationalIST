@@ -1,14 +1,11 @@
 package pt.ulisboa.tecnico.cmov.conversational_ist.firebase;
 
-import android.net.Uri;
 import android.util.Log;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -17,11 +14,13 @@ import com.google.firebase.database.ValueEventListener;
 import com.mikhaellopez.circularimageview.CircularImageView;
 import com.squareup.picasso.Picasso;
 
+import java.util.Objects;
+
 import pt.ulisboa.tecnico.cmov.conversational_ist.model.User;
 
 public class FirebaseHandler {
 
-    private static String TAG = "FirebaseHandler";
+    private static final String TAG = "FirebaseHandler";
     private static DatabaseReference db;
 
     public static void registerUser(DatabaseReference db, String userId, String userName) {
@@ -38,14 +37,14 @@ public class FirebaseHandler {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.hasChild("username")) {
-                    userName.setText(snapshot.child("username").getValue().toString());
-                    userName2.setText(snapshot.child("username").getValue().toString());
+                    userName.setText(Objects.requireNonNull(snapshot.child("username").getValue()).toString());
+                    userName2.setText(Objects.requireNonNull(snapshot.child("username").getValue()).toString());
                 }
                 if (snapshot.hasChild("bio")) {
-                    bio.setText(snapshot.child("bio").getValue().toString());
+                    bio.setText(Objects.requireNonNull(snapshot.child("bio").getValue()).toString());
                 }
                 if (snapshot.hasChild("photo")) {
-                    String photo = snapshot.child("photo").getValue().toString();
+                    String photo = Objects.requireNonNull(snapshot.child("photo").getValue()).toString();
                     Picasso.get().load(photo).into(profileImage);
                 }
 
@@ -66,7 +65,7 @@ public class FirebaseHandler {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 
                 if (snapshot.hasChild("username")) {
-                    userName.setText(snapshot.child("username").getValue().toString());
+                    userName.setText(Objects.requireNonNull(snapshot.child("username").getValue()).toString());
                 }
                 if (snapshot.hasChild("photo")) {
                     String photo = snapshot.child("photo").getValue().toString();
