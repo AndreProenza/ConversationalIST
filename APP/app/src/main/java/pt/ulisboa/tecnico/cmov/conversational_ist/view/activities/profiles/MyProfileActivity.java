@@ -34,7 +34,6 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
@@ -53,6 +52,7 @@ import pt.ulisboa.tecnico.cmov.conversational_ist.R;
 import pt.ulisboa.tecnico.cmov.conversational_ist.firebase.FirebaseHandler;
 import pt.ulisboa.tecnico.cmov.conversational_ist.model.User;
 import pt.ulisboa.tecnico.cmov.conversational_ist.satic.StaticData;
+import pt.ulisboa.tecnico.cmov.conversational_ist.view.activities.MainActivity;
 import pt.ulisboa.tecnico.cmov.conversational_ist.view.activities.RegisterActivity;
 
 public class MyProfileActivity extends AppCompatActivity {
@@ -125,7 +125,10 @@ public class MyProfileActivity extends AppCompatActivity {
 
         FirebaseHandler.getCurrentProfileInfo(userId, userName, userName2, profileImage, bio);
 
-        findViewById(R.id.btn_back).setOnClickListener(v -> finish());
+        findViewById(R.id.btn_back).setOnClickListener(v -> {
+            startActivity(new Intent(MyProfileActivity.this, MainActivity.class));
+            finish();
+        });
     }
 
     private void uploadBio() {

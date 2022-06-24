@@ -79,11 +79,6 @@ public class RoomsActivity extends AppCompatActivity implements RecyclerViewAddR
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        //************************************************
-        //FIREBASE DATABASE
-        //db = FirebaseDatabase.getInstance().getReference("room");
-        //************************************************
-
         locationProvider = LocationServices.getFusedLocationProviderClient(this);
 
         getLocationAndFetchRooms();
@@ -91,39 +86,6 @@ public class RoomsActivity extends AppCompatActivity implements RecyclerViewAddR
 
         //TODO call to save channel in db
         //FeedReaderDbHelper.getInstance(getApplicationContext()).createChannel("628e1fa903146c7d0cc43b23","b");
-
-
-        //************************************************
-        //FIREBASE DATABASE
-
-        /*
-        db.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    Room room = dataSnapshot.getValue(Room.class);
-                    rooms.add(room);
-                }
-                roomsAdapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });*/
-
-        //************************************************
-
-        /**
-         loadRoomsBtn = findViewById(R.id.load_rooms);
-         loadRoomsBtn.setOnClickListener(new View.OnClickListener() {
-        @Override public void onClick(View v) {
-        startActivity(new Intent(RoomsActivity.this, RoomListActivity.class));
-        finish();
-        }
-        });
-         */
 
     }
 
@@ -237,7 +199,6 @@ public class RoomsActivity extends AppCompatActivity implements RecyclerViewAddR
 
     @Override
     public void onItemClick(int position) {
-        startActivity(new Intent(RoomsActivity.this, MainActivity.class));
-        finish();
+
     }
 }

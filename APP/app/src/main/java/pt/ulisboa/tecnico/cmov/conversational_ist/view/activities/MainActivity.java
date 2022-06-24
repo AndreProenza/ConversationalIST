@@ -42,8 +42,6 @@ import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.navigation.NavigationView;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.mikhaellopez.circularimageview.CircularImageView;
 
@@ -75,6 +73,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
     private LinearLayout btnLogOut;
     private CircularImageView profileImage;
     private TextView userName;
+    private LinearLayout initialLayout;
 
     //private FirebaseAuth mAuth;
     private String userId;
@@ -166,8 +165,16 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
 
     private void getRoomsSubscribed() {
         rooms = FeedReaderDbHelper.getInstance(getApplicationContext()).getAllChannels();
+        initialLayout = findViewById(R.id.initial_layout);
+        if (rooms.isEmpty()) {
+            initialLayout.setVisibility(View.VISIBLE);
+        }
+        else {
+            initialLayout.setVisibility(View.GONE);
+        }
         roomsAdapter = new MainRoomsAdapter(MainActivity.this, rooms, this);
         recyclerView.setAdapter(roomsAdapter);
+
     }
 
     private void initUser() {
@@ -255,8 +262,9 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
         });
 
         nav_view.findViewById(R.id.settings_btn).setOnClickListener(v -> {
-            startActivity(new Intent(MainActivity.this, MyProfileActivity.class));
             drawerLayout.closeDrawers();
+            startActivity(new Intent(MainActivity.this, MyProfileActivity.class));
+            finish();
         });
 
         nav_view.findViewById(R.id.recommendations_btn).setOnClickListener(v -> {
@@ -293,13 +301,6 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         getRoomsSubscribed();
-
-        /** FIREBASE AUTH
-        FirebaseUser user = mAuth.getCurrentUser();
-        if (user == null){
-            startActivity(new Intent(MainActivity.this, LoginActivity.class));
-        }
-         */
     }
 
     private void initDialog() {
@@ -323,6 +324,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
                 dialog.dismiss();
                 deleteAccount();
                 startActivity(new Intent(MainActivity.this, RegisterActivity.class));
+                finish();
             }
         });
 
@@ -375,5 +377,17 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
         intent.putExtra("roomId", roomId);
         intent.putExtra("username", userId);
         startActivity(intent);
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList("rooms", new ArrayList<Room>(roomsAdapter.getList()));
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        savedInstanceState.getParcelableArrayList("rooms");
     }
 }

@@ -65,6 +65,7 @@
         <entry key="app/src/main/res/layout/activity_chat.xml" value="0.16770833333333332" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.25" />
         <entry key="app/src/main/res/layout/activity_my_profile.xml" value="0.26927083333333335" />
+        <entry key="app/src/main/res/layout/activity_new_room.xml" value="0.26927083333333335" />
         <entry key="app/src/main/res/layout/activity_recommendations.xml" value="0.26927083333333335" />
         <entry key="app/src/main/res/layout/activity_register.xml" value="0.26927083333333335" />
         <entry key="app/src/main/res/layout/activity_room.xml" value="0.25" />

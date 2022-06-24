@@ -90,6 +90,35 @@
 
         </androidx.recyclerview.widget.RecyclerView>
 
+        <LinearLayout
+            android:id="@+id/initial_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="150dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/new_room_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="No Rooms yet! Subscribe some Rooms"
+                android:textColor="@android:color/holo_blue_dark"
+                android:textSize="18sp"
+                app:layout_constraintVertical_bias="0.844"
+                android:gravity="center"
+                android:layout_gravity="center"/>
+
+            <ImageView
+                android:id="@+id/new_room_image"
+                android:layout_width="250dp"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/ist_icon" />
+
+        </LinearLayout>
+
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

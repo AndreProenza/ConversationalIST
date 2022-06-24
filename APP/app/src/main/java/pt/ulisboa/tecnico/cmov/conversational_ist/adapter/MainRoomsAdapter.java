@@ -48,6 +48,10 @@ public class MainRoomsAdapter extends RecyclerView.Adapter<MainRoomsAdapter.Room
         return rooms.size();
     }
 
+    public ArrayList<Room> getList() {
+        return rooms;
+    }
+
     public static class RoomsViewHolder extends RecyclerView.ViewHolder {
         TextView roomName, roomId, roomDescription, roomVisibility;
         public RoomsViewHolder(@NonNull View itemView,  RecyclerViewEnterChatInterface rvEnterChatInterface) {

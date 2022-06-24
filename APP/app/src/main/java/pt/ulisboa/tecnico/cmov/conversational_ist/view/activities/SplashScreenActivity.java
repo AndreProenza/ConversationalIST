@@ -10,9 +10,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-
 import pt.ulisboa.tecnico.cmov.conversational_ist.R;
 
 public class SplashScreenActivity extends AppCompatActivity {
@@ -36,8 +33,10 @@ public class SplashScreenActivity extends AppCompatActivity {
             public void run() {
                 if (!userId.isEmpty()) { // If user already login
                     startActivity(new Intent(SplashScreenActivity.this, MainActivity.class)); // Go to MainScreen
+                    finish();
                 } else {
                     startActivity(new Intent(SplashScreenActivity.this, StartUpActivity.class)); // Go to Startup then Register
+                    finish();
                 }
 
                 finish();

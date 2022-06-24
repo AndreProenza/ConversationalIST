@@ -22,13 +22,13 @@ public class StartUpActivity extends AppCompatActivity {
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                toLogin();
+                toRegister();
             }
         });
     }
 
-    public void toLogin() {
+    public void toRegister() {
         startActivity(new Intent(StartUpActivity.this, RegisterActivity.class));
-        //finish();
+        finish();
     }
 }

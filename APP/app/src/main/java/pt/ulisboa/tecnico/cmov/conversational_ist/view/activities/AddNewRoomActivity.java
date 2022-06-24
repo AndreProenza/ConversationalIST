@@ -310,4 +310,11 @@ public class AddNewRoomActivity extends AppCompatActivity implements AdapterView
     public void onNothingSelected(AdapterView<?> parent) {
 
     }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        startActivity(new Intent(AddNewRoomActivity.this, MainActivity.class));
+        finish();
+    }
 }

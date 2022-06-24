@@ -1,6 +1,8 @@
 package pt.ulisboa.tecnico.cmov.conversational_ist.adapter;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +24,8 @@ import pt.ulisboa.tecnico.cmov.conversational_ist.R;
 import pt.ulisboa.tecnico.cmov.conversational_ist.database.FeedReaderDbHelper;
 import pt.ulisboa.tecnico.cmov.conversational_ist.model.Room;
 import pt.ulisboa.tecnico.cmov.conversational_ist.interfaces.RecyclerViewAddRoomsInterface;
+import pt.ulisboa.tecnico.cmov.conversational_ist.view.activities.MainActivity;
+import pt.ulisboa.tecnico.cmov.conversational_ist.view.activities.RoomsActivity;
 
 
 public class RoomsAdapter extends RecyclerView.Adapter<RoomsAdapter.RoomsViewHolder> {
@@ -84,6 +88,8 @@ public class RoomsAdapter extends RecyclerView.Adapter<RoomsAdapter.RoomsViewHol
                                 @Override
                                 public void onSuccess(Void aVoid) {
                                     Log.d(TAG, "Subscribe successful");
+                                    context.startActivity(new Intent(context, MainActivity.class));
+                                    ((Activity)context).finish();
                                 }
                             });
                         }
