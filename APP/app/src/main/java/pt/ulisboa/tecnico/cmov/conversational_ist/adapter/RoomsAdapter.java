@@ -23,6 +23,8 @@ import pt.ulisboa.tecnico.cmov.conversational_ist.database.FeedReaderDbHelper;
 import pt.ulisboa.tecnico.cmov.conversational_ist.model.Room;
 import pt.ulisboa.tecnico.cmov.conversational_ist.interfaces.RecyclerViewAddRoomsInterface;
 import pt.ulisboa.tecnico.cmov.conversational_ist.view.activities.AddNewRoomActivity;
+import pt.ulisboa.tecnico.cmov.conversational_ist.view.activities.MainActivity;
+import pt.ulisboa.tecnico.cmov.conversational_ist.view.activities.RoomsActivity;
 
 
 public class RoomsAdapter extends RecyclerView.Adapter<RoomsAdapter.RoomsViewHolder> {
@@ -82,14 +84,16 @@ public class RoomsAdapter extends RecyclerView.Adapter<RoomsAdapter.RoomsViewHol
                         if (position != RecyclerView.NO_POSITION) {
                             rvAddRoomsInterface.onItemClick(position);
                             Room r = rooms.get(position);
+                            AddNewRoomActivity.postSubscribe(context,r.getRoomId(),userID);
                             FeedReaderDbHelper.getInstance(v.getContext()).createChannel(r);
                             FirebaseMessaging.getInstance().subscribeToTopic(roomId.getText().toString()).addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
                                     Log.d(TAG, "Subscribe successful");
+                                    context.startActivity(new Intent(context, MainActivity.class));
+                                    ((Activity)context).finish();
                                 }
                             });
-                            AddNewRoomActivity.postSubscribe(context,r.getRoomId(),userID);
                         }
 
                     }

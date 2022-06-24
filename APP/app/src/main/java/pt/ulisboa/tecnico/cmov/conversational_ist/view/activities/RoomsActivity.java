@@ -15,6 +15,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -73,8 +74,8 @@ public class RoomsActivity extends AppCompatActivity implements RecyclerViewAddR
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
                 startActivity(new Intent(RoomsActivity.this, MainActivity.class));
+                finish();
             }
         });
 
@@ -87,6 +88,9 @@ public class RoomsActivity extends AppCompatActivity implements RecyclerViewAddR
 
         getLocationAndFetchRooms();
         initSearch();
+
+        //TODO call to save channel in db
+        //FeedReaderDbHelper.getInstance(getApplicationContext()).createChannel("628e1fa903146c7d0cc43b23","b");
 
     }
 
@@ -109,6 +113,7 @@ public class RoomsActivity extends AppCompatActivity implements RecyclerViewAddR
 
     private void filterRooms(String text) {
         ArrayList<Room> filteredRooms = new ArrayList<>();
+        if (rooms == null) { return;}
         for (Room r : rooms) {
             if (r.getRoomName().toLowerCase().contains(text.toLowerCase())) {
                 filteredRooms.add(r);
@@ -199,7 +204,6 @@ public class RoomsActivity extends AppCompatActivity implements RecyclerViewAddR
 
     @Override
     public void onItemClick(int position) {
-        finish();
-        startActivity(new Intent(RoomsActivity.this, MainActivity.class));
+
     }
 }

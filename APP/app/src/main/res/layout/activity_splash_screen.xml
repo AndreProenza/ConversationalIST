@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".view.activities.SplashScreenActivity">
+    tools:context=".view.activities.SplashScreenActivity"
+    android:background="@color/purple_200">
 
     <ImageView
         android:id="@+id/imageView"
@@ -26,7 +27,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-
+        android:textColor="@android:color/holo_blue_light"
         app:layout_constraintTop_toBottomOf="@+id/imageView" />
 
 

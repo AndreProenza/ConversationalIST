@@ -58,9 +58,6 @@
             android:exported="false"
             android:label="@string/title_activity_maps" />
         <activity
-            android:name=".view.activities.RegisterFirebaseActivity"
-            android:exported="false" />
-        <activity
             android:name=".view.activities.RegisterActivity"
             android:exported="false" />
         <activity
@@ -77,9 +74,6 @@
             android:exported="false" />
         <activity
             android:name=".view.activities.NewRoomActivity"
-            android:exported="false" />
-        <activity
-            android:name=".view.activities.LoginActivity"
             android:exported="false" />
         <activity
             android:name=".view.activities.MainActivity"

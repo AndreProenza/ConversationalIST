@@ -4,6 +4,7 @@ import static android.content.ContentValues.TAG;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 
 import android.content.Context;
 import android.content.Intent;
@@ -27,8 +28,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.messaging.FirebaseMessaging;
 
@@ -46,6 +45,7 @@ import pt.ulisboa.tecnico.cmov.conversational_ist.model.User;
 public class RegisterActivity extends AppCompatActivity {
 
     SharedPreferences sharedPref;
+    SharedPreferences sharedPrefMode;
 
     private TextInputEditText etRegUsername;
     private Button btnRegister;
@@ -53,6 +53,7 @@ public class RegisterActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        verifyLightDarkMode();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
@@ -143,8 +144,25 @@ public class RegisterActivity extends AppCompatActivity {
     private void switchToMain() {
         Intent switchActivityIntent = new Intent(this, MainActivity.class);
         startActivity(switchActivityIntent);
+        finish();
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
 
+    private void verifyLightDarkMode() {
+        sharedPrefMode = getSharedPreferences("mode", Context.MODE_PRIVATE);
+        boolean isDarkMode = sharedPrefMode.getBoolean("mode_status", false);
+        System.out.println("isDarkMode: " + isDarkMode);
+        if (isDarkMode) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        }
+        else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        }
+    }
 }
 

@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
@@ -19,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -26,10 +28,13 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -44,8 +49,10 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.mikhaellopez.circularimageview.CircularImageView;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -70,6 +77,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
     private DrawerLayout drawerLayout;
     private CircularImageView profileImage;
     private TextView userName;
+    private LinearLayout initialLayout;
 
     private String username;
 
@@ -78,6 +86,10 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
     MainRoomsAdapter roomsAdapter;
 
     SharedPreferences sharedPref;
+    SharedPreferences sharedPrefMode;
+
+    private Dialog dialog;
+
 
     private final BroadcastReceiver Updated = new BroadcastReceiver() {
 
@@ -115,10 +127,13 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
         setContentView(R.layout.activity_main);
 
         sharedPref = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        sharedPrefMode = getSharedPreferences("mode", Context.MODE_PRIVATE);
 
+        //isUserLoggedIn();
         initUser();
         init();
         initProfile();
+        initDialog();
 
         String appLinkAction = getIntent().getAction();
         Uri appLinkData = getIntent().getData();
@@ -185,12 +200,20 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
     private void getRoomsSubscribed() {
         rooms = FeedReaderDbHelper.getInstance(getApplicationContext()).getGeoFencedRooms(0);
         System.out.println(rooms);
-        filterGeoRooms();
+        initialLayout = findViewById(R.id.initial_layout);
+        if (rooms.isEmpty()) {
+            initialLayout.setVisibility(View.VISIBLE);
+        }
+        else {
+            filterGeoRooms();
+            initialLayout.setVisibility(View.GONE);
+        }
     }
 
     private void initAdapter(){
         roomsAdapter = new MainRoomsAdapter(MainActivity.this, rooms, this);
         recyclerView.setAdapter(roomsAdapter);
+
     }
 
     @SuppressLint("MissingPermission")
@@ -292,8 +315,9 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
         });
 
         nav_view.findViewById(R.id.settings_btn).setOnClickListener(v -> {
-            startActivity(new Intent(MainActivity.this, MyProfileActivity.class));
             drawerLayout.closeDrawers();
+            startActivity(new Intent(MainActivity.this, MyProfileActivity.class));
+            finish();
         });
 
         nav_view.findViewById(R.id.recommendations_btn).setOnClickListener(v -> {
@@ -307,8 +331,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
         });
 
         nav_view.findViewById(R.id.btnDelAccount).setOnClickListener(v -> {
-            deleteAccount();
-            startActivity(new Intent(MainActivity.this, RegisterActivity.class));
+            dialog.show();
             drawerLayout.closeDrawers();
         });
     }
@@ -322,6 +345,40 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+        getRoomsSubscribed();
+    }
+
+    private void initDialog() {
+        //Create the Dialog here
+        dialog = new Dialog(this);
+        dialog.setContentView(R.layout.delete_account_dialog);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            dialog.getWindow().setBackgroundDrawable(getDrawable(R.drawable.delete_account_background));
+        }
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.setCancelable(false); //Optional
+        dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation; //Setting the animations to dialog
+
+        Button yesBtn = dialog.findViewById(R.id.btn_yes);
+        Button noBtn = dialog.findViewById(R.id.btn_no);
+
+        yesBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(MainActivity.this, "Account Deleted", Toast.LENGTH_SHORT).show();
+                dialog.dismiss();
+                deleteAccount();
+                startActivity(new Intent(MainActivity.this, RegisterActivity.class));
+                finish();
+            }
+        });
+
+        noBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
     }
 
 
@@ -330,6 +387,13 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
         editor.remove("saved_username");
         editor.clear();
         editor.apply();
+        //Erase Darkmode
+        SharedPreferences.Editor editorMode = sharedPrefMode.edit();
+        editorMode.remove("mode");
+        editorMode.clear();
+        editorMode.apply();
+        //Delete Firebase Account
+        FirebaseHandler.deleteUserId(username);
         //Delete tables
         FeedReaderDbHelper.getInstance(MainActivity.this).getWritableDatabase().execSQL(FeedReaderDbHelper.SQL_DELETE_ENTRIES_CHANNELS);
         FeedReaderDbHelper.getInstance(MainActivity.this).getWritableDatabase().execSQL(FeedReaderDbHelper.SQL_DELETE_ENTRIES_MESSAGES);
@@ -358,5 +422,17 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
         intent.putExtra("roomId", roomId);
         intent.putExtra("username", username);
         startActivity(intent);
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList("rooms", new ArrayList<Room>(roomsAdapter.getList()));
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        savedInstanceState.getParcelableArrayList("rooms");
     }
 }

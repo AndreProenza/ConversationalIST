@@ -29,9 +29,9 @@
 
             <com.mikhaellopez.circularimageview.CircularImageView
                 android:id="@+id/profile"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_marginStart="5dp"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_marginStart="0dp"
                 android:src="@drawable/place_holder"/>
 
             <LinearLayout
@@ -46,7 +46,7 @@
                     android:layout_height="wrap_content"
                     android:text="Room Name"
                     android:textStyle="bold"
-                    android:textSize="19sp"
+                    android:textSize="17sp"
                     android:textColor="@android:color/white"/>
 
 
@@ -55,7 +55,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Room id"
-                    android:textSize="14sp"
+                    android:textSize="12sp"
                     android:textColor="@android:color/white"/>
 
                 <!--
@@ -69,6 +69,20 @@
                     -->
 
             </LinearLayout>
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/remove_room_btn"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:clickable="true"
+                app:tint="@android:color/white"
+                app:srcCompat="@drawable/ic_baseline_remove_24"
+                app:backgroundTint="@color/purple_200"
+                android:backgroundTint="@color/purple_700"
+                app:borderWidth="2dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="2dp"
+                app:fabCustomSize="30dp"/>
 
             <ImageButton
                 android:id="@+id/share_room_button"

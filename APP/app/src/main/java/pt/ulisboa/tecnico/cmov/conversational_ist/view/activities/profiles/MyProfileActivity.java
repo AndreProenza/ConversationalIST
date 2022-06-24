@@ -34,7 +34,6 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
@@ -53,6 +52,7 @@ import pt.ulisboa.tecnico.cmov.conversational_ist.R;
 import pt.ulisboa.tecnico.cmov.conversational_ist.firebase.FirebaseHandler;
 import pt.ulisboa.tecnico.cmov.conversational_ist.model.User;
 import pt.ulisboa.tecnico.cmov.conversational_ist.satic.StaticData;
+import pt.ulisboa.tecnico.cmov.conversational_ist.view.activities.MainActivity;
 import pt.ulisboa.tecnico.cmov.conversational_ist.view.activities.RegisterActivity;
 
 public class MyProfileActivity extends AppCompatActivity {
@@ -83,15 +83,18 @@ public class MyProfileActivity extends AppCompatActivity {
     private FloatingActionButton bioUploadBtn;
 
     private String userId;
-    SharedPreferences sharedPref;
+    private SharedPreferences sharedPref;
+    private SharedPreferences sharedPrefMode;
+
+    private boolean isDarkMode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        //Check Light/Dark Mode
         verifyLightDarkMode();
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_profile);
+
+        initLightDarkMode();
 
         sharedPref = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
 
@@ -105,7 +108,6 @@ public class MyProfileActivity extends AppCompatActivity {
         //To Upload a picture
         uploadPhoto();
 
-        initLightDarkMode();
         initPolicy();
     }
 
@@ -113,17 +115,6 @@ public class MyProfileActivity extends AppCompatActivity {
         SharedPreferences sh = getApplicationContext().getSharedPreferences("MyPrefs",MODE_PRIVATE);
         userId = sh.getString("saved_username","");
         Log.d("UserId: ", userId);
-    }
-
-    private void verifyLightDarkMode() {
-        modeIcon = findViewById(R.id.mode_icon);
-        modeTextContent = findViewById(R.id.mode_text);
-        if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
-            setTheme(R.style.Theme_Dark);
-        }
-        else {
-            setTheme(R.style.Theme_Light);
-        }
     }
 
     private void initProfile() {
@@ -134,7 +125,10 @@ public class MyProfileActivity extends AppCompatActivity {
 
         FirebaseHandler.getCurrentProfileInfo(userId, userName, userName2, profileImage, bio);
 
-        findViewById(R.id.btn_back).setOnClickListener(v -> finish());
+        findViewById(R.id.btn_back).setOnClickListener(v -> {
+            startActivity(new Intent(MyProfileActivity.this, MainActivity.class));
+            finish();
+        });
     }
 
     private void uploadBio() {
@@ -170,29 +164,70 @@ public class MyProfileActivity extends AppCompatActivity {
         });
     }
 
+    private void verifyLightDarkMode() {
+        sharedPrefMode = getSharedPreferences("mode", Context.MODE_PRIVATE);
+        boolean isDarkMode = sharedPrefMode.getBoolean("mode_status", false);
+        System.out.println("isDarkMode: " + isDarkMode);
+        if (isDarkMode) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        }
+        else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        }
+    }
+
     private void initLightDarkMode() {
         switchBtn = findViewById(R.id.switch_btn);
         modeIcon = findViewById(R.id.mode_icon);
         modeTextContent = findViewById(R.id.mode_text);
+
+        sharedPrefMode = getSharedPreferences("mode", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPrefMode.edit();
+
+        isDarkMode = sharedPrefMode.getBoolean("mode_status", false); // False for light mode
+
+        if (isDarkMode) {
+            modeTextContent.setText("Light Mode");
+            modeIcon.setImageResource(R.drawable.ic_baseline_wb_sunny_24);
+        }
+        else {
+            modeTextContent.setText("Dark Mode");
+            modeIcon.setImageResource(R.drawable.ic_baseline_dark_mode_24);
+        }
+
+        switchBtn.setChecked(isDarkMode);
+
+        System.out.println("isDarkMode: " + isDarkMode);
 
         switchBtn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                     AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-                    // change mode details
                     modeTextContent.setText("Light Mode");
                     modeIcon.setImageResource(R.drawable.ic_baseline_wb_sunny_24);
+
+                    editor.putBoolean("mode_status", true);
+                    editor.apply();
+                    switchBtn.setChecked(true);
+
+                    System.out.println("Current mode: Dark Mode");
+                    System.out.println("Change to: Light Mode");
                 }
                 else {
                     AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-                    // change mode details
                     modeTextContent.setText("Dark Mode");
                     modeIcon.setImageResource(R.drawable.ic_baseline_dark_mode_24);
+
+                    editor.putBoolean("mode_status", false);
+                    editor.apply();
+                    switchBtn.setChecked(false);
+
+                    System.out.println("Current mode: Light Mode");
+                    System.out.println("Change to: Dark Mode");
                 }
             }
         });
-
     }
 
     private void initPolicy() {
