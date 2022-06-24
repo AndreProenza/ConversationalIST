@@ -253,6 +253,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
 
     private void initProfile() {
         userName = findViewById(R.id.name);
+        userName.setText(username);
         profileImage = findViewById(R.id.profile);
 
         profileImage.setOnClickListener(new View.OnClickListener() {
