@@ -73,7 +73,9 @@
         <entry key="app/src/main/res/layout/activity_splash_screen.xml" value="0.26927083333333335" />
         <entry key="app/src/main/res/layout/activity_start_up.xml" value="0.26927083333333335" />
         <entry key="app/src/main/res/layout/delete_account_dialog.xml" value="0.2682291666666667" />
+        <entry key="app/src/main/res/layout/delete_room_dialog.xml" value="0.2682291666666667" />
         <entry key="app/src/main/res/layout/message_item.xml" value="0.26927083333333335" />
+        <entry key="app/src/main/res/layout/room_item.xml" value="0.26927083333333335" />
         <entry key="app/src/main/res/layout/row_chat_left.xml" value="0.16770833333333332" />
         <entry key="app/src/main/res/layout/row_chat_list.xml" value="0.16770833333333332" />
         <entry key="app/src/main/res/layout/row_chat_right.xml" value="0.16770833333333332" />

@@ -13,6 +13,7 @@ import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -23,11 +24,14 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -41,6 +45,7 @@ import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -81,6 +86,8 @@ public class RoomActivity extends AppCompatActivity {
     ImageButton send, attach;
     RequestQueue queue;
     List<Message> messageList;
+    private FloatingActionButton removeRoomBtn;
+    private Dialog dialog;
 
     private final String deepLink = "https://github.com/AndreProenza/ConversationalIST/room/";
 
@@ -176,6 +183,8 @@ public class RoomActivity extends AppCompatActivity {
         rId.setText(roomID);
         //********************************************
 
+        initRemoveRoom();
+
         backBtn.setOnClickListener(v -> finish());
 
         queue = Volley.newRequestQueue(RoomActivity.this);
@@ -222,6 +231,51 @@ public class RoomActivity extends AppCompatActivity {
         loadMessages();
 
         registerReceiver(Updated, new IntentFilter("message_inserted_" + roomID));
+    }
+
+    private void initRemoveRoom() {
+        removeRoomBtn = findViewById(R.id.remove_room_btn);
+        initDialog();
+        removeRoomBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.show();
+            }
+        });
+    }
+
+    private void initDialog() {
+        //Create the Dialog here
+        dialog = new Dialog(this);
+        dialog.setContentView(R.layout.delete_room_dialog);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            dialog.getWindow().setBackgroundDrawable(getDrawable(R.drawable.delete_account_background));
+        }
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.setCancelable(false); //Optional
+        dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation; //Setting the animations to dialog
+
+        Button yesBtn = dialog.findViewById(R.id.btn_yes);
+        Button noBtn = dialog.findViewById(R.id.btn_no);
+
+        yesBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(RoomActivity.this, "Room Removed", Toast.LENGTH_SHORT).show();
+                //TODO
+
+                dialog.dismiss();
+                //startActivity(new Intent(RoomActivity.this, MainActivity.class));
+                finish();
+            }
+        });
+        noBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
     }
 
     public void sendPhotoMessage(Uri uri){
