@@ -107,27 +107,32 @@ public class AdapterChat extends RecyclerView.Adapter<pt.ulisboa.tecnico.cmov.co
             holder.mimage.setVisibility(View.VISIBLE);
             holder.map.setVisibility(View.GONE);
             holder.downloadBtn.setVisibility(View.GONE);
-            try {
-                Bitmap image = getPhotoFromMedia(messageID);
-                holder.mimage.setImageBitmap(image);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-                if(isWifiEnabled()){
-                    System.out.println("ENTROU NO WIFIIIII");
-                    fetchPhoto(messageID,position);
-                }
-                else {
-                    System.out.println("ENTROU NOS DADOS");
-                    holder.mimage.setImageResource(R.drawable.place_holder);
-                    holder.downloadBtn.setVisibility(View.VISIBLE);
-                    holder.downloadBtn.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Bitmap image = getPhotoFromMedia(messageID);
+                        holder.mimage.setImageBitmap(image);
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                        if(isWifiEnabled()){
+                            System.out.println("ENTROU NO WIFIIIII");
                             fetchPhoto(messageID,position);
                         }
-                    });
+                        else {
+                            System.out.println("ENTROU NOS DADOS");
+                            holder.mimage.setImageResource(R.drawable.place_holder);
+                            holder.downloadBtn.setVisibility(View.VISIBLE);
+                            holder.downloadBtn.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    fetchPhoto(messageID,position);
+                                }
+                            });
+                        }
+                    }
                 }
-            }
+            }).start();
         }
     }
 
