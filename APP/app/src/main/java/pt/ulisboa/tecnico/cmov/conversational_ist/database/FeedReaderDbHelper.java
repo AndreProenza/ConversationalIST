@@ -19,7 +19,7 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
 
     public static FeedReaderDbHelper sInstance;
 
-    public static final int DATABASE_VERSION = 20;
+    public static final int DATABASE_VERSION = 21;
     public static final String DATABASE_NAME = "FeedReader.db";
     private Context dbContext;
 
@@ -227,7 +227,7 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
 
         if (c.moveToFirst()) {
             while (!c.isAfterLast()) {
-                boolean isGeoFenced = c.getInt(2) == 2;
+                boolean isGeoFenced = c.getInt(2) == 1;
                 rooms.add(new Room(c.getString(0), c.getString(1),isGeoFenced,c.getDouble(3),c.getDouble(4),c.getInt(5), c.getInt(6)));
                 c.moveToNext();
             }

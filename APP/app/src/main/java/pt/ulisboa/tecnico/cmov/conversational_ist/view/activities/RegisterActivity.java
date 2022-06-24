@@ -51,6 +51,8 @@ public class RegisterActivity extends AppCompatActivity {
     private Button btnRegister;
     private ProgressBar loadingPB;
 
+    private DatabaseReference db;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         verifyLightDarkMode();
@@ -104,6 +106,7 @@ public class RegisterActivity extends AppCompatActivity {
                     String id = response.getString("id");
                     String name = response.getString("name");
                     saveUsername(name,id);
+                    FirebaseHandler.registerUser(db, name, name);
                     switchToMain();
 
                 } catch (JSONException e) {

@@ -201,16 +201,33 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
         rooms = FeedReaderDbHelper.getInstance(getApplicationContext()).getGeoFencedRooms(0);
         System.out.println(rooms);
         initialLayout = findViewById(R.id.initial_layout);
+        filterGeoRooms();
+    }
+    /**
+    private void getRoomsSubscribed() {
+        rooms = FeedReaderDbHelper.getInstance(getApplicationContext()).getAllChannels();
+        initialLayout = findViewById(R.id.initial_layout);
         if (rooms.isEmpty()) {
             initialLayout.setVisibility(View.VISIBLE);
         }
         else {
-            filterGeoRooms();
             initialLayout.setVisibility(View.GONE);
         }
+        roomsAdapter = new MainRoomsAdapter(MainActivity.this, rooms, this);
+        recyclerView.setAdapter(roomsAdapter);
+
     }
+     */
 
     private void initAdapter(){
+        /**
+        if (rooms.isEmpty()) {
+            initialLayout.setVisibility(View.VISIBLE);
+        }
+        else {
+            initialLayout.setVisibility(View.GONE);
+        }
+         */
         roomsAdapter = new MainRoomsAdapter(MainActivity.this, rooms, this);
         recyclerView.setAdapter(roomsAdapter);
 
@@ -255,6 +272,8 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewEnter
         userName = findViewById(R.id.name);
         userName.setText(username);
         profileImage = findViewById(R.id.profile);
+
+        FirebaseHandler.getCurrentProfileInfoMain(username, userName, profileImage);
 
         profileImage.setOnClickListener(new View.OnClickListener() {
             @Override
