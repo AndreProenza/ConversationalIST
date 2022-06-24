@@ -56,6 +56,7 @@ import pt.ulisboa.tecnico.cmov.conversational_ist.RoomType;
 import pt.ulisboa.tecnico.cmov.conversational_ist.VolleySingleton;
 import pt.ulisboa.tecnico.cmov.conversational_ist.adapter.MainRoomsAdapter;
 import pt.ulisboa.tecnico.cmov.conversational_ist.database.FeedReaderDbHelper;
+import pt.ulisboa.tecnico.cmov.conversational_ist.database.Message;
 import pt.ulisboa.tecnico.cmov.conversational_ist.firebase.FirebaseHandler;
 import pt.ulisboa.tecnico.cmov.conversational_ist.interfaces.RecyclerViewEnterChatInterface;
 import pt.ulisboa.tecnico.cmov.conversational_ist.model.Room;

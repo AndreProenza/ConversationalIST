@@ -228,7 +228,7 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
         if (c.moveToFirst()) {
             while (!c.isAfterLast()) {
                 boolean isGeoFenced = c.getInt(2) == 2;
-                rooms.add(new Room(c.getString(0), c.getString(1),isGeoFenced,c.getDouble(3),c.getDouble(4),c.getInt(5)));
+                rooms.add(new Room(c.getString(0), c.getString(1),isGeoFenced,c.getDouble(3),c.getDouble(4),c.getInt(5), c.getInt(6)));
                 c.moveToNext();
             }
         }

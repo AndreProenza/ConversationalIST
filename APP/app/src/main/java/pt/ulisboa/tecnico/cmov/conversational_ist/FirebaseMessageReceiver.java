@@ -51,22 +51,18 @@ public class FirebaseMessageReceiver extends FirebaseMessagingService {
                 date,
                 isPhoto);
 
-        boolean broadcast = false;
+        FeedReaderDbHelper db = FeedReaderDbHelper.getInstance(getApplicationContext());
+        db.createMessage(m,true);
 
         if (!NotifyActive.getInstance().getActive().equals(roomID)) { //TODO Geofenced before adding to db
-            broadcast = true;
             if (isGeoFenced) {
-                System.out.println("entrou no geofenced");
                 sendNotificationWithinRoomLocation(title, message, roomID,notificationID);
             } else {
-                System.out.println("entrou no outro");
-                    sendNotification(title, message, roomID ,notificationID);
+                sendNotification(title, message, roomID ,notificationID);
             }
             FeedReaderDbHelper.getInstance(getApplicationContext()).incrementUnreadMessages(roomID,1);
         }
 
-        FeedReaderDbHelper db = FeedReaderDbHelper.getInstance(getApplicationContext());
-        db.createMessage(m,broadcast);
     }
 
     @SuppressLint("UnspecifiedImmutableFlag")

@@ -143,6 +143,7 @@ public class RoomActivity extends AppCompatActivity {
             public void onClick(View view) {
                 recyclerView.smoothScrollToPosition(messageList.size() - 1);
                 scrollButton.setVisibility(View.INVISIBLE);
+                FeedReaderDbHelper.getInstance(getApplicationContext()).clearUnreadMessages(roomID);
             }
         });
 
@@ -163,13 +164,15 @@ public class RoomActivity extends AppCompatActivity {
                                                  int pos = linearLayoutManager.findLastVisibleItemPosition();
                                                  if(pos >= messageList.size() - 1) {
                                                      scrollButton.setVisibility(View.INVISIBLE);
+                                                     FeedReaderDbHelper.getInstance(getApplicationContext()).clearUnreadMessages(roomID);
                                                  }
                                              }
                                          });
 
 
                 btn_location = findViewById(R.id.btn_sticker);
-        scrollListener = new RecyclerView.OnScrollListener() {
+
+        /*scrollListener = new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
@@ -183,9 +186,9 @@ public class RoomActivity extends AppCompatActivity {
                     fetchMessagesBefore();
                 }
             }
-        };
+        };*/
 
-        recyclerView.addOnScrollListener(scrollListener);
+        //recyclerView.addOnScrollListener(scrollListener);
 
         btn_location = findViewById(R.id.btn_sticker);
         btn_location.setOnClickListener(new View.OnClickListener() {
@@ -501,7 +504,7 @@ public class RoomActivity extends AppCompatActivity {
                 messageList.addAll(0,chatList);
                 adapterChat.notifyItemRangeInserted(0,chatList.size());
                 adapterChat.notifyItemChanged(chatList.size());
-                recyclerView.addOnScrollListener(scrollListener);
+                //recyclerView.addOnScrollListener(scrollListener);
             }
         }, new com.android.volley.Response.ErrorListener() {
             @Override
