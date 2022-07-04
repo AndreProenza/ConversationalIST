@@ -46,6 +46,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -291,6 +292,7 @@ public class RoomActivity extends AppCompatActivity {
 
         yesBtn.setOnClickListener(v -> {
             FeedReaderDbHelper.getInstance(getApplicationContext()).leaveRoom(roomID);
+            FirebaseMessaging.getInstance().unsubscribeFromTopic(roomID);
             Toast.makeText(RoomActivity.this, "Room Removed", Toast.LENGTH_SHORT).show();
             dialog.dismiss();
             startActivity(new Intent(RoomActivity.this, MainActivity.class));

@@ -108,7 +108,7 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
         return messages;
     }
 
-    public void clearUnreadMessages(String id) {
+    public synchronized void clearUnreadMessages(String id) {
         String query = "UPDATE " + FeedReaderContract.FeedEntry.CHANNELS_TABLE_NAME + " SET " + FeedReaderContract.FeedEntry.KEY_CHANNEL_UNREAD
                 + " = 0  WHERE " + FeedReaderContract.FeedEntry.KEY_CHANNEL_ID + "= '" + id + "';";
 
