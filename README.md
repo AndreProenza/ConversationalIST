@@ -14,7 +14,7 @@ ConversationalIST user communication is centered around chatrooms, which users c
 
 ## ConversationalIST Live Video
 
-The live video shows the creation of two users, room setup, and the message exchange between them.
+The live video shows the creation of two users in two different mobile devices (emulators), rooms setup, and the message exchange between them.
 
 https://user-images.githubusercontent.com/78174997/178368246-95d9eb45-3127-4990-ae99-dbc6d6afe503.mp4
 
