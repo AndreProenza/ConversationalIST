@@ -20,19 +20,30 @@ https://user-images.githubusercontent.com/78174997/178361578-4df7a816-094b-4fcf-
 
 # Table of Contents
 1. [Introduction](#introduction)
-2. [Features](#features) 
-3. [Extra Features](#extra-features)
-4. [Processing and Saving Data](#processing-and-saving-data)
-5. [Moderation and resource management](#moderation-and-resource-management)
-6. [Context Awareness and Privacy](#context-awareness-and-privacy)
-7. [Caching](#caching)
-8. [Getting Started](#getting-started)
-9. [Prerequisites](#prerequisites)
-10. [Setup](#setup)
-11. [Used Technologies](#used-technologies)
-12. [References](#references)
-13. [Authors](#authors)
-14. [Information about the project statement and idea](#information-about-the-project-statement-and-idea)
+2. [ConversationalIST Live Video](#conversationalist-live-video)
+3. [Mobile Interface Design](#mobile-interface-design)
+4. [Features](#features) 
+5. [Extra Features](#extra-features)
+6. [Processing and Saving Data](#processing-and-saving-data)
+7. [Description of Client-Server Protocols](#description-of-client-server-protocols)
+8. [Moderation and resource management](#moderation-and-resource-management)
+9. [Context Awareness and Privacy](#context-awareness-and-privacy)
+10. [Caching](#caching)
+11. [Getting Started](#getting-started)
+12. [Prerequisites](#prerequisites)
+13. [Setup](#setup)
+14. [Used Technologies](#used-technologies)
+15. [References](#references)
+16. [Authors](#authors)
+17. [Information about the project statement and idea](#information-about-the-project-statement-and-idea)
+
+---
+
+## Mobile Interface Design 
+
+The activity wireframe of ConversionalIST is visible on the image below
+
+![wireframe](https://user-images.githubusercontent.com/78174997/178365395-bdc31117-4f63-4a96-a10c-e89d778cbed7.jpg)
 
 ---
 
@@ -45,6 +56,12 @@ https://user-images.githubusercontent.com/78174997/178361578-4df7a816-094b-4fcf-
 |Watch chatroom content            | After selecting a chatroom, users should be able to see the content published there. Chatrooms can be seen as living append-only documents in that once a user has access to the chatroom, they are able to see all of its past content, including content submitted before they joined
 |Ability to submit media           |   Users are able to submit a variety of simple media, including: Simple text messages. Photos taken from the phone’s camera. Geographic locations, to be shown as an embedded map with a button to request directions to the given location (e.g. by opening up Google Maps or other similar application). The user sharing a location is able to specify the location by selecting it on a map, searching an address, or using the phone’s current location.
 | Notify user via a Notification   | If a message is sent to a chatroom the user has access to it, but if the user is not actively watching, will be notified via a Notification. Tapping the notification takes them directly to the specific chatroom to see the new messages.
+| Messages Sync Across Devices Promptly | Messages are synchronized across mobile devices
+| Efficient Message Retrieval        | Messages are received efficiently
+| Download via Cellular Data or WiFi | Download Images on Request with Cellular Data / Automatically with WiFi
+| Data Caching                       | Data is cached on mobile devices to improve efficiency
+| Cache Pre-loading                  | Data is cached and pre-loaded
+
 
 <img src="https://user-images.githubusercontent.com/78174997/168443250-d94029eb-9c45-43df-872c-7cb44c7fe0cc.jpg"/>
 
@@ -64,7 +81,30 @@ https://user-images.githubusercontent.com/78174997/178361578-4df7a816-094b-4fcf-
 
 ConversationalIST supports a number of features that build on explicit data sharing and crowd-sourcing among multiple devices. To enable such functionality we have a back-end service that holds and processes shared data (e.g. chatrooms) and that each device communicates with to synchronize its state.
 
-The back-end service is implemented via a RESTful service and the data is persisted in MongoDB database.
+The back-end service is implemented via a RESTful service. The Server uses MongoDB to save Users(id, name), Rooms(id, name, roomType, latitude, longitude, radius), Messages(id,sender, roomID, message, createdAt, isPhoto), Photos(id, messageID, file), Subscriptions(roomID, userID).
+
+We additionally use Firebase Realtime Database to store the user's profile data, such as profile picture and bio.
+The Client uses SQLite to save Rooms(id, name, isGeoFenced, latitude, longitude, radius), Messages(id, sender, roomID, message, createdAt, isPhoto), and photos are saved in the internal storage of the app.
+
+---
+
+## Description of Client-Server Protocols
+
+The communication between the client and the server is done through HTTPS, using the methods GET and POST.
+Both the server and the app use firebase cloud messaging(FCM), in order to, in case of the server to send notifications, and in the app receive notifications. 
+
+When a user adds a room, it will save it in the local database, send the pair userID roomID to the server,and subscribe the topic in FCM with the roomID, so when a user sends a message to a room, it will send to the server, and the server stores it and then sends a notification to the roomID FCM topic.
+
+In order to send a photo, the app first will send a message with the isPhoto flag, and with the server’s response(messageID) the app will then upload the image to the server. When a message is received with the flag isPhoto, the app will only make the photo’s request to the server when the app needs to display it, taking into account that if the user is on a metered connection it will only download if requested by him.
+
+In the case of a geo-fenced room, when a notification is received, the data will be stored but it will only send a notification if the user is within the room's location. In the main activity, where the chatrooms are listed, the geo-fenced rooms that the users joined will only be listed if the user is within the room’s location. In order to add a geo-fenced room will only be possible if the user is within the room’s location.
+
+In order to get recommendations, the app will send a request to the server with the userID, the server will then calculate 6 rooms to recommend according to the project statement and after it will be displayed the recommendations.
+
+###  Other Relevant Design Features
+
+Although a login and registration system were not designed, profiles were developed for the users, where each user can upload a
+profile picture and add a bio. In addition, a Dark Mode/Light Mode was implemented to flow with the rotation of the device.
 
 ---
 
@@ -72,8 +112,7 @@ The back-end service is implemented via a RESTful service and the data is persis
 
 In ConversationalIST, conversations are sync across users and devices in a timely manner while also using the network efficiently. When the user is actively viewing a chatroom, we ensure that any new content shows up quickly. If the user disengages from the application, we use more efficient messaging to save network resources, even if at the expense of increased latency.
 
-ConversationalIST avoids using resources unnecessarily. As conversations in a chatroom grow overtime, users are less likely to scroll up to older messages. We avoid wasting resources by only downloading data related to UI elements as they become visible to the
-user.
+ConversationalIST avoids using resources unnecessarily. As conversations in a chatroom grow overtime, users are less likely to scroll up to older messages. We avoid wasting resources by only downloading data related to UI elements as they become visible to the user.
 
 Particularly large content is further optimized to avoid costly metered data. In ConversationalIST photos represent a hefty data cost so, to optimize network usage,
 we show a placeholder for them when the user is on a metered connection, retrieving the image only when the user taps it. If, on the other hand, the user is on WiFi, automatically retrieve photos when visible.
