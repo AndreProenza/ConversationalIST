@@ -14,7 +14,7 @@ ConversationalIST user communication is centered around chatrooms, which users c
 
 ## ConversationalIST Live Video
 
-https://user-images.githubusercontent.com/78174997/178361578-4df7a816-094b-4fcf-b17d-108af8f63931.mp4
+https://user-images.githubusercontent.com/78174997/178368246-95d9eb45-3127-4990-ae99-dbc6d6afe503.mp4
 
 ---
 
@@ -29,11 +29,12 @@ https://user-images.githubusercontent.com/78174997/178361578-4df7a816-094b-4fcf-
 8. [Moderation and resource management](#moderation-and-resource-management)
 9. [Context Awareness and Privacy](#context-awareness-and-privacy)
 10. [Caching](#caching)
-11. [Getting Started](#getting-started)
-12. [Prerequisites](#prerequisites)
-13. [Used Technologies](#used-technologies)
-14. [Authors](#authors)
-15. [Information about the project statement and idea](#information-about-the-project-statement-and-idea)
+11. [Optimizations](#optimizations)
+12. [Getting Started](#getting-started)
+13. [Prerequisites](#prerequisites)
+14. [Used Technologies](#used-technologies)
+15. [Authors](#authors)
+16. [Information about the project statement and idea](#information-about-the-project-statement-and-idea)
 
 ---
 
@@ -144,11 +145,28 @@ Further cache is optimized through careful pre-loading when the user connects to
 
 ---
 
+## Optimizations
+
+Additional optimizations implemented, to save power and improve usability:
+
+- In order to save power, the geo-fenced rooms will only be displayed in the chatroom list if the user is within the room’s location, the same happens with the notifications, so that when a notification is received from a geo-fenced room the data will be saved, and the notification will only be displayed if the user is within the room’s location.
+
+- In order to improve usability, whenever a message is received and the user is in the indicated room it will show an indicator that can be pressed to auto-scroll to the bottom of the chatroom.
+
+- In order to save resources, when a chatroom is opened for the first time it will only fetch the latest 30 messages, but if the user scrolls to the top it will fetch 30 more and consequentially more.
+
+- In order to save resources, the class that interacts with the database and the class that communicates with the server are singletons.
+
+---
+
 ## Getting Started
 
 The following instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
-- Instruction 1
+- Clone this repository
+- Import app to `Android Studio`
+- Set up your favorite Emulator or install the app directly on your mobile device
+- Run the app
 
 ---
 
