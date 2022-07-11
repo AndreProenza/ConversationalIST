@@ -169,6 +169,11 @@ The following instructions will get you a copy of the project up and running on 
 
 - Clone this repository
 - Import app to `Android Studio`
+- Paste `MAPS_API_KEY` in `local.properties` file located in `app` -> `Gradle Scripts` -> `local.properties`
+```code
+#API MAPS
+MAPS_API_KEY=AIzaSyDdimAEyAsn91wlRecMN8fxCjfnM8GJScI
+```
 - Set up your favorite Emulator or install the app directly on your mobile device
 - Run the app
 
