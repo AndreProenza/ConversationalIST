@@ -1,6 +1,6 @@
 # ConversationalIST
 
-A mobile text-based chat application for Android Operating Systems.
+A mobile messaging application focused on speed, security and location features for Android Operating Systems.
 
 ![ConversationalIST2](https://user-images.githubusercontent.com/78174997/168442370-834eda47-5517-472b-b0ca-ecc2ae1b5069.png)
 
