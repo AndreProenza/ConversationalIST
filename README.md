@@ -12,6 +12,8 @@ ConversationalIST user communication is centered around chatrooms, which users c
 
 ---
 
+
+
 ---
 
 # Table of Contents
@@ -49,6 +51,7 @@ ConversationalIST user communication is centered around chatrooms, which users c
 
 | Feature                            | Definition                
 |:----------------------------------:|:---------------------------------
+| Securing Communications            | Securing Communications, Check Trust in Server
 | Recommendations                    | Compute Most Likely Chatroom Pairings, List Sorted Suggestions 
 | UI Adaptability: Light/Dark Theme  | UI Works Well in Light and Dark Mode
 | UI Adaptability: Rotation          | UI Adaptability: Rotation
