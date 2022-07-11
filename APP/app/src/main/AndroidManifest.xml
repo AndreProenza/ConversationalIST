@@ -73,9 +73,6 @@
             android:name=".view.activities.RoomActivity"
             android:exported="false" />
         <activity
-            android:name=".view.activities.NewRoomActivity"
-            android:exported="false" />
-        <activity
             android:name=".view.activities.MainActivity"
             android:exported="true">
             <intent-filter>
