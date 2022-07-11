@@ -143,6 +143,8 @@ With this in place, repeated downloads of images are minimized and any content r
 Further cache is optimized through careful pre-loading when the user connects to WiFi. As WiFi data is virtually free, the opportunity to load the most recent content
 (the content immediately visible when opening the chatroom without scrolling) is used for each chatroom the user has access to. This way, later when the user no longer has WiFi, they can still browse all of their chatrooms with minimal data usage
 
+<img src="https://user-images.githubusercontent.com/78174997/178370884-d63fb29e-c2d9-49c6-a048-f090b141f4fb.jpg" width="470" height="350"/>
+
 ---
 
 ## Optimizations
