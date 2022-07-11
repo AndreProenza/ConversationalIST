@@ -31,11 +31,9 @@ https://user-images.githubusercontent.com/78174997/178361578-4df7a816-094b-4fcf-
 10. [Caching](#caching)
 11. [Getting Started](#getting-started)
 12. [Prerequisites](#prerequisites)
-13. [Setup](#setup)
-14. [Used Technologies](#used-technologies)
-15. [References](#references)
-16. [Authors](#authors)
-17. [Information about the project statement and idea](#information-about-the-project-statement-and-idea)
+13. [Used Technologies](#used-technologies)
+14. [Authors](#authors)
+15. [Information about the project statement and idea](#information-about-the-project-statement-and-idea)
 
 ---
 
@@ -150,21 +148,13 @@ Further cache is optimized through careful pre-loading when the user connects to
 
 The following instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
+- Instruction 1
+
 ---
 
 ## Prerequisites
 
-- Prerequisite 1
-- Prerequisite 2
-- Prerequisite 3
-
----
-
-## Setup
-
-- Instruction 1
-- Instruction 2
-- Instruction 3
+- [Android Studio](https://developer.android.com/studio) - Unified environment to build Android Apps;
 
 ---
 
@@ -172,12 +162,9 @@ The following instructions will get you a copy of the project up and running on 
 
 * [Java](https://openjdk.java.net/) - Programming Language;
 * [Android Studio](https://developer.android.com/studio) - Unified environment to build Android Apps;
-
----
-
-## References
-
-- [Some ref](someref)
+* [SQLite](https://www.sqlite.org/index.html) - SQL database engine;
+* [Mongodb](https://www.mongodb.com/) - NoSQL database;
+* [Firebase](https://firebase.google.com/) - App development platform;
 
 ---
 
