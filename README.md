@@ -171,7 +171,7 @@ The following instructions will get you a copy of the project up and running on 
 ## Authors
 
 * **André Proença** - [GitHub](https://github.com/AndreProenza)
-* **Bernardo** - [GitHub](https://github.com/bernacv)
+* **Bernardo Várzea** - [GitHub](https://github.com/bernacv)
 * **António Martins** - [GitHub](https://github.com/AL-CT)
 
 ---
