@@ -50,6 +50,9 @@ The activity wireframe of ConversionalIST is visible on the image below
 
 ## Features
 
+<details>
+  <summary align="left"><b>&nbsp;show more</b></summary>
+
 | Feature                          | Definition                
 |:--------------------------------:|:---------------------------------
 |Pick Username                     | Allow users to pick a unique username or handle to identify themselves in a conversation. This user ID is used to clearly mark their contributions to the shared conversation, along with additional meta-data like timestamps. 
@@ -66,8 +69,12 @@ The activity wireframe of ConversionalIST is visible on the image below
 
 <img src="https://user-images.githubusercontent.com/78174997/168443250-d94029eb-9c45-43df-872c-7cb44c7fe0cc.jpg"/>
 
+</details>
 
 ## Extra Features
+
+<details>
+  <summary align="left"><b>&nbsp;show more</b></summary>
 
 | Feature                            | Definition                
 |:----------------------------------:|:---------------------------------
@@ -76,10 +83,15 @@ The activity wireframe of ConversionalIST is visible on the image below
 | UI Adaptability: Light/Dark Theme  | UI Works Well in Light and Dark Mode
 | UI Adaptability: Rotation          | UI Adaptability: Rotation
 
+</details>
+
 ---
 
 ## Processing and Saving Data
 
+<details>
+  <summary align="left"><b>&nbsp;show more</b></summary>
+  
 ConversationalIST supports a number of features that build on explicit data sharing and crowd-sourcing among multiple devices. To enable such functionality we have a back-end service that holds and processes shared data (e.g. chatrooms) and that each device communicates with to synchronize its state.
 
 The back-end service is implemented via a RESTful service. The Server uses MongoDB to save Users(id, name), Rooms(id, name, roomType, latitude, longitude, radius), Messages(id,sender, roomID, message, createdAt, isPhoto), Photos(id, messageID, file), Subscriptions(roomID, userID).
@@ -87,10 +99,15 @@ The back-end service is implemented via a RESTful service. The Server uses Mongo
 We additionally use Firebase Realtime Database to store the user's profile data, such as profile picture and bio.
 The Client uses SQLite to save Rooms(id, name, isGeoFenced, latitude, longitude, radius), Messages(id, sender, roomID, message, createdAt, isPhoto), and photos are saved in the internal storage of the app.
 
+</details>
+
 ---
 
 ## Description of Client-Server Protocols
 
+<details>
+  <summary align="left"><b>&nbsp;show more</b></summary>
+  
 The communication between the client and the server is done through HTTPS, using the methods GET and POST.
 Both the server and the app use firebase cloud messaging(FCM), in order to, in case of the server to send notifications, and in the app receive notifications. 
 
@@ -102,13 +119,23 @@ In the case of a geo-fenced room, when a notification is received, the data will
 
 In order to get recommendations, the app will send a request to the server with the userID, the server will then calculate 6 rooms to recommend according to the project statement and after it will be displayed the recommendations.
 
+</details>
+
 ###  Other Relevant Design Features
 
+<details>
+  <summary align="left"><b>&nbsp;show more</b></summary>
+  
 Although a login and registration system were not designed, profiles were developed for the users, where each user can upload a
 profile picture and add a bio. In addition, a Dark Mode/Light Mode was implemented to flow with the rotation of the device.
 
+</details>
+
 ---
 
+<details>
+  <summary align="left"><b>&nbsp;show more</b></summary>
+  
 ## Moderation and resource management
 
 In ConversationalIST, conversations are sync across users and devices in a timely manner while also using the network efficiently. When the user is actively viewing a chatroom, we ensure that any new content shows up quickly. If the user disengages from the application, we use more efficient messaging to save network resources, even if at the expense of increased latency.
@@ -118,10 +145,15 @@ ConversationalIST avoids using resources unnecessarily. As conversations in a ch
 Particularly large content is further optimized to avoid costly metered data. In ConversationalIST photos represent a hefty data cost so, to optimize network usage,
 we show a placeholder for them when the user is on a metered connection, retrieving the image only when the user taps it. If, on the other hand, the user is on WiFi, automatically retrieve photos when visible.
 
+</details>
+
 ---
 
 ## Context Awareness and Privacy
 
+<details>
+  <summary align="left"><b>&nbsp;show more</b></summary>
+  
 Access to chatrooms is restricted to keep conversations private or in context. Three modes are supported:
 
 <img src="https://user-images.githubusercontent.com/78174997/168442705-11ed6c3c-e359-4742-afa3-5df646fe3f4a.png" width="470" height="300"/>
@@ -132,9 +164,14 @@ Access to chatrooms is restricted to keep conversations private or in context. T
 |Private                           | Users must first use an Android App Link to join the chatroom. Anyone already in the chatroom can share these links using the Android simple data sharing API (share via SMS, social networks, E-Mail, etc.)
 |Geo-fenced                        | Users can only participate (join/view) in the chatroom when located within a specific region defined by the chatroom creator. The creator picks a point (on a map, by address, or using their current location) and a radius. Other users within that radius can then search and join the chatroom and participate. Leaving the area blocks access, even for those who have already joined. Re-entering allows access once again, without needing to rejoin.
 
+</details>
+
 ---
 
 ## Caching
+
+<details>
+  <summary align="left"><b>&nbsp;show more</b></summary>
 
 Often users have only spotty data-connections with metered data. As such, communication between the ConversationalIST application and its back-end server are optimized to use the network judiciously and to compensate for short term outages. On one hand we avoid downloading the same content multiple times when it could
 reasonably be avoided, on the other we minimize disruption during a momentary outage.
@@ -145,11 +182,14 @@ With this in place, repeated downloads of images are minimized and any content r
 Further cache is optimized through careful pre-loading when the user connects to WiFi. As WiFi data is virtually free, the opportunity to load the most recent content
 (the content immediately visible when opening the chatroom without scrolling) is used for each chatroom the user has access to. This way, later when the user no longer has WiFi, they can still browse all of their chatrooms with minimal data usage
 
-<img src="https://user-images.githubusercontent.com/78174997/178370884-d63fb29e-c2d9-49c6-a048-f090b141f4fb.jpg" width="470" height="350"/>
+</details>
 
 ---
 
 ## Optimizations
+
+<details>
+  <summary align="left"><b>&nbsp;show more</b></summary>
 
 Additional optimizations implemented, to save power and improve usability:
 
@@ -160,6 +200,8 @@ Additional optimizations implemented, to save power and improve usability:
 - In order to save resources, when a chatroom is opened for the first time it will only fetch the latest 30 messages, but if the user scrolls to the top it will fetch 30 more and consequentially more.
 
 - In order to save resources, the class that interacts with the database and the class that communicates with the server are singletons.
+
+</details>
 
 ---
 
